@@ -32,6 +32,10 @@ User.init({
     allowNull: false,
     unique: true
   },
+  certified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false
+  },
   lastLogin: {
     type: DataTypes.DATE
   }
