@@ -6,11 +6,16 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon app",
-    "start": "node app"
+    "start": "node app",
+    "test": "jest"
   },
   "author": "Valdior",
   "license": "MIT",
+  "jest": {
+    "testMatch": ["**/tests/**/*.test.js"]
+  },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.0.3"
   },
   "dependencies": {
