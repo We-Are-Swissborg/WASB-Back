@@ -4,14 +4,19 @@ import { Server } from "socket.io";
 import seqConnection from "./src/db/sequelizeConfig.js";
 import { User } from "./src/models/user.model.js";
 import { router }  from "./src/routes/useRoutes.js"
+import cors from "cors";
 
 const PORT = process.env.PORT || 3000;
 const app = express();
 const server = createServer(app);
+const corsOptions = {
+  origin: ["http://localhost:5173"]
+}
 
 // Body parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions))
 
 const initDb = () => {
   return seqConnection.sync({force:true}).then(
@@ -39,7 +44,9 @@ server.listen(PORT, () => {
     console.log(`Listen on port ${PORT}`);
 });
 
-
+/******
+ * Use only for WebSocket
+ ******/
 // const io = new Server(server, {
 //   cors: {
 //     origin: ["http://localhost:5173"]

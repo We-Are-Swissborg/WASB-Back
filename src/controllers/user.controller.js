@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { getUsers } from "../services/user.service.js";
 
 const addUser = async (req, res) => {
   const newData = req.body;
@@ -10,7 +11,7 @@ const addUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await getUsers();
     res.status(200).json(users);
   } catch (e) {
     console.error(e);
