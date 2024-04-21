@@ -1,7 +1,7 @@
 
 import { register } from "../services/user.service.js";
 
-const register = async (req, res) => {
+const registration = async (req, res) => {
     try
     {
         const newUser = req.body;
@@ -14,4 +14,4 @@ const register = async (req, res) => {
     }
 };
 
-export { register }
+export { registration }
