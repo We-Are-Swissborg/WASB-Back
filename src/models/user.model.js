@@ -11,11 +11,9 @@ User.init({
   },
   firstName: {
     type: DataTypes.STRING,
-    allowNull: false
   },
   lastName: {
     type: DataTypes.STRING,
-    allowNull: false
   },
   pseudo: {
     type: DataTypes.STRING,
@@ -38,6 +36,12 @@ User.init({
   },
   lastLogin: {
     type: DataTypes.DATE
+  },
+  country: {
+    type: DataTypes.STRING,
+  },
+  referral: {
+    type: DataTypes.STRING
   }
 }, {
   sequelize: seqConnection,
