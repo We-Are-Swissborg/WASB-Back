@@ -1,7 +1,7 @@
-import { User } from "../models/user.model.js";
-import { emailAlreadyExist, pseudoAlreadyExist } from "../validators/registration.validator.js";
+import { User } from "../models/user.model.ts";
+import { emailAlreadyExist, pseudoAlreadyExist } from "../validators/registration.validator.ts";
 
-const register = async (user) => {
+const register = async (user: User) => {
     let flag = await pseudoAlreadyExist(user?.pseudo);
     if(!!flag) {
         throw new Error(`Le pseudo '${user?.pseudo}' existe déjà !`);
@@ -26,7 +26,7 @@ const register = async (user) => {
     await newUser.save();
 }
 
-const getUserByWallet = async (wallet) => {
+const getUserByWallet = async (wallet: string) => {
     const user = await User.findOne(
         { where:
             { walletAdress: wallet }

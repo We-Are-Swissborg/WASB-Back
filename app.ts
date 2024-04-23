@@ -1,13 +1,13 @@
-import express from "express";
+import express, { Express } from "express";
 import { createServer  } from "node:http";
 import { Server } from "socket.io";
-import seqConnection from "./src/db/sequelizeConfig.js";
-import { User } from "./src/models/user.model.js";
-import { router }  from "./src/routes/useRoutes.js"
+import seqConnection from "./src/db/sequelizeConfig.ts";
+import { User } from "./src/models/user.model.ts";
+import { router }  from "./src/routes/useRoutes.ts";
 import cors from "cors";
 
 const PORT = process.env.PORT || 3000;
-const app = express();
+const app: Express = express();
 const server = createServer(app);
 const corsOptions = {
   origin: ["http://localhost:5173"]
@@ -20,7 +20,7 @@ app.use(cors(corsOptions))
 
 const initDb = () => {
   return seqConnection.sync({force:true}).then(
-      async _ => {
+      async (_: any) => {
           const jane = User.build({
             firstName: "Jane",
             lastName: "Doe",
@@ -38,7 +38,7 @@ const initDb = () => {
 initDb();
 
 //Routes
-app.use("/api", router)
+app.use("/api", router);
 
 server.listen(PORT, () => {
     console.log(`Listen on port ${PORT}`);
