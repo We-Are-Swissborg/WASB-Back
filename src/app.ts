@@ -1,13 +1,13 @@
-import express, { Express } from "express";
+import express, {Application} from "express";
 import { createServer  } from "node:http";
-import { Server } from "socket.io";
-import seqConnection from "./src/db/sequelizeConfig.ts";
-import { User } from "./src/models/user.model.ts";
-import { router }  from "./src/routes/useRoutes.ts";
+// import { Server } from "socket.io";
+import { User } from "./models/user.model";
+import { router }  from "./routes/useRoutes";
 import cors from "cors";
+import { sequelize } from "./db/sequelizeConfig";
 
 const PORT = process.env.PORT || 3000;
-const app: Express = express();
+const app: Application = express();
 const server = createServer(app);
 const corsOptions = {
   origin: ["http://localhost:5173"]
@@ -19,8 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions))
 
 const initDb = () => {
-  return seqConnection.sync({force:true}).then(
-      async (_: any) => {
+  return sequelize.sync({force:true}).then(
+      async (_) => {
           const jane = User.build({
             firstName: "Jane",
             lastName: "Doe",

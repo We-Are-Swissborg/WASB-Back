@@ -1,5 +1,5 @@
+import { sequelize } from './../db/sequelizeConfig';
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
-import seqConnection from '../db/sequelizeConfig.ts';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
@@ -16,6 +16,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare discord: string | null;
   declare tiktok: string | null;
   declare telegram: string | null;
+  declare createdAt: Date | null;
+  declare updatedAt: Date | null;
 
   // getters that are not attributes should be tagged using NonAttribute
   // to remove them from the model's Attribute Typings.
@@ -76,8 +78,12 @@ User.init({
   telegram: {
     type: DataTypes.STRING,
   },
+  // technically, `createdAt` & `updatedAt` are added by Sequelize and don't need to be configured in Model.init
+  // but the typings of Model.init do not know this. Add the following to mute the typing error:
+  createdAt: DataTypes.DATE,
+  updatedAt: DataTypes.DATE,
 }, {
-  sequelize: seqConnection,
+  sequelize,
   modelName: 'User'
 });
 

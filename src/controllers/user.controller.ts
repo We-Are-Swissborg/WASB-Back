@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { User } from "../models/user.model.ts";
-import { getUsers } from "../services/user.service.ts";
+import { User } from "../models/user.model";
+import { getUsers } from "../services/user.service";
 
 const addUser = async (req: Request, res: Response) => {
   const newData = req.body;

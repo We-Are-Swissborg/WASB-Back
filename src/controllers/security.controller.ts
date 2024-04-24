@@ -1,6 +1,6 @@
 
 import { Request, Response } from "express";
-import { register } from "../services/user.service.ts";
+import { register } from "../services/user.service";
 
 const registration = async (req: Request, res: Response) => {
     try
