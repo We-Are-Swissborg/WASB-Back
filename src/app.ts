@@ -1,10 +1,11 @@
 import express, {Application} from "express";
 import { createServer  } from "node:http";
 // import { Server } from "socket.io";
-import { User } from "./models/user.model";
+import { User } from "./models/user";
 import { router }  from "./routes/useRoutes";
 import cors from "cors";
 import { sequelize } from "./db/sequelizeConfig";
+import { SocialNetwork } from "./models/socialNetwork";
 
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
@@ -30,6 +31,14 @@ const initDb = () => {
             certified: true
             });
           await jane.save();
+          console.log(`jane id with : ${jane.id}`);
+
+          const socialNetwork = SocialNetwork.build({
+            discord: 'WASB 1',
+            userId: jane.id
+          });
+          await socialNetwork.save();
+          console.log(`socialNetwork with jane : ${socialNetwork.userId}`);
           console.log(`La base de données a bien été synchronisée.`);
       }
   );

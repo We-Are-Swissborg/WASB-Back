@@ -1,4 +1,4 @@
-import { sequelize } from './../db/sequelizeConfig';
+import { sequelize } from '../db/sequelizeConfig';
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
@@ -12,12 +12,8 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare lastLogin: Date | null;
   declare country: string | null;
   declare referral: string | null;
-  declare twitter: string | null;
-  declare discord: string | null;
-  declare tiktok: string | null;
-  declare telegram: string | null;
-  declare createdAt: Date | null;
-  declare updatedAt: Date | null;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
 
   // getters that are not attributes should be tagged using NonAttribute
   // to remove them from the model's Attribute Typings.
@@ -66,25 +62,13 @@ User.init({
   referral: {
     type: DataTypes.STRING,
   },
-  twitter: {
-    type: DataTypes.STRING,
-  },
-  discord: {
-    type: DataTypes.STRING,
-  },
-  tiktok: {
-    type: DataTypes.STRING,
-  },
-  telegram: {
-    type: DataTypes.STRING,
-  },
   // technically, `createdAt` & `updatedAt` are added by Sequelize and don't need to be configured in Model.init
   // but the typings of Model.init do not know this. Add the following to mute the typing error:
   createdAt: DataTypes.DATE,
   updatedAt: DataTypes.DATE,
 }, {
   sequelize,
-  modelName: 'User'
+  modelName: 'user'
 });
 
 export { User };
