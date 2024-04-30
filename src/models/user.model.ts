@@ -1,26 +1,44 @@
 import { sequelize } from './../db/sequelizeConfig';
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
+import { Exclude, Expose } from 'class-transformer';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare id: CreationOptional<number>;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare firstName: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare lastName: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare pseudo: string;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare email: string;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare walletAdress: string;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare certified: boolean;
+  @Expose({ groups: ['user', 'profil'] })
   declare lastLogin: Date | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare country: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare referral: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare twitter: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare discord: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare tiktok: string | null;
+  @Expose({ groups: ['user', 'register', 'profil'] })
   declare telegram: string | null;
+  @Expose({ groups: ['user', 'profil'] })
   declare createdAt: Date | null;
+  @Expose({ groups: ['user', 'profil'] })
   declare updatedAt: Date | null;
 
   // getters that are not attributes should be tagged using NonAttribute
   // to remove them from the model's Attribute Typings.
+  @Expose({ name: 'fullName', groups: ['user', 'profil'] })
   get fullName(): NonAttribute<string> {
     return `${this.lastName} ${this.firstName}`;
   }

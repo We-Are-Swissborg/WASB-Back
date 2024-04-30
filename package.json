@@ -28,9 +28,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@automapper/classes": "^8.8.1",
-    "@automapper/core": "^8.8.1",
-    "@automapper/sequelize": "^8.8.1",
+    "class-transformer": "^0.5.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "path": "^0.12.7",
