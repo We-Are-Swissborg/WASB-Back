@@ -1,6 +1,6 @@
-import { User } from "../models/user.model.js";
+import { User } from "../models/user";
 
-const pseudoAlreadyExist = async (pseudo) => {
+const pseudoAlreadyExist = async (pseudo: string): Promise<User | null> => {
     const exist = await User.findOne(
         { where:
             { pseudo: pseudo }
@@ -10,7 +10,7 @@ const pseudoAlreadyExist = async (pseudo) => {
     return exist;
 }
 
-const emailAlreadyExist = async (email) => {
+const emailAlreadyExist = async (email: string): Promise<User | null> => {
     const exist = await User.findOne(
         { where:
             { email: email }
