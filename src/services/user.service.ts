@@ -1,4 +1,4 @@
-import { User } from "../models/user.model";
+import { User } from "../models/user";
 import { emailAlreadyExist, pseudoAlreadyExist } from "../validators/registration.validator";
 
 const register = async (user: User) => {
@@ -39,4 +39,11 @@ const getUsers = async (): Promise<User[]> => {
     return users;
 }
 
-export { register, getUserByWallet, getUsers }
+const getUsersWithSocialNetworks = async (): Promise<User[]> => {
+    const users = await User.findAll({
+        include: 'socialNetwork'
+    });
+    return users;
+}
+
+export { register, getUserByWallet, getUsers, getUsersWithSocialNetworks }
