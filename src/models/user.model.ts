@@ -1,108 +1,94 @@
-import { sequelize } from './../db/sequelizeConfig';
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from 'sequelize';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { AllowNull, AutoIncrement, Column, CreatedAt, HasOne, IsDate, Model, PrimaryKey, Table, Unique, UpdatedAt } from 'sequelize-typescript';
+import { SocialNetwork } from './socialnetwork.model';
 
-class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+interface IUser {
+  id: number;
+  firstName: string | null;
+  lastName: string | null;
+  pseudo: string;
+  email: string;
+  walletAddress: string;
+  certified: boolean;
+  lastLogin: Date | null;
+  country: string | null;
+  referral: string | null;
+}
+
+@Table
+class User extends Model implements IUser {
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare id: CreationOptional<number>;
+  @AllowNull(false)
+	@AutoIncrement
+	@PrimaryKey
+  @Column
+  declare id: number;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare firstName: string | null;
+  @Column
+  declare firstName: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare lastName: string | null;
+  @Column
+  declare lastName: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
+  @AllowNull(false)
+  @Unique(true)
+  @Column
   declare pseudo: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
+  @AllowNull(false)
+  @Unique(true)
+  @Column
   declare email: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare walletAdress: string;
+  @AllowNull(false)
+  @Unique(true)
+  @Column
+  declare walletAddress: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
+  @Column
   declare certified: boolean;
-  @Expose({ groups: ['user', 'profil'] })
-  declare lastLogin: Date | null;
+
+  @Expose({ groups: ['user'] })
+  @Column
+  declare lastLogin: Date;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare country: string | null;
+  @Column
+  declare country: string;
+
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare referral: string | null;
+  @Column
+  declare referral: string;
+
+  @Expose({ groups: ['user'] })
+  @CreatedAt
+  @IsDate
+  @Column
+  declare createdAt: Date;
+
+  @Expose({ groups: ['user'] })
+  @UpdatedAt
+  @IsDate
+  @Column
+  declare updatedAt: Date;
+
+  @Type(() => SocialNetwork)
   @Expose({ groups: ['user', 'register', 'profil'] })
-  declare twitter: string | null;
-  @Expose({ groups: ['user', 'register', 'profil'] })
-  declare discord: string | null;
-  @Expose({ groups: ['user', 'register', 'profil'] })
-  declare tiktok: string | null;
-  @Expose({ groups: ['user', 'register', 'profil'] })
-  declare telegram: string | null;
-  @Expose({ groups: ['user', 'profil'] })
-  declare createdAt: Date | null;
-  @Expose({ groups: ['user', 'profil'] })
-  declare updatedAt: Date | null;
+  @HasOne(() => SocialNetwork)
+  declare socialNetwork: SocialNetwork | null;
 
   // getters that are not attributes should be tagged using NonAttribute
   // to remove them from the model's Attribute Typings.
-  @Expose({ name: 'fullName', groups: ['user', 'profil'] })
-  get fullName(): NonAttribute<string> {
-    return `${this.lastName} ${this.firstName}`;
-  }
+  // @Expose({ groups: ['user', 'profil'] })
+  // get fullName(): NonAttribute<string> {
+  //   return `${this.lastName} ${this.firstName}`;
+  // }
 }
 
-User.init({
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  firstName: {
-    type: DataTypes.STRING,
-  },
-  lastName: {
-    type: DataTypes.STRING,
-  },
-  pseudo: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  walletAdress: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  certified: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
-  },
-  lastLogin: {
-    type: DataTypes.DATE,
-  },
-  country: {
-    type: DataTypes.STRING,
-  },
-  referral: {
-    type: DataTypes.STRING,
-  },
-  twitter: {
-    type: DataTypes.STRING,
-  },
-  discord: {
-    type: DataTypes.STRING,
-  },
-  tiktok: {
-    type: DataTypes.STRING,
-  },
-  telegram: {
-    type: DataTypes.STRING,
-  },
-  // technically, `createdAt` & `updatedAt` are added by Sequelize and don't need to be configured in Model.init
-  // but the typings of Model.init do not know this. Add the following to mute the typing error:
-  createdAt: DataTypes.DATE,
-  updatedAt: DataTypes.DATE,
-}, {
-  sequelize,
-  modelName: 'User'
-});
-
-export { User };
+export { User, IUser };

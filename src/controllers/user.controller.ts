@@ -1,23 +1,24 @@
 import { Request, Response } from "express";
-import { User } from "../models/user";
+import { User } from "../models/user.model";
 import { getUsers } from "../services/user.service";
+import { instanceToPlain } from "class-transformer";
 
-const addUser = async (req: Request, res: Response) => {
-  const newData = req.body;
-  // const existingDatas = await loadDatas();
-  // existingDatas.push(newData);
-  // await saveDatas(existingDatas);
-  res.status(201).json({ message: "Utilisateur ajouté avec succès" });
-};
+// const addUser = async (req: Request, res: Response) => {
+//   const user = plainToInstance(req.body, User, { groups: ['register']});
+//   console.log(user);
+//   res.status(201).json({ message: "Utilisateur ajouté avec succès" });
+// };
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users: User[] = await getUsers();
-    res.status(200).json(users);
+
+    const test = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true })
+    res.status(200).json(test);
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Oops !, une erreur s'est produite." });
   }
 };
 
-export { getAllUsers, addUser }
+export { getAllUsers }

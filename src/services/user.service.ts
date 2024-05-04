@@ -1,7 +1,7 @@
-import { User } from "../models/user";
+import { IUser, User } from "../models/user.model";
 import { emailAlreadyExist, pseudoAlreadyExist } from "../validators/registration.validator";
 
-const register = async (user: User) => {
+const register = async (user: IUser) => {
     let flag = await pseudoAlreadyExist(user.pseudo);
     if(!!flag) {
         throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
@@ -17,7 +17,7 @@ const register = async (user: User) => {
         lastName: user.lastName,
         pseudo: user.pseudo,
         email: user.email,
-        walletAdress: user.walletAdress,
+        walletAddress: user.walletAddress,
         certified: true,
         country: user.country,
         referral: user.referral,
@@ -29,7 +29,7 @@ const register = async (user: User) => {
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne(
         { where:
-            { walletAdress: wallet }
+            { walletAddress: wallet }
         });
     return user;
 }
