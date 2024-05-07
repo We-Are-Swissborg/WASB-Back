@@ -1,10 +1,11 @@
 import { User } from './user.model';
 import { Expose } from 'class-transformer';
-import { AllowNull, Column, CreatedAt, ForeignKey, HasOne, IsDate, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript';
+import { AllowNull, Column, CreatedAt, ForeignKey, IsDate, Model, PrimaryKey, Table, UpdatedAt } from 'sequelize-typescript';
 
 interface ISocialNetwork {
   userId: number;
   twitter: string;
+  discord: string;
   tiktok: string;
   telegram: string;
 }

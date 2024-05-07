@@ -13,8 +13,8 @@ const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users: User[] = await getUsers();
 
-    const test = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true })
-    res.status(200).json(test);
+    const usersDTO = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true })
+    res.status(200).json(usersDTO);
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Oops !, une erreur s'est produite." });
