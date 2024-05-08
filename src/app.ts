@@ -1,11 +1,11 @@
 import express, {Application} from "express";
 import { createServer  } from "node:http";
 // import { Server } from "socket.io";
-import { User } from "./models/user";
+import { User } from "./models/user.model";
 import { router }  from "./routes/useRoutes";
 import cors from "cors";
-import { sequelize } from "./db/sequelizeConfig";
-import { SocialNetwork } from "./models/socialNetwork";
+import { sequelize, testConnection } from "./db/sequelizeConfig";
+import { SocialNetwork } from "./models/socialnetwork.model";
 
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
@@ -20,26 +20,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions))
 
 const initDb = () => {
+  testConnection();
   return sequelize.sync({force:true}).then(
       async (_) => {
-          const jane = User.build({
+          const jane = new User({
             firstName: "Jane",
             lastName: "Doe",
             pseudo:"Pseudo",
             email: "mail@test.dev",
-            walletAdress: "5F1JU",
+            walletAddress: "5F1JU",
             certified: true
             });
           await jane.save();
           console.log(`jane id with : ${jane.id}`);
 
-          const socialNetwork = SocialNetwork.build({
+          const socialNetwork = new SocialNetwork({
             discord: 'WASB 1',
             userId: jane.id
           });
           await socialNetwork.save();
-          console.log(`socialNetwork with jane : ${socialNetwork.userId}`);
-          console.log(`La base de données a bien été synchronisée.`);
+         console.log(`La base de données a bien été synchronisée.`);
       }
   );
 }
