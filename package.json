@@ -7,7 +7,7 @@
     "build": "npx tsc",
     "dev": "nodemon src/app.ts",
     "start": "npx tsc && node dist/app.js",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "author": "Valdior",
   "license": "MIT",
