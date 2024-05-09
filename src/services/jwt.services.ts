@@ -1,6 +1,7 @@
 import { JwtPayload, SignOptions, sign, verify } from 'jsonwebtoken';
-import { User } from '../models/user';
+import { IUser } from '../models/user.model';
 
+/// TODO: Placer ces valeurs dans un fichier config/env
 const signInOptions: SignOptions = {
     algorithm: 'HS512',
     expiresIn: 60 * 60 * 24
@@ -19,9 +20,9 @@ const validateToken = (token: string): JwtPayload | string => {
  * generates JWT token
  * @param user the user's expected payload
  */
-const generateToken = (user: User): string => {
+const generateToken = (user: IUser): string => {
     const payload = {
-        wallet: user.walletAdress,
+        wallet: user.walletAddress,
         userId: user.id,
         roles: []
     };

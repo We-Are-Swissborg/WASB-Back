@@ -1,36 +1,37 @@
-import { describe, expect, test} from '@jest/globals';
-import { User } from '../src/models/user'
+import { beforeAll, describe, expect, test} from '@jest/globals';
+import { User } from '../src/models/user.model'
 import { generateToken, validateToken } from '../src/services/jwt.services'
+import { sequelize, testConnection } from "../src/db/sequelizeConfig";
+
 
 describe('JWT test', () => {
-    test('sign ok', () => {
+    beforeAll(() => {
+        return sequelize.sync();
+      });
+
+    test('validateToken ok', () => {
         const user: User = User.build({
             firstName: "Jane",
             lastName: "Doe",
             pseudo:"Pseudo",
             email: "mail@test.dev",
-            walletAdress: "5F1JU",
+            walletAddress: "5F1JU",
             certified: true
         });
         const token: string = generateToken(user);
-        console.log(token);
-
         const decodedToken = validateToken(token);
-        console.log('decodedToken', decodedToken);
-        console.log('token', JSON.stringify(token));
-        expect(token.length > 10).toBeTruthy();
 
-        // expect(decodedToken.key["wallet"] === "5F1JU").toBeTruthy();
-        // expect(() => { validateToken(token); }).to();  // Success!
+        expect(token.length > 10).toBeTruthy();
+        expect(!!decodedToken).toBeTruthy();
     })
 
-    test('sign -> wallet modified', () => {
+    test('validateToken -> wallet modified', () => {
         const user: User = User.build({
             firstName: "Jane",
             lastName: "Doe",
             pseudo:"Pseudo",
             email: "mail@test.dev",
-            walletAdress: "5F1JU",
+            walletAddress: "5F1JU",
             certified: true
         });
         let token: string = generateToken(user);

@@ -5,6 +5,12 @@ import { generateToken } from "../services/jwt.services";
 import { plainToInstance } from "class-transformer";
 import { IUser, User } from "../models/user.model";
 
+/**
+ * Register a new member
+ *
+ * @param req Request
+ * @param res Response
+ */
 const registration = async (req: Request, res: Response) => {
     try
     {
@@ -20,22 +26,25 @@ const registration = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Authenticates a user
+ *
+ * @param req Request
+ * @param res Response
+ */
 const auth = async (req: Request, res: Response) => {
     try
     {
         const wallet = req.body;
+        const user = await getUserByWallet(wallet.walletAddress);
 
-        const user = await getUserByWallet(wallet.walletAdress);
-        console.log(user as User);
-
-        if(user as null) {
+        if(!user) {
             throw new Error(`Ce wallet n'a pas encore été enregistré`);
         }
 
-        const token = generateToken(user as User);
-        console.log(token);
+        const token = generateToken(user as IUser);
 
-        return res.status(200).json({ token: token });
+        res.status(200).json({ token: token });
     }
     catch(e: unknown)
     {
