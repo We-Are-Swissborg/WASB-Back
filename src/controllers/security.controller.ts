@@ -2,12 +2,14 @@
 import { Request, Response } from "express";
 import { getUserByWallet, register } from "../services/user.service";
 import { generateToken } from "../services/jwt.services";
-import { User } from "../models/user";
+import { plainToInstance } from "class-transformer";
+import { IUser, User } from "../models/user.model";
 
 const registration = async (req: Request, res: Response) => {
     try
     {
-        const newUser = req.body;
+        const form: string = req.body;
+        const newUser: IUser = plainToInstance(User, form, { groups: ['register'] });
         await register(newUser);
         res.status(201).json({ message: "Utilisateur ajouté avec succès" });
     }

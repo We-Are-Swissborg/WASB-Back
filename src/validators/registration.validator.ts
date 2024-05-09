@@ -1,4 +1,4 @@
-import { User } from "../models/user";
+import { User } from "../models/user.model";
 
 const pseudoAlreadyExist = async (pseudo: string): Promise<User | null> => {
     const exist = await User.findOne(
