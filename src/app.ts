@@ -10,8 +10,12 @@ import { SocialNetwork } from "./models/socialnetwork.model";
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
 const server = createServer(app);
+/// TODO: Placer ces valeurs dans un fichier config/env
 const corsOptions = {
-  origin: ["http://localhost:5173"]
+  origin: ["http://localhost:5173", "http://weareswissborg.com", "http://weareswissborg.fr", "http://weareswissborg.ch", "http://weareswissborg.org"],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 3600
 }
 
 // Body parsing Middleware
@@ -44,6 +48,7 @@ const initDb = () => {
   );
 }
 
+console.log(`your env:`, process.env.NODE_ENV)
 initDb();
 
 //Routes
