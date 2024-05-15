@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "build": "npx tsc",
-    "dev": "nodemon src/app.ts",
-    "start": "npx tsc && node dist/app.js",
+    "dev": "npx dotenvx run --env-file=.env --env-file=.env.local --overload --verbose -- nodemon src/app.ts",
+    "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- node  dist/app.js",
     "test": "jest --coverage"
   },
   "author": "Valdior",
@@ -26,9 +26,10 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^0.39.0",
     "class-transformer": "^0.5.1",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "path": "^0.12.7",
     "reflect-metadata": "^0.1.14",

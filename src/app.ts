@@ -6,13 +6,14 @@ import { router }  from "./routes/useRoutes";
 import cors from "cors";
 import { sequelize, testConnection } from "./db/sequelizeConfig";
 import { SocialNetwork } from "./models/socialnetwork.model";
+require('@dotenvx/dotenvx').config()
 
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
 const server = createServer(app);
-/// TODO: Placer ces valeurs dans un fichier config/env
+const corsDomains = process.env.CORS_ORIGIN?.split(',');
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://weareswissborg.com", "http://weareswissborg.fr", "http://weareswissborg.ch", "http://weareswissborg.org"],
+  origin: corsDomains,
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   maxAge: 3600
@@ -23,8 +24,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions))
 
+
 const initDb = () => {
-  testConnection();
   return sequelize.sync({force:true}).then(
       async (_) => {
           const jane = new User({
@@ -48,8 +49,12 @@ const initDb = () => {
   );
 }
 
-console.log(`your env:`, process.env.NODE_ENV)
-initDb();
+testConnection();
+
+if(process.env.NODE_ENV === "DEV")
+{
+  initDb();
+}
 
 //Routes
 app.use("/api", router);

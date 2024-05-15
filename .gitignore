@@ -3,4 +3,5 @@
 *.sql
 /.vscode
 /dist
+.env.*
 /coverage

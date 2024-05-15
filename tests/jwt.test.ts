@@ -1,23 +1,24 @@
-import { beforeAll, describe, expect, test} from '@jest/globals';
+import { beforeEach, describe, expect, test} from '@jest/globals';
 import { User } from '../src/models/user.model'
-import { generateToken, validateToken } from '../src/services/jwt.services'
-import { sequelize, testConnection } from "../src/db/sequelizeConfig";
+import { generateToken, validateToken } from '../src/services/jwt.services';
 
+jest.mock('../src/models/user.model');
+
+beforeEach(() => {
+    jest.resetAllMocks();
+});
+
+const user: User =  new User({
+    firstName: "Jane",
+    lastName: "Doe",
+    pseudo:"Pseudo",
+    email: "mail@test.dev",
+    walletAddress: "5F1JU",
+    certified: true
+});
 
 describe('JWT test', () => {
-    beforeAll(() => {
-        return sequelize.sync();
-      });
-
     test('validateToken ok', () => {
-        const user: User = User.build({
-            firstName: "Jane",
-            lastName: "Doe",
-            pseudo:"Pseudo",
-            email: "mail@test.dev",
-            walletAddress: "5F1JU",
-            certified: true
-        });
         const token: string = generateToken(user);
         const decodedToken = validateToken(token);
 
@@ -26,14 +27,6 @@ describe('JWT test', () => {
     })
 
     test('validateToken -> wallet modified', () => {
-        const user: User = User.build({
-            firstName: "Jane",
-            lastName: "Doe",
-            pseudo:"Pseudo",
-            email: "mail@test.dev",
-            walletAddress: "5F1JU",
-            certified: true
-        });
         let token: string = generateToken(user);
 
         //Change token with wallet "wallet": "5F1JU" -> "5F1GU"
