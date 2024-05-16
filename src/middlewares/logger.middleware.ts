@@ -13,7 +13,7 @@ const options = {
       dirname: 'logs',
       filename: `app.log`,
       handleExceptions: true,
-      maxsize: 1000, // 5MB
+      maxsize: 5242880, // 5MB
       maxFiles: 5,
       format: format.combine(
             format.timestamp({

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateToken } from '../services/jwt.services';
 import { TokenExpiredError } from 'jsonwebtoken';
+import { logger } from './logger.middleware';
 
 /**
  * middleware to check whether user has access to a specific endpoint
@@ -12,6 +13,7 @@ export const authorize = () => (req: Request, res: Response, next: NextFunction)
     let jwt = req.headers.authorization;
 
     if (!jwt) {
+      logger.warn('Invalid token');
       return res.status(401).json({ message: 'Invalid token' });
     }
 
@@ -33,6 +35,7 @@ export const authorize = () => (req: Request, res: Response, next: NextFunction)
 
     next();
   } catch (error) {
+    logger.error('Failed to authenticate user', error);
     if (error as TokenExpiredError) {
       res.status(401).json({ message: 'Expired token' });
       return;
