@@ -1,7 +1,8 @@
 /node_modules
-/src/db/*.sqlite
+*.sqlite
 *.sql
 /.vscode
 /dist
 .env.*
 /coverage
+/logs

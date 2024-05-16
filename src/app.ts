@@ -6,7 +6,10 @@ import { router }  from "./routes/useRoutes";
 import cors from "cors";
 import { sequelize, testConnection } from "./db/sequelizeConfig";
 import { SocialNetwork } from "./models/socialnetwork.model";
-require('@dotenvx/dotenvx').config()
+import { logger } from "./middlewares/logger.middleware";
+require('@dotenvx/dotenvx').config();
+
+logger.info(`Start application`);
 
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
@@ -22,8 +25,7 @@ const corsOptions = {
 // Body parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors(corsOptions))
-
+app.use(cors(corsOptions));
 
 const initDb = () => {
   return sequelize.sync({force:true}).then(
@@ -37,14 +39,14 @@ const initDb = () => {
             certified: true
             });
           await jane.save();
-          console.log(`jane id with : ${jane.id}`);
+          logger.debug(`jane id with : ${jane.id}`, jane);
 
           const socialNetwork = new SocialNetwork({
             discord: 'WASB 1',
             userId: jane.id
           });
           await socialNetwork.save();
-         console.log(`La base de données a bien été synchronisée.`);
+          logger.debug(`La base de données a bien été synchronisée.`);
       }
   );
 }
@@ -60,7 +62,7 @@ if(process.env.NODE_ENV === "DEV")
 app.use("/api", router);
 
 server.listen(PORT, () => {
-    console.log(`Listen on port ${PORT}`);
+    logger.info(`Listen on port ${PORT}`);
 });
 
 /******
