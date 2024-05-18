@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
+import { logger } from "../middlewares/logger.middleware";
 
 const sequelize: Sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -12,9 +13,9 @@ const sequelize: Sequelize = new Sequelize({
 const testConnection = async () => {
   try {
       await sequelize.authenticate();
-      console.log('Connection has been established successfully.');
+      logger.debug('Connection has been established successfully.');
   } catch (error) {
-      console.error('Unable to connect to the database:', error);
+      logger.error('Unable to connect to the database:', error);
   }
 }
 

@@ -4,6 +4,7 @@ import { getUserByWallet, register } from "../services/user.service";
 import { generateToken } from "../services/jwt.services";
 import { plainToInstance } from "class-transformer";
 import { IUser, User } from "../models/user.model";
+import { logger } from "../middlewares/logger.middleware";
 
 /**
  * Register a new member
@@ -17,10 +18,11 @@ const registration = async (req: Request, res: Response) => {
         const form: string = req.body;
         const newUser: IUser = plainToInstance(User, form, { groups: ['register'] });
         await register(newUser);
-        res.status(201).json({ message: "Utilisateur ajouté avec succès" });
+        res.status(201).json({ message: "User successfully added" });
     }
     catch(e: unknown)
     {
+        logger.error(`User registration error`, e);
         if (e instanceof Error)
             res.status(400).json({ message: e.message });
     }
@@ -39,7 +41,7 @@ const auth = async (req: Request, res: Response) => {
         const user = await getUserByWallet(wallet.walletAddress);
 
         if(!user) {
-            throw new Error(`Ce wallet n'a pas encore été enregistré`);
+            throw new Error(`This wallet has not yet been registered`);
         }
 
         const token = generateToken(user as IUser);
@@ -48,6 +50,7 @@ const auth = async (req: Request, res: Response) => {
     }
     catch(e: unknown)
     {
+        logger.error(`User auth error`, e);
         if (e instanceof Error)
             res.status(400).json({ message: e.message });
     }

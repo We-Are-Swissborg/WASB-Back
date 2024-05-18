@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { getUsers } from "../services/user.service";
 import { instanceToPlain } from "class-transformer";
+import { logger } from "../middlewares/logger.middleware";
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -16,7 +17,7 @@ const getAllUsers = async (req: Request, res: Response) => {
     const usersDTO = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true })
     res.status(200).json(usersDTO);
   } catch (e) {
-    console.error(e);
+    logger.error(`getAllUsers error`, e);
     res.status(500).json({ message: "Oops !, une erreur s'est produite." });
   }
 };
