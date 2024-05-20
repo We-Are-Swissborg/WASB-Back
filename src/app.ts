@@ -1,12 +1,12 @@
-import express, {Application} from "express";
-import { createServer  } from "node:http";
+import express, { Application } from 'express';
+import { createServer } from 'node:http';
 // import { Server } from "socket.io";
-import { User } from "./models/user.model";
-import { router }  from "./routes/useRoutes";
-import cors from "cors";
-import { sequelize, testConnection } from "./db/sequelizeConfig";
-import { SocialNetwork } from "./models/socialnetwork.model";
-import { logger } from "./middlewares/logger.middleware";
+import { User } from './models/user.model';
+import { router } from './routes/useRoutes';
+import cors from 'cors';
+import { sequelize, testConnection } from './db/sequelizeConfig';
+import { SocialNetwork } from './models/socialnetwork.model';
+import { logger } from './middlewares/logger.middleware';
 require('@dotenvx/dotenvx').config();
 
 logger.info(`Start application`);
@@ -16,11 +16,11 @@ const app: Application = express();
 const server = createServer(app);
 const corsDomains = process.env.CORS_ORIGIN?.split(',');
 const corsOptions = {
-  origin: corsDomains,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  maxAge: 3600
-}
+    origin: corsDomains,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    maxAge: 3600,
+};
 
 // Body parsing Middleware
 app.use(express.json());
@@ -28,38 +28,35 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
 const initDb = () => {
-  return sequelize.sync({force:true}).then(
-      async (_) => {
-          const jane = new User({
-            firstName: "Jane",
-            lastName: "Doe",
-            pseudo:"Pseudo",
-            email: "mail@test.dev",
-            walletAddress: "5F1JU",
-            certified: true
-            });
-          await jane.save();
-          logger.debug(`jane id with : ${jane.id}`, jane);
+    return sequelize.sync({ force: true }).then(async (_) => {
+        const jane = new User({
+            firstName: 'Jane',
+            lastName: 'Doe',
+            pseudo: 'Pseudo',
+            email: 'mail@test.dev',
+            walletAddress: '5F1JU',
+            certified: true,
+        });
+        await jane.save();
+        logger.debug(`jane id with : ${jane.id}`, jane);
 
-          const socialNetwork = new SocialNetwork({
+        const socialNetwork = new SocialNetwork({
             discord: 'WASB 1',
-            userId: jane.id
-          });
-          await socialNetwork.save();
-          logger.debug(`La base de données a bien été synchronisée.`);
-      }
-  );
-}
+            userId: jane.id,
+        });
+        await socialNetwork.save();
+        logger.debug(`La base de données a bien été synchronisée.`);
+    });
+};
 
 testConnection();
 
-if(process.env.NODE_ENV === "DEV")
-{
-  initDb();
+if (process.env.NODE_ENV === 'DEV') {
+    initDb();
 }
 
 //Routes
-app.use("/api", router);
+app.use('/api', router);
 
 server.listen(PORT, () => {
     logger.info(`Listen on port ${PORT}`);

@@ -7,7 +7,8 @@
     "build": "npx tsc",
     "dev": "npx dotenvx run --env-file=.env --env-file=.env.local --overload --verbose -- nodemon src/app.ts",
     "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- node  dist/app.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "format": "prettier --write \"src/**/*.ts\""
   },
   "author": "Valdior",
   "license": "MIT",
@@ -21,6 +22,7 @@
     "@types/validator": "^13.11.9",
     "jest": "^29.7.0",
     "nodemon": "^3.0.3",
+    "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
