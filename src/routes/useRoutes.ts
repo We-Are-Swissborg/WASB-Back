@@ -1,11 +1,8 @@
-import express from "express";
-import { getAllUsers } from "../controllers/user.controller";
-import * as Security from "../controllers/security.controller";
-import * as Auth from './../middlewares/auth.middleware';
+import express, { Router } from "express";
+import { testRouter } from "./test.Routes";
+import { userRouter } from "./user.routes";
 
-export const router = express.Router();
+export const apiRouter: Router = express.Router();
 
-router.post("/register", Security.registration);
-router.post("/auth", Security.auth);
-
-router.get("/users", Auth.authorize(), getAllUsers);
+apiRouter.use("/test", testRouter);
+apiRouter.use("/users", userRouter);

@@ -34,6 +34,11 @@ const getUserByWallet = async (wallet: string): Promise<User | null> => {
     return user;
 }
 
+const getUserById = async (identifiant: number): Promise<User | null> => {
+    const user = await User.findByPk(identifiant);
+    return user;
+}
+
 const getUsers = async (): Promise<User[]> => {
     const users = await User.findAll();
     return users;
@@ -46,4 +51,4 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
     return users;
 }
 
-export { register, getUserByWallet, getUsers, getUsersWithSocialNetworks }
+export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks }

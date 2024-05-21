@@ -38,7 +38,7 @@ const auth = async (req: Request, res: Response) => {
     try
     {
         const wallet = req.body;
-        const user = await getUserByWallet(wallet.walletAddress);
+        const user: User | null = await getUserByWallet(wallet.walletAddress);
 
         if(!user) {
             throw new Error(`This wallet has not yet been registered`);
