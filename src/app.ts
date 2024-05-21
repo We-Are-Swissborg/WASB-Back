@@ -1,8 +1,7 @@
 import express, { Application } from 'express';
 import { createServer } from 'node:http';
-// import { Server } from "socket.io";
 import { User } from './models/user.model';
-import { router } from './routes/useRoutes';
+import { apiRouter } from './routes/useRoutes';
 import cors from 'cors';
 import { sequelize, testConnection } from './db/sequelizeConfig';
 import { SocialNetwork } from './models/socialnetwork.model';
@@ -42,14 +41,15 @@ const initDb = () => {
         await jane.save();
         logger.debug(`jane id with : ${jane.id}`, jane);
 
-        const socialNetwork = new SocialNetwork({
+          const socialNetwork = new SocialNetwork({
             discord: 'WASB 1',
-            userId: jane.id,
-        });
-        await socialNetwork.save();
-        logger.debug(`La base de données a bien été synchronisée.`);
-    });
-};
+            userId: jane.id
+          });
+          await socialNetwork.save();
+          logger.debug(`La base de données a bien été synchronisée.`);
+      }
+  );
+}
 
 testConnection();
 
@@ -58,7 +58,7 @@ if (process.env.NODE_ENV === 'DEV') {
 }
 
 //Routes
-app.use('/api', router);
+app.use('/api', apiRouter);
 
 server.listen(PORT, () => {
     logger.info(`Listen on port ${PORT}`);
@@ -95,3 +95,4 @@ server.listen(PORT, () => {
 //     console.log(`disconnect ${socket.id} due to ${reason}`);
 //   });
 // });
+
