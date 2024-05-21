@@ -48,6 +48,4 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
     return users;
 };
 
-export { register, getUserByWallet, getUsers, getUsersWithSocialNetworks };
-
 export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks };
