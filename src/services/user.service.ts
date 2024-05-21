@@ -3,12 +3,12 @@ import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registratio
 
 const register = async (user: IUser) => {
     let flag = await pseudoAlreadyExist(user.pseudo);
-    if (!!flag) {
+    if (flag) {
         throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
     }
 
     flag = await emailAlreadyExist(user.email);
-    if (!!flag) {
+    if (flag) {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
 

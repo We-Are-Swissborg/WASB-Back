@@ -1,10 +1,10 @@
 import { createLogger, transports, format } from 'winston';
 
-const errorFilter = format((info, opts) => {
+const errorFilter = format((info) => {
     return info.level === 'error' ? info : false;
 });
 
-const otherErrorFilter = format((info, opts) => {
+const otherErrorFilter = format((info) => {
     return info.level !== 'error' ? info : false;
 });
 

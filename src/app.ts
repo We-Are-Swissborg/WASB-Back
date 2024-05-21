@@ -7,7 +7,9 @@ import cors from 'cors';
 import { sequelize, testConnection } from './db/sequelizeConfig';
 import { SocialNetwork } from './models/socialnetwork.model';
 import { logger } from './middlewares/logger.middleware';
+/* eslint-disable */
 require('@dotenvx/dotenvx').config();
+/* eslint-enable */
 
 logger.info(`Start application`);
 
@@ -28,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
 const initDb = () => {
-    return sequelize.sync({ force: true }).then(async (_) => {
+    return sequelize.sync({ force: true }).then(async () => {
         const jane = new User({
             firstName: 'Jane',
             lastName: 'Doe',
