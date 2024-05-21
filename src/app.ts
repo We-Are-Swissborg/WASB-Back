@@ -41,15 +41,14 @@ const initDb = () => {
         await jane.save();
         logger.debug(`jane id with : ${jane.id}`, jane);
 
-          const socialNetwork = new SocialNetwork({
+        const socialNetwork = new SocialNetwork({
             discord: 'WASB 1',
-            userId: jane.id
-          });
-          await socialNetwork.save();
-          logger.debug(`La base de données a bien été synchronisée.`);
-      }
-  );
-}
+            userId: jane.id,
+        });
+        await socialNetwork.save();
+        logger.debug(`La base de données a bien été synchronisée.`);
+    });
+};
 
 testConnection();
 
@@ -95,4 +94,3 @@ server.listen(PORT, () => {
 //     console.log(`disconnect ${socket.id} due to ${reason}`);
 //   });
 // });
-

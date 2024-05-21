@@ -34,7 +34,7 @@ const getUserByWallet = async (wallet: string): Promise<User | null> => {
 const getUserById = async (identifiant: number): Promise<User | null> => {
     const user = await User.findByPk(identifiant);
     return user;
-}
+};
 
 const getUsers = async (): Promise<User[]> => {
     const users = await User.findAll();

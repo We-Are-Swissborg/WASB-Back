@@ -33,4 +33,3 @@ const generateToken = (user: IUser): string => {
 };
 
 export { validateToken, generateToken };
-
