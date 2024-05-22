@@ -1,14 +1,14 @@
-import { IUser, User } from "../models/user.model";
-import { emailAlreadyExist, pseudoAlreadyExist } from "../validators/registration.validator";
+import { IUser, User } from '../models/user.model';
+import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
 
 const register = async (user: IUser) => {
     let flag = await pseudoAlreadyExist(user.pseudo);
-    if(!!flag) {
+    if (flag) {
         throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
     }
 
     flag = await emailAlreadyExist(user.email);
-    if(!!flag) {
+    if (flag) {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
 
@@ -24,31 +24,28 @@ const register = async (user: IUser) => {
     });
 
     await newUser.save();
-}
+};
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
-    const user = await User.findOne(
-        { where:
-            { walletAddress: wallet }
-        });
+    const user = await User.findOne({ where: { walletAddress: wallet } });
     return user;
-}
+};
 
 const getUserById = async (identifiant: number): Promise<User | null> => {
     const user = await User.findByPk(identifiant);
     return user;
-}
+};
 
 const getUsers = async (): Promise<User[]> => {
     const users = await User.findAll();
     return users;
-}
+};
 
 const getUsersWithSocialNetworks = async (): Promise<User[]> => {
     const users = await User.findAll({
-        include: 'socialNetwork'
+        include: 'socialNetwork',
     });
     return users;
-}
+};
 
-export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks }
+export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks };
