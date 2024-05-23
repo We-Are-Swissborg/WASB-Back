@@ -24,7 +24,11 @@ interface IUser {
     certified: boolean;
     lastLogin: Date | null;
     country: string | null;
+    city: string | null;
     referral: string | null;
+    aboutUs: string | null;
+    confidentiality: boolean;
+    beContacted: boolean;
 }
 
 @Table
@@ -73,10 +77,26 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare country: string;
+    
+    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare city: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare referral: string;
+
+    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare aboutUs: string;
+
+    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare confidentiality: boolean;
+
+    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare beContacted: boolean;
 
     @Expose({ groups: ['user'] })
     @CreatedAt
