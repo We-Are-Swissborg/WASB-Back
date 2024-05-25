@@ -12,7 +12,7 @@ const register = async (user: IUser) => {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
 
-    const newUser = await User.create({
+    await User.create({
         firstName: user.firstName,
         lastName: user.lastName,
         pseudo: user.pseudo,
