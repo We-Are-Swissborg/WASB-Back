@@ -10,7 +10,13 @@ import {
     PrimaryKey,
     Table,
     UpdatedAt,
+    Is,
 } from 'sequelize-typescript';
+
+const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+/;
+const DISCORD_REGEX = /^[a-z0-9._]{2,32}$/;
+const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_,.']+/;
+const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+/;
 
 interface ISocialNetwork {
     userId: number;
@@ -30,18 +36,22 @@ class SocialNetwork extends Model implements ISocialNetwork {
     declare userId: number;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Is(TWITTER_REGEX)
     @Column
     declare twitter: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Is(DISCORD_REGEX)
     @Column
     declare discord: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Is(TIKTOK_REGEX)
     @Column
     declare tiktok: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Is(TELEGRAM_REGEX)
     @Column
     declare telegram: string;
 

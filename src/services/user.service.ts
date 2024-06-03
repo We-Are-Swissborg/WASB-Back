@@ -12,7 +12,7 @@ const register = async (user: IUser) => {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
 
-    const newUser = await User.create({
+    await User.create({
         firstName: user.firstName,
         lastName: user.lastName,
         pseudo: user.pseudo,
@@ -20,10 +20,12 @@ const register = async (user: IUser) => {
         walletAddress: user.walletAddress,
         certified: true,
         country: user.country,
+        city: user.city,
         referral: user.referral,
+        aboutUs: user.aboutUs,
+        confidentiality: user.confidentiality,
+        beContacted: user.beContacted,
     });
-
-    await newUser.save();
 };
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {

@@ -30,22 +30,27 @@ app.use(cors(corsOptions));
 
 const initDb = () => {
     return sequelize.sync({ force: true }).then(async () => {
-        const jane = new User({
+        const jane = await User.create({
             firstName: 'Jane',
             lastName: 'Doe',
-            pseudo: 'Pseudo',
+            pseudo: 'pseudo',
             email: 'mail@test.dev',
             walletAddress: '5F1JU',
             certified: true,
+            country: 'Suisse',
+            city: 'Lausanne',
+            referral: 'Kevin HART',
+            aboutUs: 'Twitter',
+            confidentiality: true,
+            beContacted: true,
         });
-        await jane.save();
         logger.debug(`jane id with : ${jane.id}`, jane);
 
-        const socialNetwork = new SocialNetwork({
-            discord: 'WASB 1',
+        const socialNetwork = await SocialNetwork.create({
+            discord: "wasb1",
             userId: jane.id,
         });
-        await socialNetwork.save();
+        logger.debug(`jane discord : ${socialNetwork.discord}`, socialNetwork);
         logger.debug(`La base de données a bien été synchronisée.`);
     });
 };
