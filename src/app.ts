@@ -33,7 +33,7 @@ const initDb = () => {
         const jane = await User.create({
             firstName: 'Jane',
             lastName: 'Doe',
-            pseudo: 'Pseudo',
+            pseudo: 'pseudo',
             email: 'mail@test.dev',
             walletAddress: '5F1JU',
             certified: true,
@@ -47,7 +47,7 @@ const initDb = () => {
         logger.debug(`jane id with : ${jane.id}`, jane);
 
         const socialNetwork = await SocialNetwork.create({
-            discord: 'WASB 1',
+            discord: "wasb1",
             userId: jane.id,
         });
         logger.debug(`jane discord : ${socialNetwork.discord}`, socialNetwork);

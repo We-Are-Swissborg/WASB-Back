@@ -18,10 +18,10 @@ const registration = async (req: Request, res: Response) => {
         await register(newUser);
 
         if(admin) {
-            res.status(201).json({ messageToTrans: 'user-add' });
+            res.status(201);
         } else {
             const token = generateToken(newUser as IUser);
-            res.status(201).json({ messageToTrans: 'user-add', token });
+            res.status(201).json({ token });
         }
     } catch (e: unknown) {
         logger.error(`User registration error`, e);
