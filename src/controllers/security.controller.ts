@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
-import { getUserByWallet, register } from '../services/user.service';
+import { register } from '../services/user.services';
+import { confirmSignMessage, generateNonce } from '../services/security.services';
 import { generateToken } from '../services/jwt.services';
-import { plainToInstance } from 'class-transformer';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 import { IUser, User } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
+
 /**
  * Register a new member
  *
@@ -13,18 +15,37 @@ import { logger } from '../middlewares/logger.middleware';
 const registration = async (req: Request, res: Response) => {
     try {
         const form: string = req.body;
-        const newUser: IUser = plainToInstance(User, form, { groups: ['register'] });
+        const user: IUser = plainToInstance(User, form, { groups: ['register'] });
         const admin = false; // Set up when role ok
-        await register(newUser);
+        const newUser: IUser = await register(user);
 
         if(admin) {
             res.status(201);
         } else {
-            const token = generateToken(newUser as IUser);
+            const token = generateToken(newUser);
             res.status(201).json({ token });
         }
     } catch (e: unknown) {
         logger.error(`User registration error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
+/**
+ * Generate Nonce for user
+ *
+ * @param req Request
+ * @param res Response
+ */
+const nonce = async (req: Request, res: Response) => {
+    try {
+		const { walletAddress } = req.body;
+
+		const user = await generateNonce(walletAddress);
+		const userDTO = instanceToPlain(user, { groups: ['auth'], excludeExtraneousValues: true });
+        res.status(200).json(userDTO);
+    } catch (e: unknown) {
+        logger.error(`nonce error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 };
@@ -37,14 +58,10 @@ const registration = async (req: Request, res: Response) => {
  */
 const auth = async (req: Request, res: Response) => {
     try {
-        const data = req.body;
-        const user: User | null = await getUserByWallet(data.walletAddress);
+		const { walletAddress, signedMessageHash } = req.body;
 
-        if (!user) {
-            throw new Error(`This wallet has not yet been registered`);
-        }
-
-        const token = generateToken(user as IUser);
+		const user = await confirmSignMessage(walletAddress, signedMessageHash);
+        const token = generateToken(user);
 
         res.status(200).json({ token: token });
     } catch (e: unknown) {
@@ -53,4 +70,4 @@ const auth = async (req: Request, res: Response) => {
     }
 };
 
-export { registration, auth };
+export { registration, auth, nonce };

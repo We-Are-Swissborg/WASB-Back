@@ -60,6 +60,10 @@ testConnection();
 if (process.env.NODE_ENV === 'DEV') {
     initDb();
 }
+else
+{
+	sequelize.sync({ alter: true })
+}
 
 //Routes
 app.use('/api', apiRouter);

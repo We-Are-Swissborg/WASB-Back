@@ -17,7 +17,7 @@ import {
 import { SocialNetwork } from './socialnetwork.model';
 
 const NAME_REGEX = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
-const PSEUDO_REGEX = /^[a-z0-9._]{2,32}$/;
+const PSEUDO_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
 
 interface IUser {
     id: number;
@@ -34,12 +34,13 @@ interface IUser {
     aboutUs: string | null;
     confidentiality: boolean;
     beContacted: boolean;
+	nonce: string | null;
+	expiresIn: Date | null;
 }
 
 @Table
 class User extends Model implements IUser {
     @Expose({ groups: ['user', 'register', 'profil'] })
-    @AllowNull(false)
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -55,14 +56,12 @@ class User extends Model implements IUser {
     declare lastName: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
-    @AllowNull(false)
     @Unique(true)
     @Is(PSEUDO_REGEX)
     @Column
     declare pseudo: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
-    @AllowNull(false)
     @Unique(true)
     @IsEmail
     @Column
@@ -86,7 +85,7 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare country: string;
-    
+
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare city: string;
@@ -106,6 +105,14 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare beContacted: boolean;
+
+	@Expose({ groups: ['auth'] })
+    @Column
+    declare nonce: string;
+
+	@IsDate
+    @Column
+    declare expiresIn: Date;
 
     @Expose({ groups: ['user'] })
     @CreatedAt
