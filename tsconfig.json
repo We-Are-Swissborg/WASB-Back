@@ -5,7 +5,7 @@
 
     /* Modules */
     "module": "NodeNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
     "rootDir": "src",
     "types": ["node", "jest", "express"],

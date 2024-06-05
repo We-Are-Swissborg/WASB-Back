@@ -2,8 +2,11 @@ import { IUser, User } from '../models/user.model';
 import crypto from 'node:crypto';
 import { getUserNonce, getUserByWallet } from './user.services';
 import { logger } from '../middlewares/logger.middleware';
-import { decodeAddress, signatureVerify } from '@polkadot/util-crypto';
-import { u8aToHex } from '@polkadot/util';
+/* eslint-disable */
+const utilCrypto = require('@polkadot/util-crypto');
+const util = require('@polkadot/util');
+/* eslint-enable */
+
 
 /**
  * generateNonce
@@ -70,9 +73,9 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 }
 
 const isValidSignaturePolkadot = (signedMessage: string, signature: string, address: string) => {
-	const publicKey = decodeAddress(address);
-	const hexPublicKey = u8aToHex(publicKey);
-	return signatureVerify(signedMessage, signature, hexPublicKey).isValid;
+	const publicKey = utilCrypto.decodeAddress(address);
+	const hexPublicKey = util.u8aToHex(publicKey);
+	return utilCrypto.signatureVerify(signedMessage, signature, hexPublicKey).isValid;
 };
 
 export { generateNonce, confirmSignMessage }
