@@ -1,7 +1,11 @@
+import { Op } from 'sequelize';
+import { logger } from '../middlewares/logger.middleware';
 import { IUser, User } from '../models/user.model';
 import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
 
-const register = async (user: IUser) => {
+
+const register = async (user: IUser): Promise<IUser> => {
+	logger.info('register', user);
     let flag = await pseudoAlreadyExist(user.pseudo);
     if (flag) {
         throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
@@ -12,7 +16,13 @@ const register = async (user: IUser) => {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
 
-    await User.create({
+	const oldUser = await getUserByWallet(user.walletAddress);
+	logger.info('oldUser', oldUser);
+
+	if(!oldUser)
+		throw new Error('Ce Wallet n\'existe pas dans notre registre');
+
+    await oldUser.update({
         firstName: user.firstName,
         lastName: user.lastName,
         pseudo: user.pseudo,
@@ -26,6 +36,9 @@ const register = async (user: IUser) => {
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
     });
+	logger.debug('oldUser updated', oldUser);
+
+	return oldUser;
 };
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
@@ -50,4 +63,16 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
     return users;
 };
 
-export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks };
+const getUserNonce = async (wallet: string): Promise<IUser | null> => {
+	const user: IUser | null = await User.findOne({
+		where: {
+			walletAddress: wallet,
+			expiresIn: {
+				[Op.gte]: new Date()
+			}
+		},
+	});
+	return user;
+}
+
+export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };

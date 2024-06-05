@@ -10,3 +10,4 @@ userRouter.get('/:id', Auth.authorize(), getUser);
 
 userRouter.post('/register', Security.registration);
 userRouter.post('/auth', Security.auth);
+userRouter.post('/nonce', Security.nonce);

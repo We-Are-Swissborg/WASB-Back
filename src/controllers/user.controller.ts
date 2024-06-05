@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
-import { getUserById, getUsers } from '../services/user.service';
+import { getUserById, getUsers } from '../services/user.services';
 import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 
