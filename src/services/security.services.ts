@@ -48,7 +48,7 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 	try
 	{
 		if(!nonce)
-			throw new Error(`L'authentification n'est plus valide pour cette adresse`);
+			throw new Error(`Authentication is no longer valid for this address`);
 
 		logger.info('nonce retrieve', nonce.nonce);
 
@@ -61,10 +61,13 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 		);
 
 		if(!isValid)
-			throw new Error('Une erreur lors de la validation de la signature');
+			throw new Error('An error during signature validation');
+
+		// If the signature is validated, we no longer need the nonce
+		deleteNonce(nonce);
 	}
 	catch(e) {
-		logger.error('Error : isValidSignaturePolkadot ', e);
+		logger.error('Error : confirmSignMessage ', e);
 		throw e;
 	}
 
@@ -72,6 +75,29 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 	return nonce;
 }
 
+/**
+ *
+ * @param user
+ */
+const deleteNonce = async(user: IUser): Promise<void> => {
+	logger.info('deleteNonce', {userId : user.id, nonce: user.nonce});
+
+	user.nonce = null;
+	user.expiresIn = null;
+	const updatedUser = user as User;
+
+	updatedUser.save();
+
+	logger.info('The nonce for the user has been removed', {userId : updatedUser.id, nonce: updatedUser.nonce});
+};
+
+/**
+ *
+ * @param signedMessage message content signed
+ * @param signature signature hash
+ * @param address wallet address
+ * @returns whether the signature corresponds to the message
+ */
 const isValidSignaturePolkadot = (signedMessage: string, signature: string, address: string) => {
 	const publicKey = utilCrypto.decodeAddress(address);
 	const hexPublicKey = util.u8aToHex(publicKey);
