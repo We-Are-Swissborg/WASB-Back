@@ -3,4 +3,4 @@
 ## Installation
 
 Requirement :
-    - NodeJS v21.4
+    - NodeJS v20.6
