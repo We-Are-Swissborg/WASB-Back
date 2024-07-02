@@ -16,6 +16,10 @@ const util = require('@polkadot/util');
 const generateNonce = async (walletAddress: string): Promise<IUser> => {
 	logger.info('generateNonce', {walletAddress :walletAddress});
 
+	if (!walletAddress) {
+		throw new Error(`Wallet is not initialized`)
+	}
+
 	const nonce = crypto.randomBytes(32).toString("hex");
 
 	// Set the expiry of the nonce to 1 hour
