@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "dev": "npx dotenvx run --env-file=.env --env-file=.env.local --overload --verbose -- nodemon src/app.ts",
-    "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- node  dist/app.js",
+    "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- pm2 start ecosystem.config.js",
     "test": "jest --coverage",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint -c eslint.config.mjs .",
