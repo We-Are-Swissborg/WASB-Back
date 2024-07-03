@@ -19,7 +19,7 @@ const registration = async (req: Request, res: Response) => {
         const admin = false; // Set up when role ok
         const newUser: IUser = await register(user);
 
-        if(admin) {
+        if (admin) {
             res.status(201);
         } else {
             const token = generateToken(newUser);
@@ -39,10 +39,10 @@ const registration = async (req: Request, res: Response) => {
  */
 const nonce = async (req: Request, res: Response) => {
     try {
-		const { walletAddress } = req.body;
+        const { walletAddress } = req.body;
 
-		const user = await generateNonce(walletAddress);
-		const userDTO = instanceToPlain(user, { groups: ['auth'], excludeExtraneousValues: true });
+        const user = await generateNonce(walletAddress);
+        const userDTO = instanceToPlain(user, { groups: ['auth'], excludeExtraneousValues: true });
         res.status(200).json(userDTO);
     } catch (e: unknown) {
         logger.error(`nonce error`, e);
@@ -58,9 +58,9 @@ const nonce = async (req: Request, res: Response) => {
  */
 const auth = async (req: Request, res: Response) => {
     try {
-		const { walletAddress, signedMessageHash } = req.body;
+        const { walletAddress, signedMessageHash } = req.body;
 
-		const user = await confirmSignMessage(walletAddress, signedMessageHash);
+        const user = await confirmSignMessage(walletAddress, signedMessageHash);
         const token = generateToken(user);
 
         res.status(200).json({ token: token });

@@ -9,8 +9,8 @@
     "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- pm2 start ecosystem.config.js",
     "test": "jest --coverage",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint -c eslint.config.mjs .",
-    "lintfix": "eslint -c eslint.config.mjs --fix ."
+    "lint": "eslint -c eslint.config.mjs ./src",
+    "lintfix": "eslint -c eslint.config.mjs --fix ./src"
   },
   "author": "Valdior",
   "license": "MIT",

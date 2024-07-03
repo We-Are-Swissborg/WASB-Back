@@ -47,7 +47,7 @@ const initDb = () => {
         logger.debug(`jane id with : ${jane.id}`, jane);
 
         const socialNetwork = await SocialNetwork.create({
-            discord: "wasb1",
+            discord: 'wasb1',
             userId: jane.id,
         });
         logger.debug(`jane discord : ${socialNetwork.discord}`, socialNetwork);
@@ -59,10 +59,8 @@ testConnection();
 
 if (process.env.NODE_ENV === 'DEV') {
     initDb();
-}
-else
-{
-	sequelize.sync({ alter: true })
+} else {
+    sequelize.sync({ alter: true });
 }
 
 //Routes
