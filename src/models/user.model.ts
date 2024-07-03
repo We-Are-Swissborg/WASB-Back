@@ -12,11 +12,12 @@ import {
     Unique,
     UpdatedAt,
     IsEmail,
-    Is
+    Is,
 } from 'sequelize-typescript';
 import { SocialNetwork } from './socialnetwork.model';
 
-const NAME_REGEX = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
+const NAME_REGEX =
+    /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
 const PSEUDO_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
 
 interface IUser {
@@ -34,8 +35,8 @@ interface IUser {
     aboutUs: string | null;
     confidentiality: boolean;
     beContacted: boolean;
-	nonce: string | null;
-	expiresIn: Date | null;
+    nonce: string | null;
+    expiresIn: Date | null;
 }
 
 @Table
@@ -106,11 +107,11 @@ class User extends Model implements IUser {
     @Column
     declare beContacted: boolean;
 
-	@Expose({ groups: ['auth'] })
+    @Expose({ groups: ['auth'] })
     @Column
     declare nonce: string;
 
-	@IsDate
+    @IsDate
     @Column
     declare expiresIn: Date;
 
