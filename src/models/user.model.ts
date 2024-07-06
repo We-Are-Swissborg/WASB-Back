@@ -149,7 +149,6 @@ class User extends Model implements IUser {
 
     @BeforeCreate
     static async addDefaultRoles(instance: User) {
-        console.info('addDefaultRoles', instance);
         if (instance.roles === undefined) instance.roles = JSON.stringify([Role.User]);
         else {
             const currentRoles: string[] = JSON.parse(instance.roles);
