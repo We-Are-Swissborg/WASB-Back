@@ -13,8 +13,11 @@ import {
     UpdatedAt,
     IsEmail,
     Is,
+    BeforeCreate,
 } from 'sequelize-typescript';
 import { SocialNetwork } from './socialnetwork.model';
+import { NonAttribute } from 'sequelize';
+import Role from '../types/Role';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -37,6 +40,7 @@ interface IUser {
     beContacted: boolean;
     nonce: string | null;
     expiresIn: Date | null;
+    roles: string | null;
 }
 
 @Table
@@ -61,6 +65,10 @@ class User extends Model implements IUser {
     @Is(PSEUDO_REGEX)
     @Column
     declare pseudo: string;
+
+    @Expose({ groups: ['user', 'profil', 'admin'] })
+    @Column
+    declare roles: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Unique(true)
@@ -134,10 +142,53 @@ class User extends Model implements IUser {
 
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
-    // @Expose({ groups: ['user', 'profil'] })
-    // get fullName(): NonAttribute<string> {
-    //   return `${this.lastName} ${this.firstName}`;
-    // }
+    @Expose({ groups: ['user', 'profil'] })
+    get fullName(): NonAttribute<string> {
+        return `${this.lastName} ${this.firstName}`;
+    }
+
+    @BeforeCreate
+    static async addDefaultRoles(instance: User) {
+        console.info('addDefaultRoles', instance);
+        if (instance.roles === undefined) instance.roles = JSON.stringify([Role.User]);
+        else {
+            const currentRoles: string[] = JSON.parse(instance.roles);
+            if (!currentRoles.includes(Role.User)) {
+                currentRoles.splice(0, 0, Role.User);
+            }
+            instance.roles = JSON.stringify(currentRoles);
+        }
+    }
+
+    addRoles(roles: Role[]): User {
+        if (!this.roles) this.roles = JSON.stringify(roles);
+        else {
+            const currentRoles: string[] = JSON.parse(this.roles);
+            roles.forEach((r) => {
+                if (!currentRoles.includes(r)) currentRoles.push(r);
+            });
+            this.roles = JSON.stringify(currentRoles);
+        }
+
+        return this;
+    }
+
+    removeRoles(roles: Role[]): User {
+        if (this.roles.length > 0) {
+            const currentRoles: string[] = JSON.parse(this.roles);
+            roles.forEach((r) => {
+                // Never remove user roles
+                if (r === Role.User) {
+                    return;
+                }
+
+                if (currentRoles.includes(r)) currentRoles.splice(currentRoles.indexOf(r), 1);
+            });
+            this.roles = JSON.stringify(currentRoles);
+        }
+
+        return this;
+    }
 }
 
 export { User, IUser };

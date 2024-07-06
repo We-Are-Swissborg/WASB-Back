@@ -1,11 +1,10 @@
 import express, { Application } from 'express';
 import { createServer } from 'node:http';
-import { User } from './models/user.model';
 import { apiRouter } from './routes/useRoutes';
 import cors from 'cors';
 import { sequelize, testConnection } from './db/sequelizeConfig';
-import { SocialNetwork } from './models/socialnetwork.model';
 import { logger } from './middlewares/logger.middleware';
+import initDb from './dev/init-db';
 /* eslint-disable */
 require('@dotenvx/dotenvx').config();
 /* eslint-enable */
@@ -27,33 +26,6 @@ const corsOptions = {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
-
-const initDb = () => {
-    return sequelize.sync({ force: true }).then(async () => {
-        const jane = await User.create({
-            firstName: 'Jane',
-            lastName: 'Doe',
-            pseudo: 'pseudo',
-            email: 'mail@test.dev',
-            walletAddress: '5F1JU',
-            certified: true,
-            country: 'Suisse',
-            city: 'Lausanne',
-            referral: 'Kevin HART',
-            aboutUs: 'Twitter',
-            confidentiality: true,
-            beContacted: true,
-        });
-        logger.debug(`jane id with : ${jane.id}`, jane);
-
-        const socialNetwork = await SocialNetwork.create({
-            discord: 'wasb1',
-            userId: jane.id,
-        });
-        logger.debug(`jane discord : ${socialNetwork.discord}`, socialNetwork);
-        logger.debug(`La base de données a bien été synchronisée.`);
-    });
-};
 
 testConnection();
 
