@@ -77,6 +77,7 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 const deleteNonce = async (user: IUser): Promise<void> => {
     logger.info('deleteNonce', { userId: user.id, nonce: user.nonce });
 
+    user.lastLogin = new Date();
     user.nonce = null;
     user.expiresIn = null;
     const updatedUser = user as User;
