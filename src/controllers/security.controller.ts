@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { register } from '../services/user.services';
+import { login, register, updateLastLogin } from '../services/user.services';
 import { confirmSignMessage, generateNonce } from '../services/security.services';
 import { generateToken } from '../services/jwt.services';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
@@ -51,16 +51,18 @@ const nonce = async (req: Request, res: Response) => {
 };
 
 /**
- * Authenticates a user
+ * Authenticates a user with credential
  *
  * @param req Request
  * @param res Response
  */
-const auth = async (req: Request, res: Response) => {
+const authCredentials = async (req: Request, res: Response) => {
     try {
-        const { walletAddress, signedMessageHash } = req.body;
+        const { pseudo, password } = req.body;
+        logger.info(`Attempt authCredentials`, req.body);
 
-        const user = await confirmSignMessage(walletAddress, signedMessageHash);
+        const user = await login(pseudo, password);
+		updateLastLogin(user);
         const token = generateToken(user);
 
         res.status(200).json({ token: token });
@@ -70,4 +72,26 @@ const auth = async (req: Request, res: Response) => {
     }
 };
 
-export { registration, auth, nonce };
+/**
+ * Authenticates a user with wallet
+ *
+ * @param req Request
+ * @param res Response
+ */
+const authWallet = async (req: Request, res: Response) => {
+    try {
+        const { walletAddress, signedMessageHash } = req.body;
+        logger.info(`Attempt authWallet`, req.body);
+
+        const user = await confirmSignMessage(walletAddress, signedMessageHash);
+		updateLastLogin(user);
+        const token = generateToken(user);
+
+        res.status(200).json({ token: token });
+    } catch (e: unknown) {
+        logger.error(`User auth error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
+export { registration, authCredentials, authWallet, nonce };

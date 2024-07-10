@@ -1,8 +1,14 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { IUser, User } from '../models/user.model';
+import bcrypt from "bcrypt";
 import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
 
+/**
+ *
+ * @param user
+ * @returns
+ */
 const register = async (user: IUser): Promise<IUser> => {
     logger.info('register', user);
     let flag = await pseudoAlreadyExist(user.pseudo);
@@ -39,6 +45,31 @@ const register = async (user: IUser): Promise<IUser> => {
     return oldUser;
 };
 
+/**
+ *
+ * @param login user login
+ * @param plaintextPassword user plaintext password
+ * @returns user
+ */
+const login = async (login: string, plaintextPassword: string): Promise<User> => {
+	const password: string = await bcrypt.hash(plaintextPassword, 12);
+    const user = await User.findOne({ where:
+        {
+            pseudo: login,
+            password: password
+        }
+	});
+
+	if (!user) throw new Error(`Authentication is not valid for this pseudo or password`);
+
+    return user;
+};
+
+const updateLastLogin = (user: User): void => {
+	user.lastLogin = new Date();
+	user.save();
+}
+
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
     return user;
@@ -61,8 +92,8 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
     return users;
 };
 
-const getUserNonce = async (wallet: string): Promise<IUser | null> => {
-    const user: IUser | null = await User.findOne({
+const getUserNonce = async (wallet: string): Promise<User> => {
+    const user = await User.findOne({
         where: {
             walletAddress: wallet,
             expiresIn: {
@@ -70,7 +101,10 @@ const getUserNonce = async (wallet: string): Promise<IUser | null> => {
             },
         },
     });
+
+	if (!user) throw new Error(`Authentication is not valid for this wallet`);
+
     return user;
 };
 
-export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };
+export { register, login, updateLastLogin, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };

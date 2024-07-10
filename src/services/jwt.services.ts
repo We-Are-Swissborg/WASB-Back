@@ -30,6 +30,7 @@ const generateToken = (user: IUser): string => {
     const payload = {
         wallet: user.walletAddress,
         userId: user.id,
+		pseudo: user.pseudo,
         roles: user.roles,
     };
 
