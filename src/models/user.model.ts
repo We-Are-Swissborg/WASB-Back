@@ -28,6 +28,7 @@ interface IUser {
     firstName: string | null;
     lastName: string | null;
     pseudo: string;
+	password: string | null;
     email: string;
     walletAddress: string;
     certified: boolean;
@@ -69,6 +70,10 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'profil', 'admin'] })
     @Column
     declare roles: string;
+
+	@Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare password: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Unique(true)
