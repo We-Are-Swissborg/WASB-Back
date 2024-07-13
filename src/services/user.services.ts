@@ -41,15 +41,17 @@ const register = async (user: IUser): Promise<IUser> => {
  * @returns user
  */
 const login = async (login: string, plaintextPassword: string): Promise<User> => {
-	const password: string = await bcrypt.hash(plaintextPassword, 12);
-    const user = await User.findOne({ where:
-        {
-            pseudo: login,
-            password: password
+    logger.info(`login`, {login: login});
+    const user = await User.findOne({
+        attributes: ['password', 'pseudo', 'roles', 'walletAddress', 'id'],
+        where: {
+            pseudo: login
         }
 	});
 
 	if (!user) throw new Error(`Authentication is not valid for this pseudo or password`);
+    const response = await bcrypt.compare(plaintextPassword, user?.password);
+	if (!response) throw new Error(`Authentication is not valid for this pseudo or password`);
 
     return user;
 };

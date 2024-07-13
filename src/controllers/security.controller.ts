@@ -58,10 +58,10 @@ const nonce = async (req: Request, res: Response) => {
  */
 const authCredentials = async (req: Request, res: Response) => {
     try {
-        const { pseudo, password } = req.body;
-        logger.info(`Attempt authCredentials`, req.body);
+        const { username, password } = req.body;
+        logger.info(`Attempt authCredentials`, { username: username});
 
-        const user = await login(pseudo, password);
+        const user = await login(username, password);
 		updateLastLogin(user);
         const token = generateToken(user);
 
