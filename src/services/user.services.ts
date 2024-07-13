@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { IUser, User } from '../models/user.model';
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
 
 /**
@@ -20,12 +20,12 @@ const register = async (user: IUser): Promise<IUser> => {
     if (flag) {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
-	const password: string = await bcrypt.hash(user.password, 12);
+    const password: string = await bcrypt.hash(user.password, 12);
 
     const u = await User.create({
         pseudo: user.pseudo,
         email: user.email,
-		password: password,
+        password: password,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
     });
@@ -41,25 +41,25 @@ const register = async (user: IUser): Promise<IUser> => {
  * @returns user
  */
 const login = async (login: string, plaintextPassword: string): Promise<User> => {
-    logger.info(`login`, {login: login});
+    logger.info(`login`, { login: login });
     const user = await User.findOne({
         attributes: ['password', 'pseudo', 'roles', 'walletAddress', 'id'],
         where: {
-            pseudo: login
-        }
-	});
+            pseudo: login,
+        },
+    });
 
-	if (!user) throw new Error(`Authentication is not valid for this pseudo or password`);
+    if (!user) throw new Error(`Authentication is not valid for this pseudo or password`);
     const response = await bcrypt.compare(plaintextPassword, user?.password);
-	if (!response) throw new Error(`Authentication is not valid for this pseudo or password`);
+    if (!response) throw new Error(`Authentication is not valid for this pseudo or password`);
 
     return user;
 };
 
 const updateLastLogin = (user: User): void => {
-	user.lastLogin = new Date();
-	user.save();
-}
+    user.lastLogin = new Date();
+    user.save();
+};
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -93,9 +93,18 @@ const getUserNonce = async (wallet: string): Promise<User> => {
         },
     });
 
-	if (!user) throw new Error(`Authentication is not valid for this wallet`);
+    if (!user) throw new Error(`Authentication is not valid for this wallet`);
 
     return user;
 };
 
-export { register, login, updateLastLogin, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };
+export {
+    register,
+    login,
+    updateLastLogin,
+    getUserByWallet,
+    getUserById,
+    getUsers,
+    getUsersWithSocialNetworks,
+    getUserNonce,
+};

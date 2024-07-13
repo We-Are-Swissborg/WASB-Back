@@ -1,6 +1,5 @@
 import { Expose, Type } from 'class-transformer';
 import {
-    AllowNull,
     AutoIncrement,
     Column,
     CreatedAt,
@@ -28,7 +27,7 @@ interface IUser {
     firstName: string | null;
     lastName: string | null;
     pseudo: string;
-	password: string;
+    password: string;
     email: string;
     walletAddress: string;
     certified: boolean;
@@ -71,7 +70,7 @@ class User extends Model implements IUser {
     @Column
     declare roles: string;
 
-	@Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
     declare password: string;
 

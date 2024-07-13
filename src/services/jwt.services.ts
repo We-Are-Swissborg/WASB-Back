@@ -31,7 +31,7 @@ const generateToken = (user: IUser): string => {
     const payload = {
         wallet: user.walletAddress,
         userId: user.id,
-		pseudo: user.pseudo,
+        pseudo: user.pseudo,
         roles: user.roles,
     };
     logger.info(`new token generated for user`, payload);

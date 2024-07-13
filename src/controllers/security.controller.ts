@@ -59,10 +59,10 @@ const nonce = async (req: Request, res: Response) => {
 const authCredentials = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
-        logger.info(`Attempt authCredentials`, { username: username});
+        logger.info(`Attempt authCredentials`, { username: username });
 
         const user = await login(username, password);
-		updateLastLogin(user);
+        updateLastLogin(user);
         const token = generateToken(user);
 
         res.status(200).json({ token: token });
@@ -84,7 +84,7 @@ const authWallet = async (req: Request, res: Response) => {
         logger.info(`Attempt authWallet`, req.body);
 
         const user = await confirmSignMessage(walletAddress, signedMessageHash);
-		updateLastLogin(user);
+        updateLastLogin(user);
         const token = generateToken(user);
 
         res.status(200).json({ token: token });
