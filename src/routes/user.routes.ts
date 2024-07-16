@@ -9,5 +9,6 @@ userRouter.get('/', Auth.authorize(), getAllUsers);
 userRouter.get('/:id', Auth.authorize(), getUser);
 
 userRouter.post('/register', Security.registration);
-userRouter.post('/auth', Security.auth);
+userRouter.post('/auth', Security.authCredentials);
+userRouter.post('/authWallet', Security.authWallet);
 userRouter.post('/nonce', Security.nonce);

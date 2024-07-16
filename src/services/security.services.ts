@@ -44,13 +44,11 @@ const generateNonce = async (walletAddress: string): Promise<IUser> => {
  * @param signedMessageHash
  * @returns
  */
-const confirmSignMessage = async (walletAddress: string, signedMessageHash: string): Promise<IUser> => {
+const confirmSignMessage = async (walletAddress: string, signedMessageHash: string): Promise<User> => {
     logger.info('confirmSignMessage', { walletAddress: walletAddress, signedMessageHash: signedMessageHash });
 
-    const nonce = await getUserNonce(walletAddress);
     try {
-        if (!nonce) throw new Error(`Authentication is no longer valid for this address`);
-
+        const nonce = await getUserNonce(walletAddress);
         logger.info('nonce retrieve', nonce.nonce);
 
         const message = `Confirm your authentication to our community #WeAreSwissborg \nNONCE : ${nonce.nonce}`;
@@ -61,13 +59,12 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 
         // If the signature is validated, we no longer need the nonce
         deleteNonce(nonce);
+        logger.info('return user info', nonce);
+        return nonce;
     } catch (e) {
         logger.error('Error : confirmSignMessage ', e);
         throw e;
     }
-
-    logger.info('return user info', nonce);
-    return nonce;
 };
 
 /**
@@ -77,7 +74,6 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 const deleteNonce = async (user: IUser): Promise<void> => {
     logger.info('deleteNonce', { userId: user.id, nonce: user.nonce });
 
-    user.lastLogin = new Date();
     user.nonce = null;
     user.expiresIn = null;
     const updatedUser = user as User;

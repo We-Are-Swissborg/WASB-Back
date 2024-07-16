@@ -17,11 +17,11 @@ const initDb = () => {
             referral: 'Kevin HART',
             aboutUs: 'Twitter',
             confidentiality: true,
-            beContacted: true
+            beContacted: true,
         });
         logger.debug(`jane id with : ${jane.id}`, jane);
 
-		const John = await User.create({
+        const John = await User.create({
             firstName: 'John',
             lastName: 'Doe',
             pseudo: 'JDoe',
@@ -34,16 +34,16 @@ const initDb = () => {
             aboutUs: 'Twitter',
             confidentiality: true,
             beContacted: true,
-			roles: JSON.stringify([Role.Member, Role.Moderator])
+            roles: JSON.stringify([Role.Member, Role.Moderator]),
         });
 
-		John.addRoles([Role.Admin]);
-		John.addRoles([Role.Admin]);
+        John.addRoles([Role.Admin]);
+        John.addRoles([Role.Admin]);
         logger.debug(`me id with : ${John.id}`, John);
-		John.removeRoles([Role.Moderator]);
-		John.removeRoles([Role.User]);
-		John.removeRoles([Role.Moderator]);
-		John.save();
+        John.removeRoles([Role.Moderator]);
+        John.removeRoles([Role.User]);
+        John.removeRoles([Role.Moderator]);
+        John.save();
         logger.debug(`La base de données a bien été synchronisée.`);
     });
 };
