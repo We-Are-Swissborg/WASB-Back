@@ -20,28 +20,26 @@ const register = async (user: IUser): Promise<IUser> => {
     if (flag) {
         throw new Error(`L'adresse email '${user.email}' existe déjà !`);
     }
+
+    if(user.referral) flag = await getUserByReferral(user.referral);
+    if (!flag && user.referral) {
+        throw new Error(`Le code référent '${user.referral}' est incorrect !`);
+    }
     const password: string = await bcrypt.hash(user.password, 12);
+    const referralId: string = await getReferralId();
 
-    //TOCHANGE 
+    const u = await User.create({
+        pseudo: user.pseudo,
+        email: user.email,
+        password: password,
+        referral: user.referral,
+        confidentiality: user.confidentiality,
+        beContacted: user.beContacted,
+        referralId: referralId,
+    });
+    logger.debug('user created', u);
 
-    // const oldUser = await getUserByWallet(user.walletAddress);
-    // logger.info('oldUser', oldUser);
-
-    // if (!oldUser) throw new Error("Ce Wallet n'existe pas dans notre registre");
-
-    // await updateUser(oldUser, user, 'all');
-
-    // logger.debug('oldUser updated', oldUser);
-    // const u = await User.create({
-    //     pseudo: user.pseudo,
-    //     email: user.email,
-    //     password: password,
-    //     confidentiality: user.confidentiality,
-    //     beContacted: user.beContacted,
-    // });
-    // logger.debug('user created', u);
-
-    // return u;
+    return u;
 };
 
 /**
@@ -108,48 +106,58 @@ const getUserNonce = async (wallet: string): Promise<User> => {
     return user;
 };
 
-//TOCHANGE
+const generateReferralId = (): string => {
+    let referralId = '';
+    let lengthReferral = 0;
+    const letterArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-// const getUserByPseudo = async (pseudo: string): Promise<User | null> => {
-//     const user = await User.findOne({ where: { pseudo: pseudo } });
-//     return user;
-// };
+    while(lengthReferral < 5) {
+        const randomNumber = Math.floor(Math.random() * 10);
+        const letterOrNumber = Math.floor(Math.random() * 2);
 
-// const updateUser = async (oldUser: User, user: IUser, update: string) => {
-//     if(update === 'all') {
-//         await oldUser.update({
-//             firstName: user.firstName,
-//             lastName: user.lastName,
-//             pseudo: user.pseudo,
-//             email: user.email,
-//             walletAddress: user.walletAddress,
-//             certified: true,
-//             country: user.country,
-//             city: user.city,
-//             referral: user.referral,
-//             aboutUs: user.aboutUs,
-//             confidentiality: user.confidentiality,
-//             beContacted: user.beContacted,
-//         });
-//     } else if(update === 'userReferred') {
-//         const arrayReferred = JSON.parse(oldUser.userReferred);
-//         arrayReferred.push(user.id);
+        if(letterOrNumber === 0) referralId += letterArray[randomNumber];
+        if(letterOrNumber === 1) referralId += randomNumber;
 
-//         await oldUser.update({
-//             ...oldUser,
-//             userReferred: JSON.stringify(arrayReferred),
-//         });
-//     }
-// };
+        ++lengthReferral;
+    }
+    return referralId;
+};
 
-// export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce, getUserByPseudo, updateUser };
-// export {
-//     register,
-//     login,
-//     updateLastLogin,
-//     getUserByWallet,
-//     getUserById,
-//     getUsers,
-//     getUsersWithSocialNetworks,
-//     getUserNonce,
-// };
+const getReferralId = async (): Promise<string> => {
+    let referralId = '';
+    while(!referralId) {
+        referralId = generateReferralId(); 
+        const user = await User.findOne({ where: { referralId: referralId } });
+        if(user) referralId = '';
+    }
+    return referralId;
+};
+
+const getUserByReferral = async (referral: string): Promise<User | null> => {
+    const user = await User.findOne({ where: { referralId: referral } });
+    return user;
+};
+
+const updateReferralUser = async (referral: User, user: IUser) => {
+    const arrayReferred = JSON.parse(referral.userReferred);
+    arrayReferred.push(user.id);
+
+    await referral.update({
+        ...referral,
+        userReferred: JSON.stringify(arrayReferred),
+    });
+};
+
+export {
+    register,
+    login,
+    updateLastLogin,
+    getUserByWallet,
+    getUserById,
+    getUsers,
+    getUsersWithSocialNetworks,
+    getUserNonce,
+    getUserByReferral,
+    updateReferralUser,
+    getReferralId
+};
