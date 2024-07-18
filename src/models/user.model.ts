@@ -14,10 +14,12 @@ import {
     IsEmail,
     Is,
     BeforeCreate,
+    AfterSave,
 } from 'sequelize-typescript';
 import { SocialNetwork } from './socialnetwork.model';
 import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
+import { getUserByPseudo, updateUser } from '../services/user.services';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -41,6 +43,7 @@ interface IUser {
     nonce: string | null;
     expiresIn: Date | null;
     roles: string | null;
+    userReferred: string | null;
 }
 
 @Table
@@ -140,6 +143,10 @@ class User extends Model implements IUser {
     @HasOne(() => SocialNetwork)
     declare socialNetwork: SocialNetwork | null;
 
+    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare userReferred: string;
+
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
     @Expose({ groups: ['user', 'profil'] })
@@ -148,7 +155,9 @@ class User extends Model implements IUser {
     }
 
     @BeforeCreate
-    static async addDefaultRoles(instance: User) {
+    static async addDefaultValue(instance: User) {
+        instance.userReferred = JSON.stringify([]);
+
         if (instance.roles === undefined) instance.roles = JSON.stringify([Role.User]);
         else {
             const currentRoles: string[] = JSON.parse(instance.roles);
@@ -156,6 +165,11 @@ class User extends Model implements IUser {
                 currentRoles.splice(0, 0, Role.User);
             }
             instance.roles = JSON.stringify(currentRoles);
+        }
+
+        if(instance.referral) {
+            const referent = await getUserByPseudo(instance.referral);
+            if (!referent) throw new Error("This referent don't exist");
         }
     }
 
@@ -187,6 +201,18 @@ class User extends Model implements IUser {
         }
 
         return this;
+    }
+
+    @AfterSave
+    static async addReferralAfterRegister(instance: User) {
+        if(instance.referral) {
+            const referent = await getUserByPseudo(instance.referral);
+            const arrayReferred = JSON.parse(referent?.userReferred || '');
+            const checkUserReferred = arrayReferred.find((referred: number) => referred === instance.id);
+
+            if (!referent) throw new Error("Error add referent after register");
+            if(!checkUserReferred) await updateUser(referent, instance, 'userReferred');
+        }
     }
 }
 

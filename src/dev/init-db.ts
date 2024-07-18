@@ -8,20 +8,20 @@ const initDb = () => {
         const jane = await User.create({
             firstName: 'Jane',
             lastName: 'Doe',
-            pseudo: 'pseudo',
+            pseudo: 'Jane_D09',
             email: 'jane@doe.dev',
             walletAddress: '5F1JU',
             certified: true,
             country: 'Suisse',
             city: 'Lausanne',
-            referral: 'Kevin HART',
+            referral: '',
             aboutUs: 'Twitter',
             confidentiality: true,
             beContacted: true
         });
         logger.debug(`jane id with : ${jane.id}`, jane);
 
-		const John = await User.create({
+        const John = await User.create({
             firstName: 'John',
             lastName: 'Doe',
             pseudo: 'JDoe',
@@ -30,7 +30,7 @@ const initDb = () => {
             certified: true,
             country: 'BE',
             city: 'Lausanne',
-            referral: 'Kevin HART',
+            referral: 'Jane_D09',
             aboutUs: 'Twitter',
             confidentiality: true,
             beContacted: true,
@@ -43,7 +43,7 @@ const initDb = () => {
 		John.removeRoles([Role.Moderator]);
 		John.removeRoles([Role.User]);
 		John.removeRoles([Role.Moderator]);
-		John.save();
+        John.save();
         logger.debug(`La base de données a bien été synchronisée.`);
     });
 };

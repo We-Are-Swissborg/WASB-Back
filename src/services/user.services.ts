@@ -20,20 +20,8 @@ const register = async (user: IUser): Promise<IUser> => {
 
     if (!oldUser) throw new Error("Ce Wallet n'existe pas dans notre registre");
 
-    await oldUser.update({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        pseudo: user.pseudo,
-        email: user.email,
-        walletAddress: user.walletAddress,
-        certified: true,
-        country: user.country,
-        city: user.city,
-        referral: user.referral,
-        aboutUs: user.aboutUs,
-        confidentiality: user.confidentiality,
-        beContacted: user.beContacted,
-    });
+    await updateUser(oldUser, user, 'all');
+
     logger.debug('oldUser updated', oldUser);
 
     return oldUser;
@@ -73,4 +61,36 @@ const getUserNonce = async (wallet: string): Promise<IUser | null> => {
     return user;
 };
 
-export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };
+const getUserByPseudo = async (pseudo: string): Promise<User | null> => {
+    const user = await User.findOne({ where: { pseudo: pseudo } });
+    return user;
+};
+
+const updateUser = async (oldUser: User, user: IUser, update: string) => {
+    if(update === 'all') {
+        await oldUser.update({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            pseudo: user.pseudo,
+            email: user.email,
+            walletAddress: user.walletAddress,
+            certified: true,
+            country: user.country,
+            city: user.city,
+            referral: user.referral,
+            aboutUs: user.aboutUs,
+            confidentiality: user.confidentiality,
+            beContacted: user.beContacted,
+        });
+    } else if(update === 'userReferred') {
+        const arrayReferred = JSON.parse(oldUser.userReferred);
+        arrayReferred.push(user.id);
+
+        await oldUser.update({
+            ...oldUser,
+            userReferred: JSON.stringify(arrayReferred),
+        });
+    }
+};
+
+export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce, getUserByPseudo, updateUser };
