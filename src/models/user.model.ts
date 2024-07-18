@@ -1,6 +1,5 @@
 import { Expose, Type } from 'class-transformer';
 import {
-    AllowNull,
     AutoIncrement,
     Column,
     CreatedAt,
@@ -30,6 +29,7 @@ interface IUser {
     firstName: string | null;
     lastName: string | null;
     pseudo: string;
+    password: string;
     email: string;
     walletAddress: string;
     certified: boolean;
@@ -48,18 +48,18 @@ interface IUser {
 
 @Table
 class User extends Model implements IUser {
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @AutoIncrement
     @PrimaryKey
     @Column
     declare id: number;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Is(NAME_REGEX)
     @Column
     declare firstName: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare lastName: string;
 
@@ -74,18 +74,21 @@ class User extends Model implements IUser {
     declare roles: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare password: string;
+
+    @Expose({ groups: ['user', 'register', 'profil'] })
     @Unique(true)
     @IsEmail
     @Column
     declare email: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @AllowNull(false)
+    @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
     @Column
     declare walletAddress: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare certified: boolean;
 
@@ -94,19 +97,19 @@ class User extends Model implements IUser {
     @Column
     declare lastLogin: Date;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare country: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare city: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare referral: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare aboutUs: string;
 
