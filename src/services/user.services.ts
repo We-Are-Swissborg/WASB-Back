@@ -2,7 +2,8 @@ import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { IUser, User } from '../models/user.model';
 import bcrypt from 'bcrypt';
-import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
+import * as RegistValidator from '../validators/registration.validator';
+import { generateRandomCode } from '../utils/generator';
 
 /**
  * New user registration
@@ -11,22 +12,22 @@ import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registratio
  */
 const register = async (user: IUser): Promise<IUser> => {
     logger.info('register', user);
-    let flag = await pseudoAlreadyExist(user.pseudo);
+    let flag = await RegistValidator.pseudoAlreadyExist(user.pseudo);
     if (flag) {
-        throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
+        throw new Error(`Pseudo '${user.pseudo}' already exist !`);
     }
 
-    flag = await emailAlreadyExist(user.email);
+    flag = await RegistValidator.emailAlreadyExist(user.email);
     if (flag) {
-        throw new Error(`L'adresse email '${user.email}' existe déjà !`);
+        throw new Error(`Email '${user.email}' already exist !`);
     }
 
-    if(user.referral) flag = await getUserByReferral(user.referral);
+    if(user.referral) flag = await RegistValidator.referralExist(user.referral);
     if (!flag && user.referral) {
-        throw new Error(`Le code référent '${user.referral}' est incorrect !`);
+        throw new Error(`Referral '${user.referral}' is incorrect !`);
     }
     const password: string = await bcrypt.hash(user.password, 12);
-    const referralId: string = await getReferralId();
+    const codeRef: string = await getCode();
 
     const u = await User.create({
         pseudo: user.pseudo,
@@ -35,7 +36,7 @@ const register = async (user: IUser): Promise<IUser> => {
         referral: user.referral,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
-        referralId: referralId,
+        codeRef: codeRef,
     });
     logger.debug('user created', u);
 
@@ -106,46 +107,18 @@ const getUserNonce = async (wallet: string): Promise<User> => {
     return user;
 };
 
-const generateReferralId = (): string => {
-    let referralId = '';
-    let lengthReferral = 0;
-    const letterArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+const getCode = async (): Promise<string> => {
+    let codeRef = '';
+    const lengthCode = 5;
 
-    while(lengthReferral < 5) {
-        const randomNumber = Math.floor(Math.random() * 10);
-        const letterOrNumber = Math.floor(Math.random() * 2);
-
-        if(letterOrNumber === 0) referralId += letterArray[randomNumber];
-        if(letterOrNumber === 1) referralId += randomNumber;
-
-        ++lengthReferral;
+    while(!codeRef) {
+        codeRef = generateRandomCode(lengthCode); 
+        if(codeRef.length === lengthCode) {
+            const exist = await User.count({where: { codeRef: codeRef }});
+            if(exist) codeRef = '';
+        }
     }
-    return referralId;
-};
-
-const getReferralId = async (): Promise<string> => {
-    let referralId = '';
-    while(!referralId) {
-        referralId = generateReferralId(); 
-        const user = await User.findOne({ where: { referralId: referralId } });
-        if(user) referralId = '';
-    }
-    return referralId;
-};
-
-const getUserByReferral = async (referral: string): Promise<User | null> => {
-    const user = await User.findOne({ where: { referralId: referral } });
-    return user;
-};
-
-const updateReferralUser = async (referral: User, user: IUser) => {
-    const arrayReferred = JSON.parse(referral.userReferred);
-    arrayReferred.push(user.id);
-
-    await referral.update({
-        ...referral,
-        userReferred: JSON.stringify(arrayReferred),
-    });
+    return codeRef;
 };
 
 export {
@@ -157,7 +130,5 @@ export {
     getUsers,
     getUsersWithSocialNetworks,
     getUserNonce,
-    getUserByReferral,
-    updateReferralUser,
-    getReferralId
+    getCode
 };

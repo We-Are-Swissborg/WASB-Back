@@ -30,7 +30,7 @@ const initDb = () => {
             certified: true,
             country: 'BE',
             city: 'Lausanne',
-            referral: jane.referralId,
+            referral: jane.codeRef,
             aboutUs: 'Twitter',
             confidentiality: true,
             beContacted: true,
