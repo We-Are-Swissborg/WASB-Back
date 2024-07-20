@@ -11,4 +11,10 @@ const emailAlreadyExist = async (email: string): Promise<number | null> => {
     return exist;
 };
 
-export { pseudoAlreadyExist, emailAlreadyExist };
+const referralExist = async (referral: string): Promise<number | null> => {
+    const exist = await User.count({ where: { codeRef: referral } });
+
+    return exist;
+};
+
+export { pseudoAlreadyExist, emailAlreadyExist, referralExist };
