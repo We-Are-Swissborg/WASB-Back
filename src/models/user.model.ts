@@ -27,7 +27,6 @@ const NAME_REGEX =
 const PSEUDO_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
 const USER_REFERRAL_CODE_LENGTH: string = process.env.USER_REFERRAL_CODE_LENGTH || '5';
 
-
 interface IUser {
     id: number;
     firstName: string | null;
@@ -155,7 +154,7 @@ class User extends Model implements IUser {
     declare referringUserId?: number;
 
     @BelongsTo(() => User, 'referringUserId') //  A user can have a referral.
-    declare referringUser? : User;
+    declare referringUser?: User;
 
     @HasMany(() => User, 'referringUserId') // A user can have several godchildren.
     declare referrals: User[];
@@ -188,7 +187,7 @@ class User extends Model implements IUser {
         if (instance.referralCode === undefined) {
             let unique = false;
             while (!unique) {
-                const code = generateRandomCode(Number(USER_REFERRAL_CODE_LENGTH)); 
+                const code = generateRandomCode(Number(USER_REFERRAL_CODE_LENGTH));
                 const userExist = await User.count({ where: { referralCode: code } });
                 if (userExist == 0) {
                     instance.referralCode = code;

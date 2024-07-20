@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { IUser, User } from '../models/user.model';
+import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
 import * as RegistValidator from '../validators/registration.validator';
 import { Register } from '../types/Register';
@@ -24,11 +24,11 @@ const register = async (user: Register): Promise<User> => {
         throw new Error(`Email '${user.email}' already exist !`);
     }
 
-    if(user.referralCode) {
+    if (user.referralCode) {
         referent = await getIdReferent(user.referralCode);
         logger.debug('referent', referent);
 
-        if(!referent) throw new Error(`Referral '${user.referralCode}' is incorrect !`);
+        if (!referent) throw new Error(`Referral '${user.referralCode}' is incorrect !`);
     }
 
     const password: string = await bcrypt.hash(user.password, 12);
@@ -39,7 +39,7 @@ const register = async (user: Register): Promise<User> => {
         password: password,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
-        referringUserId: referent?.id
+        referringUserId: referent?.id,
     });
 
     logger.debug('user created', u);
@@ -120,8 +120,8 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
     const user = await User.findOne({
         attributes: ['id'],
         where: {
-            referralCode: referral
-        }
+            referralCode: referral,
+        },
     });
 
     return user;

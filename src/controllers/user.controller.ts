@@ -19,7 +19,7 @@ const getAllUsers = async (req: Request, res: Response) => {
         res.status(200).json(usersDTO);
     } catch (e) {
         logger.error(`getAllUsers error`, e);
-        res.status(500).json({ message: "Oops !, an error has occurred." });
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 };
 
@@ -37,7 +37,7 @@ const getUser = async (req: Request, res: Response) => {
         }
     } catch (e) {
         logger.error(`getUser error`, e);
-        res.status(500).json({ message: "Oops !, an error has occurred." });
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 };
 
@@ -47,13 +47,13 @@ const checkReferralExist = async (req: Request, res: Response) => {
         const referral: number | null = await referralExist(codeRef);
 
         if (referral) {
-            res.status(200).json({referral});
+            res.status(200).json({ referral });
         } else {
-            res.status(400).json({ message:`Referral doesn't exist`});
+            res.status(400).json({ message: `Referral doesn't exist` });
         }
     } catch (e) {
         logger.error(`checkReferralExist error`, e);
-        res.status(500).json({ message: "Oops !, referral not exist." });
+        res.status(500).json({ message: 'Oops !, referral not exist.' });
     }
 };
 
