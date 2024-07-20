@@ -34,7 +34,7 @@ interface IUser {
     lastLogin: Date | null;
     country: string | null;
     city: string | null;
-    referral: string | null;
+    referral: string | number | null;
     aboutUs: string | null;
     confidentiality: boolean;
     beContacted: boolean;
@@ -105,7 +105,7 @@ class User extends Model implements IUser {
 
     @Expose({ groups: ['user', 'register', 'profil'] })
     @Column
-    declare referral: string;
+    declare referral: number;
 
     @Expose({ groups: ['user', 'profil'] })
     @Column

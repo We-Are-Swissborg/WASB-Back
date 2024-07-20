@@ -13,6 +13,8 @@ import { generateRandomCode } from '../utils/generator';
 const register = async (user: IUser): Promise<IUser> => {
     logger.info('register', user);
     let flag = await RegistValidator.pseudoAlreadyExist(user.pseudo);
+    let idReferent = null;
+
     if (flag) {
         throw new Error(`Pseudo '${user.pseudo}' already exist !`);
     }
@@ -22,18 +24,20 @@ const register = async (user: IUser): Promise<IUser> => {
         throw new Error(`Email '${user.email}' already exist !`);
     }
 
-    if(user.referral) flag = await RegistValidator.referralExist(user.referral);
-    if (!flag && user.referral) {
-        throw new Error(`Referral '${user.referral}' is incorrect !`);
+    if(user.referral) {
+        const stringRef = String(user.referral);
+        idReferent = await getIdReferent(stringRef);
+        if(!idReferent) throw new Error(`Referral '${user.referral}' is incorrect !`);
     }
+
     const password: string = await bcrypt.hash(user.password, 12);
-    const codeRef: string = await getCode();
+    const codeRef: string = await getCodeRef();
 
     const u = await User.create({
         pseudo: user.pseudo,
         email: user.email,
         password: password,
-        referral: user.referral,
+        referral: idReferent,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
         codeRef: codeRef,
@@ -107,7 +111,7 @@ const getUserNonce = async (wallet: string): Promise<User> => {
     return user;
 };
 
-const getCode = async (): Promise<string> => {
+const getCodeRef = async (): Promise<string> => {
     let codeRef = '';
     const lengthCode = 5;
 
@@ -121,6 +125,15 @@ const getCode = async (): Promise<string> => {
     return codeRef;
 };
 
+const getIdReferent = async (referral: string): Promise<number> => {
+    const user = await User.findOne({
+        attributes: ['id'],
+        where: {codeRef: referral}
+    })
+    const id = user?.dataValues.id; 
+    return id;
+};
+
 export {
     register,
     login,
@@ -130,5 +143,4 @@ export {
     getUsers,
     getUsersWithSocialNetworks,
     getUserNonce,
-    getCode
 };
