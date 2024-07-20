@@ -17,8 +17,6 @@ import {
 import { SocialNetwork } from './socialnetwork.model';
 import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
-import { referralExist } from '../validators/registration.validator';
-import { getCode } from '../services/user.services';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
