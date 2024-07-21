@@ -20,7 +20,8 @@ const jane = {
     pseudo:"Pseudo",
     email: "mail@test.dev",
     walletAddress: "5F1JU",
-	roles: [Role.Member, Role.Moderator]
+	roles: [Role.Member, Role.Moderator],
+	nbReferred: [],
 };
 
 const user: User = plainToInstance(User, jane);

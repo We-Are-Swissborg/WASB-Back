@@ -28,7 +28,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
 testConnection();
-
 if (process.env.NODE_ENV === 'DEV') {
     initDb();
 } else {

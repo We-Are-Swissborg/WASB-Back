@@ -13,14 +13,19 @@ import {
     IsEmail,
     Is,
     BeforeCreate,
+    ForeignKey,
+    BelongsTo,
+    HasMany,
 } from 'sequelize-typescript';
 import { SocialNetwork } from './socialnetwork.model';
 import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
+import { generateRandomCode } from '../utils/generator';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
 const PSEUDO_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
+const USER_REFERRAL_CODE_LENGTH: string = process.env.USER_REFERRAL_CODE_LENGTH || '5';
 
 interface IUser {
     id: number;
@@ -34,13 +39,13 @@ interface IUser {
     lastLogin: Date | null;
     country: string | null;
     city: string | null;
-    referral: string | null;
     aboutUs: string | null;
     confidentiality: boolean;
     beContacted: boolean;
     nonce: string | null;
     expiresIn: Date | null;
     roles: string | null;
+    referralCode: string;
 }
 
 @Table
@@ -60,7 +65,7 @@ class User extends Model implements IUser {
     @Column
     declare lastName: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
     @Is(PSEUDO_REGEX)
     @Column
@@ -70,11 +75,11 @@ class User extends Model implements IUser {
     @Column
     declare roles: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare password: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
     @IsEmail
     @Column
@@ -104,17 +109,13 @@ class User extends Model implements IUser {
 
     @Expose({ groups: ['user', 'profil'] })
     @Column
-    declare referral: string;
+    declare aboutUs: string;
 
     @Expose({ groups: ['user', 'profil'] })
     @Column
-    declare aboutUs: string;
-
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @Column
     declare confidentiality: boolean;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare beContacted: boolean;
 
@@ -139,9 +140,24 @@ class User extends Model implements IUser {
     declare updatedAt: Date;
 
     @Type(() => SocialNetwork)
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @HasOne(() => SocialNetwork)
     declare socialNetwork: SocialNetwork | null;
+
+    @Expose({ groups: ['user', 'profil'] })
+    @Unique(true)
+    @Column
+    declare referralCode: string;
+
+    @ForeignKey(() => User)
+    @Column
+    declare referringUserId?: number;
+
+    @BelongsTo(() => User, 'referringUserId') //  A user can have a referral.
+    declare referringUser?: User;
+
+    @HasMany(() => User, 'referringUserId') // A user can have several godchildren.
+    declare referrals: User[];
 
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
@@ -159,6 +175,25 @@ class User extends Model implements IUser {
                 currentRoles.splice(0, 0, Role.User);
             }
             instance.roles = JSON.stringify(currentRoles);
+        }
+    }
+
+    /**
+     * Generation of a new unique referral code
+     * @param instance new user added
+     */
+    @BeforeCreate
+    static async generateReferalCode(instance: User) {
+        if (instance.referralCode === undefined) {
+            let unique = false;
+            while (!unique) {
+                const code = generateRandomCode(Number(USER_REFERRAL_CODE_LENGTH));
+                const userExist = await User.count({ where: { referralCode: code } });
+                if (userExist == 0) {
+                    instance.referralCode = code;
+                    unique = !unique;
+                }
+            }
         }
     }
 

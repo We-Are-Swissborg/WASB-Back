@@ -1,34 +1,47 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { IUser, User } from '../models/user.model';
+import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
-import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
+import * as RegistValidator from '../validators/registration.validator';
+import { Register } from '../types/Register';
 
 /**
  * New user registration
  * @param user
  * @returns new user
  */
-const register = async (user: IUser): Promise<IUser> => {
-    logger.info('register', user);
-    let flag = await pseudoAlreadyExist(user.pseudo);
+const register = async (user: Register): Promise<User> => {
+    logger.info('registration new user', user);
+    let flag = await RegistValidator.pseudoAlreadyExist(user.username);
+    let referent = null;
+
     if (flag) {
-        throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
+        throw new Error(`Pseudo '${user.username}' already exist !`);
     }
 
-    flag = await emailAlreadyExist(user.email);
+    flag = await RegistValidator.emailAlreadyExist(user.email);
     if (flag) {
-        throw new Error(`L'adresse email '${user.email}' existe déjà !`);
+        throw new Error(`Email '${user.email}' already exist !`);
     }
+
+    if (user.referralCode) {
+        referent = await getIdReferent(user.referralCode);
+        logger.debug('referent', referent);
+
+        if (!referent) throw new Error(`Referral '${user.referralCode}' is incorrect !`);
+    }
+
     const password: string = await bcrypt.hash(user.password, 12);
 
     const u = await User.create({
-        pseudo: user.pseudo,
+        pseudo: user.username,
         email: user.email,
         password: password,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
+        referringUserId: referent?.id,
     });
+
     logger.debug('user created', u);
 
     return u;
@@ -94,6 +107,22 @@ const getUserNonce = async (wallet: string): Promise<User> => {
     });
 
     if (!user) throw new Error(`Authentication is not valid for this wallet`);
+
+    return user;
+};
+
+/**
+ * Retrieve the identifier of the user to whom the referral code belongs
+ * @param referral unique referral code
+ * @returns user or null
+ */
+const getIdReferent = async (referral: string): Promise<User | null> => {
+    const user = await User.findOne({
+        attributes: ['id'],
+        where: {
+            referralCode: referral,
+        },
+    });
 
     return user;
 };

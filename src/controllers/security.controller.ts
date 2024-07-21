@@ -3,8 +3,9 @@ import { login, register, updateLastLogin } from '../services/user.services';
 import { confirmSignMessage, generateNonce } from '../services/security.services';
 import { generateToken } from '../services/jwt.services';
 import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { IUser, User } from '../models/user.model';
+import { IUser } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
+import { Register } from '../types/Register';
 
 /**
  * Register a new member
@@ -15,7 +16,7 @@ import { logger } from '../middlewares/logger.middleware';
 const registration = async (req: Request, res: Response) => {
     try {
         const form: string = req.body;
-        const user: IUser = plainToInstance(User, form, { groups: ['register'] });
+        const user: Register = plainToInstance(Register, form, { groups: ['register'] });
         const admin = false; // Set up when role ok
         const newUser: IUser = await register(user);
 
