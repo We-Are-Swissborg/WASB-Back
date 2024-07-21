@@ -65,7 +65,7 @@ class User extends Model implements IUser {
     @Column
     declare lastName: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
     @Is(PSEUDO_REGEX)
     @Column
@@ -75,11 +75,11 @@ class User extends Model implements IUser {
     @Column
     declare roles: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare password: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
     @IsEmail
     @Column
@@ -111,11 +111,11 @@ class User extends Model implements IUser {
     @Column
     declare aboutUs: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare confidentiality: boolean;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare beContacted: boolean;
 
