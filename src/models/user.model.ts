@@ -24,14 +24,14 @@ import { generateRandomCode } from '../utils/generator';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
-const PSEUDO_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
+const USERNAME_REGEX = /^[a-zA-Z0-9._]{2,32}$/;
 const USER_REFERRAL_CODE_LENGTH: string = process.env.USER_REFERRAL_CODE_LENGTH || '5';
 
 interface IUser {
     id: number;
     firstName: string | null;
     lastName: string | null;
-    pseudo: string;
+    username: string;
     password: string;
     email: string;
     walletAddress: string;
@@ -67,9 +67,9 @@ class User extends Model implements IUser {
 
     @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
-    @Is(PSEUDO_REGEX)
+    @Is(USERNAME_REGEX)
     @Column
-    declare pseudo: string;
+    declare username: string;
 
     @Expose({ groups: ['user', 'profil', 'admin'] })
     @Column
