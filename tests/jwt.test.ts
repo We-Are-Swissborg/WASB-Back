@@ -17,7 +17,7 @@ const jane = {
 	id: 1,
     firstName: "Jane",
     lastName: "Doe",
-    pseudo:"Pseudo",
+    username:"Username",
     email: "mail@test.dev",
     walletAddress: "5F1JU",
 	roles: [Role.Member, Role.Moderator],

@@ -9,7 +9,7 @@ const initDb = () => {
         const jane = await User.create({
             firstName: 'Jane',
             lastName: 'Doe',
-            pseudo: 'Jane_D09',
+            username: 'Jane_D09',
             email: 'jane@doe.dev',
             walletAddress: '5F1JU',
             certified: true,
@@ -25,7 +25,7 @@ const initDb = () => {
         const John = await User.create({
             firstName: 'John',
             lastName: 'Doe',
-            pseudo: 'JDoe',
+            username: 'JDoe',
             email: 'JDoe@outlook.dev',
             walletAddress: '5F1KJU',
             certified: true,
@@ -58,23 +58,23 @@ const initDb = () => {
 
         // Récupérer le parrain avec ses filleuls
         const toto = await User.findOne({
-            where: { pseudo: 'toto' },
+            where: { username: 'toto' },
             include: [
                 {
                     model: User,
                     as: 'referringUser',
-                    attributes: ['pseudo'],
+                    attributes: ['username'],
                 },
                 {
                     model: User,
                     as: 'referrals',
-                    attributes: ['pseudo'],
+                    attributes: ['username'],
                 },
             ],
         });
 
         console.log('toto est parrain/marraine ? ', !!toto?.referrals?.length);
-        console.log('toto est filleul de : ', toto?.referringUser?.dataValues.pseudo);
+        console.log('toto est filleul de : ', toto?.referringUser?.dataValues.username);
     });
 };
 

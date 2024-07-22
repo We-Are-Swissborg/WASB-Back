@@ -12,11 +12,11 @@ import { Register } from '../types/Register';
  */
 const register = async (user: Register): Promise<User> => {
     logger.info('registration new user', user);
-    let flag = await RegistValidator.pseudoAlreadyExist(user.username);
+    let flag = await RegistValidator.usernameAlreadyExist(user.username);
     let referent = null;
 
     if (flag) {
-        throw new Error(`Pseudo '${user.username}' already exist !`);
+        throw new Error(`Username '${user.username}' already exist !`);
     }
 
     flag = await RegistValidator.emailAlreadyExist(user.email);
@@ -34,7 +34,7 @@ const register = async (user: Register): Promise<User> => {
     const password: string = await bcrypt.hash(user.password, 12);
 
     const u = await User.create({
-        pseudo: user.username,
+        username: user.username,
         email: user.email,
         password: password,
         confidentiality: user.confidentiality,
@@ -56,15 +56,15 @@ const register = async (user: Register): Promise<User> => {
 const login = async (login: string, plaintextPassword: string): Promise<User> => {
     logger.info(`login`, { login: login });
     const user = await User.findOne({
-        attributes: ['password', 'pseudo', 'roles', 'walletAddress', 'id'],
+        attributes: ['password', 'username', 'roles', 'walletAddress', 'id'],
         where: {
-            pseudo: login,
+            username: login,
         },
     });
 
-    if (!user) throw new Error(`Authentication is not valid for this pseudo or password`);
+    if (!user) throw new Error(`Authentication is not valid for this username or password`);
     const response = await bcrypt.compare(plaintextPassword, user?.password);
-    if (!response) throw new Error(`Authentication is not valid for this pseudo or password`);
+    if (!response) throw new Error(`Authentication is not valid for this username or password`);
 
     return user;
 };

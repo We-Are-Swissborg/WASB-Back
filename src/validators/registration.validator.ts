@@ -1,7 +1,7 @@
 import { User } from '../models/user.model';
 
-const pseudoAlreadyExist = async (pseudo: string): Promise<number | null> => {
-    const exist = await User.count({ where: { pseudo: pseudo } });
+const usernameAlreadyExist = async (username: string): Promise<number | null> => {
+    const exist = await User.count({ where: { username: username } });
 
     return exist;
 };
@@ -17,4 +17,4 @@ const referralExist = async (referral: string): Promise<number | null> => {
     return exist;
 };
 
-export { pseudoAlreadyExist, emailAlreadyExist, referralExist };
+export { usernameAlreadyExist, emailAlreadyExist, referralExist };
