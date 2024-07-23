@@ -1,10 +1,16 @@
 import express, { Application } from 'express';
-import { createServer } from 'node:http';
+import { createServer } from 'node:https';
 import { apiRouter } from './routes/useRoutes';
 import cors from 'cors';
 import { sequelize, testConnection } from './db/sequelizeConfig';
 import { logger } from './middlewares/logger.middleware';
 import initDb from './dev/init-db';
+import fs from 'node:fs';
+
+const options = {
+  key: fs.readFileSync(process.env.CERT_KEY!),
+  cert: fs.readFileSync(process.env.CERT_PUB!),
+};
 /* eslint-disable */
 require('@dotenvx/dotenvx').config();
 /* eslint-enable */
@@ -13,7 +19,7 @@ logger.info(`Start application`);
 
 const PORT = process.env.PORT || 3000;
 const app: Application = express();
-const server = createServer(app);
+const server = createServer(options, app);
 const corsDomains = process.env.CORS_ORIGIN?.split(',');
 const corsOptions = {
     origin: corsDomains,
