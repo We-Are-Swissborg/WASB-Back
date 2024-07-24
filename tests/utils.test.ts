@@ -29,6 +29,5 @@ describe('genrerate random code', () => {
 
     code = generateRandomNonce();
     expect(code).toHaveLength(32);
-    console.log('last code :', {code : code});
   })
 })
