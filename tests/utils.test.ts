@@ -21,7 +21,7 @@ describe('genrerate random code', () => {
     expect(code).toMatch(regex);
   })
   test('generate nonce of length', () => {
-    let  code = generateRandomNonce(Number('10'));    
+    let  code = generateRandomNonce(Number('10'));
     expect(code).toHaveLength(10);
 
     code = generateRandomNonce(100);

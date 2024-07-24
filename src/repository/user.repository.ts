@@ -29,7 +29,7 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
  * @returns {Promise<User | null>} User or null
  */
 const loginByUsername = async (username: string): Promise<User | null> => {
-    if (!!username) return null;
+    if (!username) return null;
 
     return await User.findOne({
         attributes: ['password', 'username', 'roles', 'walletAddress', 'id'],
