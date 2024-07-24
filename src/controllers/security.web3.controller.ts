@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { updateLastLogin } from '../services/user.services';
 import { confirmSignMessage, generateNonce } from '../services/security.web3.services';
 import { generateToken } from '../services/jwt.services';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 
 /**

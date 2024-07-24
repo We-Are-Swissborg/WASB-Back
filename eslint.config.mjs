@@ -4,8 +4,18 @@ import tseslint from "typescript-eslint";
 
 
 export default [
-  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
-  {languageOptions: { globals: globals.browser }},
+  {
+    files: ["**/*.js"], 
+    languageOptions: {sourceType: "commonjs"}
+  },
+  {
+    languageOptions: { globals: globals.browser }
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    rules: {
+      "no-extra-boolean-cast": "off", // Allow double negations
+    },
+  },
 ];
