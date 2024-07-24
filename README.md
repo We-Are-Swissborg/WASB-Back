@@ -1,4 +1,4 @@
-# WeAreSwissborg
+# WeAreSwissBorg
 
 The association that supports you in your cryptographic adventure!
 

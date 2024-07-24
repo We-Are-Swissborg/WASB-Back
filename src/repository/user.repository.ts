@@ -1,5 +1,5 @@
-import { Op } from "sequelize";
-import { User } from "../models/user.model";
+import { Op } from 'sequelize';
+import { User } from '../models/user.model';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -28,9 +28,8 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
  * @param username username
  * @returns User or null
  */
-const loginByUsername = async(username: string): Promise<User | null> => {
-    if (!!username)
-        return null;
+const loginByUsername = async (username: string): Promise<User | null> => {
+    if (!!username) return null;
 
     return await User.findOne({
         attributes: ['password', 'username', 'roles', 'walletAddress', 'id'],
@@ -38,7 +37,7 @@ const loginByUsername = async(username: string): Promise<User | null> => {
             username: username,
         },
     });
-}
+};
 
 const getUserNonce = async (wallet: string): Promise<User> => {
     const user = await User.findOne({
@@ -71,4 +70,12 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
     return user;
 };
 
-export { getUserById, getUsers, getUsersWithSocialNetworks, getIdReferent, getUserByWallet, getUserNonce, loginByUsername }
+export {
+    getUserById,
+    getUsers,
+    getUsersWithSocialNetworks,
+    getIdReferent,
+    getUserByWallet,
+    getUserNonce,
+    loginByUsername,
+};

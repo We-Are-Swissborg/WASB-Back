@@ -52,7 +52,7 @@ const generateRandomCode = (length: number = 5): string => {
  * @param {number} [length=32] Random nonce length
  * @returns {string} random nonce
  */
-const generateRandomNonce = (length: number = 32): string => {    
+const generateRandomNonce = (length: number = 32): string => {
     return crypto.randomBytes(length / 2).toString('hex');
 };
 
