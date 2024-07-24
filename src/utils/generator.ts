@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 
 /**
- * Generate a random code of X characters
+ * Generate a random code of {length} characters
  * @param {number} [length=5] Random code length
  * @returns {string} random code
  */

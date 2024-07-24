@@ -25,8 +25,8 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
 
 /**
  * Retrieves a user's data to authenticate them
- * @param username username
- * @returns User or null
+ * @param {string} username username
+ * @returns {Promise<User | null>} User or null
  */
 const loginByUsername = async (username: string): Promise<User | null> => {
     if (!!username) return null;
