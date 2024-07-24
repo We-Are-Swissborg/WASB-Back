@@ -1,16 +1,16 @@
 import { IUser, User } from '../models/user.model';
-import crypto from 'node:crypto';
-import { getUserNonce, getUserByWallet } from './user.services';
 import { logger } from '../middlewares/logger.middleware';
+import { getUserByWallet, getUserNonce } from '../repository/user.repository';
+import { generateRandomNonce } from '../utils/generator';
 /* eslint-disable */
 const utilCrypto = require('@polkadot/util-crypto');
 const util = require('@polkadot/util');
 /* eslint-enable */
 
 /**
- * generateNonce
- * @param walletAddress public address of wallet
- * @returns user updated with new nonce and date expires
+ * Generate a nonce for a wallet user
+ * @param {string} walletAddress public address of wallet
+ * @returns {Promise<IUser>} user updated with new nonce and date expires
  */
 const generateNonce = async (walletAddress: string): Promise<IUser> => {
     logger.info('generateNonce', { walletAddress: walletAddress });
@@ -19,7 +19,7 @@ const generateNonce = async (walletAddress: string): Promise<IUser> => {
         throw new Error(`Wallet is not initialized`);
     }
 
-    const nonce = crypto.randomBytes(32).toString('hex');
+    const nonce = generateRandomNonce();
 
     // Set the expiry of the nonce to 1 hour
     const expires = new Date(new Date().getTime() + 1000 * 60 * 60);
@@ -39,10 +39,10 @@ const generateNonce = async (walletAddress: string): Promise<IUser> => {
 };
 
 /**
- *
- * @param walletAddress
- * @param signedMessageHash
- * @returns
+ * According to a wallet address. Compare whether the message signed on the blockchain contains the nonce registered for the wallet.
+ * @param {string} walletAddress wallet address
+ * @param {string} signedMessageHash signature hash
+ * @returns {Promise<User>} user
  */
 const confirmSignMessage = async (walletAddress: string, signedMessageHash: string): Promise<User> => {
     logger.info('confirmSignMessage', { walletAddress: walletAddress, signedMessageHash: signedMessageHash });
@@ -68,8 +68,8 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
 };
 
 /**
- *
- * @param user
+ * Deletes the nonce for the user
+ * @param {IUser} user
  */
 const deleteNonce = async (user: IUser): Promise<void> => {
     logger.info('deleteNonce', { userId: user.id, nonce: user.nonce });
@@ -85,9 +85,9 @@ const deleteNonce = async (user: IUser): Promise<void> => {
 
 /**
  *
- * @param signedMessage message content signed
- * @param signature signature hash
- * @param address wallet address
+ * @param {string} signedMessage message content signed
+ * @param {string} signature signature hash
+ * @param {string} address wallet address
  * @returns whether the signature corresponds to the message
  */
 const isValidSignaturePolkadot = (signedMessage: string, signature: string, address: string) => {

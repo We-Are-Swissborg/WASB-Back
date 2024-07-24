@@ -1,3 +1,10 @@
+import crypto from 'node:crypto';
+
+/**
+ * Generate a random code of {length} characters
+ * @param {number} [length=5] Random code length
+ * @returns {string} random code
+ */
 const generateRandomCode = (length: number = 5): string => {
     let code = '';
     const letterArray = [
@@ -40,4 +47,13 @@ const generateRandomCode = (length: number = 5): string => {
     return code;
 };
 
-export { generateRandomCode };
+/**
+ * Generate a random nonce of {length} characters
+ * @param {number} [length=32] Random nonce length
+ * @returns {string} random nonce
+ */
+const generateRandomNonce = (length: number = 32): string => {
+    return crypto.randomBytes(length / 2).toString('hex');
+};
+
+export { generateRandomCode, generateRandomNonce };

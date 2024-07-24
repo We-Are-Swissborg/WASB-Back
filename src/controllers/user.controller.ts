@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
-import { getUserById, getUsers } from '../services/user.services';
 import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/registration.validator';
+import { getUserById, getUsers } from '../repository/user.repository';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});

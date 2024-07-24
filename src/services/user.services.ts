@@ -1,14 +1,14 @@
-import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
 import * as RegistValidator from '../validators/registration.validator';
 import { Register } from '../types/Register';
+import { getIdReferent, loginByUsername } from '../repository/user.repository';
 
 /**
  * New user registration
- * @param user
- * @returns new user
+ * @param {Register} user
+ * @returns {Promise<User>} new user
  */
 const register = async (user: Register): Promise<User> => {
     logger.info('registration new user', user);
@@ -49,18 +49,15 @@ const register = async (user: Register): Promise<User> => {
 
 /**
  *
- * @param login user login
- * @param plaintextPassword user plaintext password
- * @returns user
+ * @param {string} username user login
+ * @param {string} plaintextPassword user plaintext password
+ * @returns {Promise<User>} user
  */
-const login = async (login: string, plaintextPassword: string): Promise<User> => {
+const login = async (username: string, plaintextPassword: string): Promise<User> => {
     logger.info(`login`, { login: login });
-    const user = await User.findOne({
-        attributes: ['password', 'username', 'roles', 'walletAddress', 'id'],
-        where: {
-            username: login,
-        },
-    });
+    const user = await loginByUsername(username);
+
+    if (!plaintextPassword) throw new Error(`Authentication is not valid for this username or password`);
 
     if (!user) throw new Error(`Authentication is not valid for this username or password`);
     const response = await bcrypt.compare(plaintextPassword, user?.password);
@@ -74,66 +71,4 @@ const updateLastLogin = (user: User): void => {
     user.save();
 };
 
-const getUserByWallet = async (wallet: string): Promise<User | null> => {
-    const user = await User.findOne({ where: { walletAddress: wallet } });
-    return user;
-};
-
-const getUserById = async (identifiant: number): Promise<User | null> => {
-    const user = await User.findByPk(identifiant);
-    return user;
-};
-
-const getUsers = async (): Promise<User[]> => {
-    const users = await User.findAll();
-    return users;
-};
-
-const getUsersWithSocialNetworks = async (): Promise<User[]> => {
-    const users = await User.findAll({
-        include: 'socialNetwork',
-    });
-    return users;
-};
-
-const getUserNonce = async (wallet: string): Promise<User> => {
-    const user = await User.findOne({
-        where: {
-            walletAddress: wallet,
-            expiresIn: {
-                [Op.gte]: new Date(),
-            },
-        },
-    });
-
-    if (!user) throw new Error(`Authentication is not valid for this wallet`);
-
-    return user;
-};
-
-/**
- * Retrieve the identifier of the user to whom the referral code belongs
- * @param referral unique referral code
- * @returns user or null
- */
-const getIdReferent = async (referral: string): Promise<User | null> => {
-    const user = await User.findOne({
-        attributes: ['id'],
-        where: {
-            referralCode: referral,
-        },
-    });
-
-    return user;
-};
-
-export {
-    register,
-    login,
-    updateLastLogin,
-    getUserByWallet,
-    getUserById,
-    getUsers,
-    getUsersWithSocialNetworks,
-    getUserNonce,
-};
+export { register, login, updateLastLogin };
