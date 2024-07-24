@@ -153,10 +153,10 @@ class User extends Model implements IUser {
     @Column
     declare referringUserId?: number;
 
-    @BelongsTo(() => User, 'referringUserId') //  A user can have a referral.
+    @BelongsTo(() => User, 'referringUserId')
     declare referringUser?: User;
 
-    @HasMany(() => User, 'referringUserId') // A user can have several godchildren.
+    @HasMany(() => User, 'referringUserId')
     declare referrals: User[];
 
     // getters that are not attributes should be tagged using NonAttribute
@@ -180,7 +180,7 @@ class User extends Model implements IUser {
 
     /**
      * Generation of a new unique referral code
-     * @param instance new user added
+     * @param {User} instance new user added
      */
     @BeforeCreate
     static async generateReferalCode(instance: User) {
