@@ -2,9 +2,9 @@ import express, { Application } from 'express';
 import { createServer } from 'node:http';
 import { apiRouter } from './routes/useRoutes';
 import cors from 'cors';
-import { sequelize, testConnection } from './db/sequelizeConfig';
 import { logger } from './middlewares/logger.middleware';
-import initDb from './dev/init-db';
+import sequelize from './models';
+
 /* eslint-disable */
 require('@dotenvx/dotenvx').config();
 /* eslint-enable */
@@ -23,18 +23,15 @@ const corsOptions = {
     maxAge: 3600,
 };
 
+sequelize.authenticate().catch(() => 
+    logger.error(`Authentication error`)
+);
+
 // Body parsing Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
-
-testConnection();
-if (process.env.NODE_ENV === 'DEV') {
-    initDb();
-} else {
-    sequelize.sync({ alter: true });
-}
 
 //Routes
 app.use('/api', apiRouter);

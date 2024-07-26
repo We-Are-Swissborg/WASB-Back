@@ -1,0 +1,10 @@
+{
+  "DEV": {
+    "storage": "./database.sqlite3",
+    "dialect": "sqlite"
+  },
+  "PROD": {
+    "storage": "./database.sqlite3",
+    "dialect": "sqlite"
+  }
+}
