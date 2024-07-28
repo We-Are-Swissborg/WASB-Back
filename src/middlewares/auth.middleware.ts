@@ -2,13 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { validateToken } from '../services/jwt.services';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
+import { TokenPayload } from '../types/TokenPayload';
 
 /**
  * middleware to check whether user has access to a specific endpoint
  *
  * @param allowedAccessTypes list of allowed access types of a specific endpoint
  */
-export const authorize = () => (req: Request, res: Response, next: NextFunction) => {
+export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: Response, next: NextFunction) => {
     try {
         let jwt = req.headers.authorization;
 
@@ -23,24 +24,26 @@ export const authorize = () => (req: Request, res: Response, next: NextFunction)
         }
 
         // verify token hasn't expired yet
-        validateToken(jwt);
+        const decodedToken: TokenPayload = validateToken(jwt) as TokenPayload;
 
-        // const hasAccessToEndpoint = allowedAccessTypes.some(
-        //   (at) => decodedToken.accessTypes.some((uat) => uat === at)
-        // );
+        if (allowedAccessTypes === undefined) next();
 
-        // if (!hasAccessToEndpoint) {
-        //   return res.status(401).json({ message: 'No enough privileges to access endpoint' });
-        // }
+        // check access
+        const hasAccessToEndpoint = allowedAccessTypes?.some((at) => decodedToken.roles?.some((uat) => uat === at));
+
+        if (!hasAccessToEndpoint) {
+            return res.status(401).json({ message: 'No enough privileges to access endpoint' });
+        }
 
         next();
     } catch (error) {
-        logger.error('Failed to authenticate user', error);
         if (error as TokenExpiredError) {
+            logger.error('Expired token', error);
             res.status(401).json({ message: 'Expired token' });
             return;
         }
 
-        res.status(500).json({ message: 'Failed to authenticate user' });
+        logger.error('Failed to authorize user', error);
+        res.status(500).json({ message: 'Failed to authorize user' });
     }
 };

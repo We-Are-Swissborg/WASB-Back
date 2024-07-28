@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { register } from '../services/user.services';
-import { confirmSignMessage, generateNonce } from '../services/security.services';
+import { login, register, updateLastLogin } from '../services/user.services';
 import { generateToken } from '../services/jwt.services';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
-import { IUser, User } from '../models/user.model';
+import { plainToInstance } from 'class-transformer';
+import { IUser } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
+import { Register } from '../types/Register';
 
 /**
  * Register a new member
@@ -15,11 +15,11 @@ import { logger } from '../middlewares/logger.middleware';
 const registration = async (req: Request, res: Response) => {
     try {
         const form: string = req.body;
-        const user: IUser = plainToInstance(User, form, { groups: ['register'] });
+        const user: Register = plainToInstance(Register, form, { groups: ['register'] });
         const admin = false; // Set up when role ok
         const newUser: IUser = await register(user);
 
-        if(admin) {
+        if (admin) {
             res.status(201);
         } else {
             const token = generateToken(newUser);
@@ -32,35 +32,18 @@ const registration = async (req: Request, res: Response) => {
 };
 
 /**
- * Generate Nonce for user
+ * Authenticates a user with credentials
  *
  * @param req Request
  * @param res Response
  */
-const nonce = async (req: Request, res: Response) => {
+const authCredentials = async (req: Request, res: Response) => {
     try {
-		const { walletAddress } = req.body;
+        const { username, password } = req.body;
+        logger.info(`Attempt authCredentials`, { username: username });
 
-		const user = await generateNonce(walletAddress);
-		const userDTO = instanceToPlain(user, { groups: ['auth'], excludeExtraneousValues: true });
-        res.status(200).json(userDTO);
-    } catch (e: unknown) {
-        logger.error(`nonce error`, e);
-        if (e instanceof Error) res.status(400).json({ message: e.message });
-    }
-};
-
-/**
- * Authenticates a user
- *
- * @param req Request
- * @param res Response
- */
-const auth = async (req: Request, res: Response) => {
-    try {
-		const { walletAddress, signedMessageHash } = req.body;
-
-		const user = await confirmSignMessage(walletAddress, signedMessageHash);
+        const user = await login(username, password);
+        updateLastLogin(user);
         const token = generateToken(user);
 
         res.status(200).json({ token: token });
@@ -70,4 +53,4 @@ const auth = async (req: Request, res: Response) => {
     }
 };
 
-export { registration, auth, nonce };
+export { registration, authCredentials };

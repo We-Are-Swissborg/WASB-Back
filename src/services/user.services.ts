@@ -1,78 +1,74 @@
-import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { IUser, User } from '../models/user.model';
-import { emailAlreadyExist, pseudoAlreadyExist } from '../validators/registration.validator';
+import { User } from '../models/user.model';
+import bcrypt from 'bcrypt';
+import * as RegistValidator from '../validators/registration.validator';
+import { Register } from '../types/Register';
+import { getIdReferent, loginByUsername } from '../repository/user.repository';
 
+/**
+ * New user registration
+ * @param {Register} user
+ * @returns {Promise<User>} new user
+ */
+const register = async (user: Register): Promise<User> => {
+    logger.info('registration new user', user);
+    let flag = await RegistValidator.usernameAlreadyExist(user.username);
+    let referent = null;
 
-const register = async (user: IUser): Promise<IUser> => {
-	logger.info('register', user);
-    let flag = await pseudoAlreadyExist(user.pseudo);
     if (flag) {
-        throw new Error(`Le pseudo '${user.pseudo}' existe déjà !`);
+        throw new Error(`Username '${user.username}' already exist !`);
     }
 
-    flag = await emailAlreadyExist(user.email);
+    flag = await RegistValidator.emailAlreadyExist(user.email);
     if (flag) {
-        throw new Error(`L'adresse email '${user.email}' existe déjà !`);
+        throw new Error(`Email '${user.email}' already exist !`);
     }
 
-	const oldUser = await getUserByWallet(user.walletAddress);
-	logger.info('oldUser', oldUser);
+    if (user.referralCode) {
+        referent = await getIdReferent(user.referralCode);
+        logger.debug('referent', referent);
 
-	if(!oldUser)
-		throw new Error('Ce Wallet n\'existe pas dans notre registre');
+        if (!referent) throw new Error(`Referral '${user.referralCode}' is incorrect !`);
+    }
 
-    await oldUser.update({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        pseudo: user.pseudo,
+    const password: string = await bcrypt.hash(user.password, 12);
+
+    const u = await User.create({
+        username: user.username,
         email: user.email,
-        walletAddress: user.walletAddress,
-        certified: true,
-        country: user.country,
-        city: user.city,
-        referral: user.referral,
-        aboutUs: user.aboutUs,
+        password: password,
         confidentiality: user.confidentiality,
         beContacted: user.beContacted,
+        referringUserId: referent?.id,
     });
-	logger.debug('oldUser updated', oldUser);
 
-	return oldUser;
+    logger.debug('user created', u);
+
+    return u;
 };
 
-const getUserByWallet = async (wallet: string): Promise<User | null> => {
-    const user = await User.findOne({ where: { walletAddress: wallet } });
+/**
+ *
+ * @param {string} username user login
+ * @param {string} plaintextPassword user plaintext password
+ * @returns {Promise<User>} user
+ */
+const login = async (username: string, plaintextPassword: string): Promise<User> => {
+    logger.info(`login`, { login: login });
+    const user = await loginByUsername(username);
+
+    if (!plaintextPassword) throw new Error(`Authentication is not valid for this username or password`);
+
+    if (!user) throw new Error(`Authentication is not valid for this username or password`);
+    const response = await bcrypt.compare(plaintextPassword, user?.password);
+    if (!response) throw new Error(`Authentication is not valid for this username or password`);
+
     return user;
 };
 
-const getUserById = async (identifiant: number): Promise<User | null> => {
-    const user = await User.findByPk(identifiant);
-    return user;
+const updateLastLogin = (user: User): void => {
+    user.lastLogin = new Date();
+    user.save();
 };
 
-const getUsers = async (): Promise<User[]> => {
-    const users = await User.findAll();
-    return users;
-};
-
-const getUsersWithSocialNetworks = async (): Promise<User[]> => {
-    const users = await User.findAll({
-        include: 'socialNetwork',
-    });
-    return users;
-};
-
-const getUserNonce = async (wallet: string): Promise<IUser | null> => {
-	const user: IUser | null = await User.findOne({
-		where: {
-			walletAddress: wallet,
-			expiresIn: {
-				[Op.gte]: new Date()
-			}
-		},
-	});
-	return user;
-}
-
-export { register, getUserByWallet, getUserById, getUsers, getUsersWithSocialNetworks, getUserNonce };
+export { register, login, updateLastLogin };

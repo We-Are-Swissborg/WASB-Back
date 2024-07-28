@@ -1,15 +1,20 @@
 import { User } from '../models/user.model';
 
-const pseudoAlreadyExist = async (pseudo: string): Promise<User | null> => {
-    const exist = await User.findOne({ where: { pseudo: pseudo } });
+const usernameAlreadyExist = async (username: string): Promise<number | null> => {
+    const exist = await User.count({ where: { username: username } });
 
     return exist;
 };
 
-const emailAlreadyExist = async (email: string): Promise<User | null> => {
-    const exist = await User.findOne({ where: { email: email } });
+const emailAlreadyExist = async (email: string): Promise<number | null> => {
+    const exist = await User.count({ where: { email: email } });
+    return exist;
+};
+
+const referralExist = async (referral: string): Promise<number | null> => {
+    const exist = await User.count({ where: { referralCode: referral } });
 
     return exist;
 };
 
-export { pseudoAlreadyExist, emailAlreadyExist };
+export { usernameAlreadyExist, emailAlreadyExist, referralExist };

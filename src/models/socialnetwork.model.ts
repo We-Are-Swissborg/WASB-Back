@@ -56,6 +56,10 @@ class SocialNetwork extends Model implements ISocialNetwork {
     declare telegram: string;
 
     @Expose({ groups: ['user', 'register', 'profil'] })
+    @Column
+    declare facebook: string;
+
+    @Expose({ groups: ['user', 'register', 'profil'] })
     @CreatedAt
     @IsDate
     @Column
