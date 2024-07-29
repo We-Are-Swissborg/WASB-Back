@@ -51,7 +51,7 @@ const confirmSignMessage = async (walletAddress: string, signedMessageHash: stri
         const nonce = await getUserNonce(walletAddress);
         logger.info('nonce retrieve', nonce.nonce);
 
-        const message = `Confirm your authentication to our community #WeAreSwissborg \nNONCE : ${nonce.nonce}`;
+        const message = `Confirm your authentification to our community #WeAreSwissborg \nNONCE : ${nonce.nonce}`;
 
         const isValid = isValidSignaturePolkadot(message, signedMessageHash, walletAddress);
 
