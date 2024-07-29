@@ -26,7 +26,7 @@ export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: 
         // verify token hasn't expired yet
         const decodedToken: TokenPayload = validateToken(jwt) as TokenPayload;
 
-        if (allowedAccessTypes === undefined) next();
+        if (allowedAccessTypes === undefined) return next();
 
         // check access
         const hasAccessToEndpoint = allowedAccessTypes?.some((at) => decodedToken.roles?.some((uat) => uat === at));
