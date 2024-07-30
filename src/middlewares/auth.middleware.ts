@@ -12,7 +12,7 @@ import { TokenPayload } from '../types/TokenPayload';
 export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: Response, next: NextFunction) => {
     try {
         let jwt = req.headers.authorization;
-        logger.debug('token jwt', {jwt});
+        logger.debug('token jwt', { jwt });
 
         if (!jwt) {
             logger.warn('Invalid token');
@@ -23,7 +23,6 @@ export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: 
         if (jwt.toLowerCase().startsWith('bearer')) {
             jwt = jwt.slice('bearer'.length).trim();
         }
-
 
         // verify token hasn't expired yet
         const decodedToken: TokenPayload = validateToken(jwt) as TokenPayload;

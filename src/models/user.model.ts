@@ -71,7 +71,7 @@ class User extends Model implements IUser {
     declare username: string;
 
     @Column
-    declare private roles: string;
+    private declare roles: string;
 
     @Expose({ groups: ['user', 'profil'] })
     @Column
@@ -163,8 +163,8 @@ class User extends Model implements IUser {
     get fullName(): NonAttribute<string | null> {
         if (!this.lastName && !this.firstName) {
             return null;
-          }
-          return `${this.lastName || ''} ${this.firstName || ''}`.trim();
+        }
+        return `${this.lastName || ''} ${this.firstName || ''}`.trim();
     }
 
     @Expose({ groups: ['user', 'profil', 'admin'] })
