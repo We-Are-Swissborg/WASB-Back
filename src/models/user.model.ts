@@ -44,7 +44,6 @@ interface IUser {
     beContacted: boolean;
     nonce: string | null;
     expiresIn: Date | null;
-    roles: string | null;
     referralCode: string;
 }
 
@@ -71,9 +70,8 @@ class User extends Model implements IUser {
     @Column
     declare username: string;
 
-    @Expose({ groups: ['user', 'profil', 'admin'] })
     @Column
-    declare roles: string;
+    declare private roles: string;
 
     @Expose({ groups: ['user', 'profil'] })
     @Column
@@ -162,8 +160,16 @@ class User extends Model implements IUser {
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
     @Expose({ groups: ['user', 'profil'] })
-    get fullName(): NonAttribute<string> {
-        return `${this.lastName} ${this.firstName}`;
+    get fullName(): NonAttribute<string | null> {
+        if (!this.lastName && !this.firstName) {
+            return null;
+          }
+          return `${this.lastName || ''} ${this.firstName || ''}`.trim();
+    }
+
+    @Expose({ groups: ['user', 'profil', 'admin'] })
+    get getRoles(): NonAttribute<string[]> {
+        return JSON.parse(this.roles);
     }
 
     @BeforeCreate

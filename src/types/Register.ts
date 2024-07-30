@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class Register {
+export default class Register {
     @Expose({ groups: ['register'] })
     declare email: string;
 
