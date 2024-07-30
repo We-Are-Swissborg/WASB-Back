@@ -56,12 +56,13 @@ const register = async (user: Register): Promise<User> => {
 const login = async (username: string, plaintextPassword: string): Promise<User> => {
     logger.info(`login`, { login: login });
     const user = await loginByUsername(username);
+    const errorMessage = `Authentication is not valid for this username or password`;
 
-    if (!plaintextPassword) throw new Error(`Authentication is not valid for this username or password`);
+    if (!plaintextPassword) throw new Error(errorMessage);
 
-    if (!user) throw new Error(`Authentication is not valid for this username or password`);
+    if (!user) throw new Error(errorMessage);
     const response = await bcrypt.compare(plaintextPassword, user?.password);
-    if (!response) throw new Error(`Authentication is not valid for this username or password`);
+    if (!response) throw new Error(errorMessage);
 
     return user;
 };
