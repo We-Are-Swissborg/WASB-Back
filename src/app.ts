@@ -28,7 +28,7 @@ const corsOptions = {
 };
 const limiter = rateLimit({
     windowMs: Number(durationLimitRequest) * 60 * 1000, // 15 minutes
-    max: Number(limitRequest), // limite chaque IP à 100 requêtes par windowMs
+    max: Number(limitRequest), // limit IP 100 request/windowMs
 });
 
 sequelize.authenticate().catch(() => logger.error(`Authentication error`));
