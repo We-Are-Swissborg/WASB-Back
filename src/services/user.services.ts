@@ -2,7 +2,7 @@ import { logger } from '../middlewares/logger.middleware';
 import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
 import * as RegistValidator from '../validators/registration.validator';
-import { Register } from '../types/Register';
+import Register from '../types/Register';
 import { getIdReferent, loginByUsername } from '../repository/user.repository';
 
 /**

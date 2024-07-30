@@ -36,7 +36,7 @@ describe('JWT test', () => {
 
 		expect(decodedToken.userId).toEqual(user.id);
 		expect(decodedToken.wallet).toEqual(user.walletAddress);
-		expect(decodedToken.roles).toEqual(user.roles);
+		expect(decodedToken.roles).toEqual(user.getRoles);
     })
 
 	test('validateToken -> changed informations user', () => {

@@ -1,5 +1,5 @@
 import { JwtPayload, SignOptions, VerifyOptions, sign, verify } from 'jsonwebtoken';
-import { IUser } from '../models/user.model';
+import { User } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
 
 const secret: string = process.env.JWT_SECRET_KEY || 'my_secret_key';
@@ -27,12 +27,12 @@ const validateToken = (token: string): JwtPayload | string => {
  * generates JWT token
  * @param user the user's expected payload
  */
-const generateToken = (user: IUser): string => {
+const generateToken = (user: User): string => {
     const payload = {
         wallet: user.walletAddress,
         userId: user.id,
         username: user.username,
-        roles: user.roles,
+        roles: user.getRoles,
     };
     logger.info(`new token generated for user`, payload);
 

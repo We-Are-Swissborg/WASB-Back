@@ -23,9 +23,7 @@ const corsOptions = {
     maxAge: 3600,
 };
 
-sequelize.authenticate().catch(() => 
-    logger.error(`Authentication error`)
-);
+sequelize.authenticate().catch(() => logger.error(`Authentication error`));
 
 // Body parsing Middleware
 app.use(express.json());
