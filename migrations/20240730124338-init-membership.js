@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('SocialMedias', {
+    await queryInterface.createTable('Memberships', {
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -15,19 +15,21 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       },
-      twitter: {
-        type: Sequelize.STRING,
+      contributionStatus: {
+        type: Sequelize.ENUM,
+        values: ['no adherent', 'adherent', 'in progress', 'not accepted'],
+        allowNull: false,
+        defaultValue: 'no adherent'
+      },
+      dateContribution: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      discord: {
-        type: Sequelize.STRING,
+      endDateContribution: {
+        type: Sequelize.DATE,
         allowNull: true,
       },
-      tiktok: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      telegram: {
+      contribution: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -45,6 +47,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('SocialMedias');
+    await queryInterface.dropTable('Memberships');
   }
 };

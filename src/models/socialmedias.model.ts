@@ -18,7 +18,7 @@ const DISCORD_REGEX = /^[a-z0-9._]{2,32}$/;
 const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_,.']+/;
 const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+/;
 
-interface ISocialNetwork {
+interface ISocialMedias {
     userId: number;
     twitter: string;
     discord: string;
@@ -27,7 +27,7 @@ interface ISocialNetwork {
 }
 
 @Table
-class SocialNetwork extends Model implements ISocialNetwork {
+class SocialMedias extends Model implements ISocialMedias {
     @Expose({ groups: ['user'] })
     @ForeignKey(() => User)
     @AllowNull(false)
@@ -35,41 +35,41 @@ class SocialNetwork extends Model implements ISocialNetwork {
     @Column
     declare userId: number;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @Is(TWITTER_REGEX)
+    @Expose({ groups: ['user', 'profil'] })
+    // @Is(TWITTER_REGEX)
     @Column
     declare twitter: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @Is(DISCORD_REGEX)
+    @Expose({ groups: ['user', 'profil'] })
+    // @Is(DISCORD_REGEX)
     @Column
     declare discord: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @Is(TIKTOK_REGEX)
+    @Expose({ groups: ['user', 'profil'] })
+    // @Is(TIKTOK_REGEX)
     @Column
     declare tiktok: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
-    @Is(TELEGRAM_REGEX)
+    @Expose({ groups: ['user', 'profil'] })
+    // @Is(TELEGRAM_REGEX)
     @Column
     declare telegram: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare facebook: string;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @CreatedAt
     @IsDate
     @Column
     declare createdAt: Date;
 
-    @Expose({ groups: ['user', 'register', 'profil'] })
+    @Expose({ groups: ['user', 'profil'] })
     @UpdatedAt
     @IsDate
     @Column
     declare updatedAt: Date;
 }
 
-export { SocialNetwork, ISocialNetwork };
+export { SocialMedias, ISocialMedias };

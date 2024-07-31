@@ -16,11 +16,14 @@ import {
     ForeignKey,
     BelongsTo,
     HasMany,
+    AfterCreate,
 } from 'sequelize-typescript';
-import { SocialNetwork } from './socialnetwork.model';
+import { SocialMedias } from './socialmedias.model';
 import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
+import { Membership } from './membership.model';
+import ContributionStatus from '../types/ContributionStatus';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -56,7 +59,7 @@ class User extends Model implements IUser {
     declare id: number;
 
     @Expose({ groups: ['user', 'profil'] })
-    @Is(NAME_REGEX)
+    // @Is(NAME_REGEX) TO RETURN AN ERROR IS EMPTY
     @Column
     declare firstName: string;
 
@@ -73,7 +76,6 @@ class User extends Model implements IUser {
     @Column
     private declare roles: string;
 
-    @Expose({ groups: ['user', 'profil'] })
     @Column
     declare password: string;
 
@@ -137,10 +139,10 @@ class User extends Model implements IUser {
     @Column
     declare updatedAt: Date;
 
-    @Type(() => SocialNetwork)
+    @Type(() => SocialMedias)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => SocialNetwork)
-    declare socialNetwork: SocialNetwork | null;
+    @HasOne(() => SocialMedias)
+    declare socialMedias: SocialMedias | null;
 
     @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
@@ -156,6 +158,11 @@ class User extends Model implements IUser {
 
     @HasMany(() => User, 'referringUserId')
     declare referrals: User[];
+
+    @Type(() => Membership)
+    @Expose({ groups: ['user', 'profil'] })
+    @HasOne(() => Membership)
+    declare membership: Membership;
 
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
@@ -201,6 +208,16 @@ class User extends Model implements IUser {
                 }
             }
         }
+    }
+
+    @AfterCreate
+    static async addDefaultContributionStatus(instance: User) {
+        if(!instance.membership) {
+          await Membership.create({
+            userId: instance.id,
+            contributionStatus: ContributionStatus.NO_ADHERENT
+          })
+      }
     }
 
     addRoles(roles: Role[]): User {
