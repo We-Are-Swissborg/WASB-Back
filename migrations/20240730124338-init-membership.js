@@ -7,7 +7,6 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
         references: {
           model: 'Users',
           key: 'id'
@@ -16,10 +15,8 @@ module.exports = {
         onUpdate: 'CASCADE'
       },
       contributionStatus: {
-        type: Sequelize.ENUM,
-        values: ['no adherent', 'adherent', 'in progress', 'not accepted'],
+        type: Sequelize.STRING,
         allowNull: false,
-        defaultValue: 'no adherent'
       },
       dateContribution: {
         type: Sequelize.DATE,

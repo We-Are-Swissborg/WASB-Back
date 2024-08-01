@@ -141,7 +141,7 @@ class User extends Model implements IUser {
 
     @Type(() => SocialMedias)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => SocialMedias)
+    @HasOne(() => SocialMedias, {foreignKey: 'userId'})
     declare socialMedias: SocialMedias | null;
 
     @Expose({ groups: ['user', 'profil'] })
@@ -161,7 +161,7 @@ class User extends Model implements IUser {
 
     @Type(() => Membership)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => Membership)
+    @HasOne(() => Membership, {foreignKey: 'userId'})
     declare membership: Membership;
 
     // getters that are not attributes should be tagged using NonAttribute
@@ -198,13 +198,13 @@ class User extends Model implements IUser {
     @BeforeCreate
     static async generateReferalCode(instance: User) {
         if (instance.referralCode === undefined) {
-            let unique = false;
-            while (!unique) {
+            let isUnique = false;
+            while (!isUnique) {
                 const code = generateRandomCode(Number(USER_REFERRAL_CODE_LENGTH));
                 const userExist = await User.count({ where: { referralCode: code } });
                 if (userExist == 0) {
                     instance.referralCode = code;
-                    unique = !unique;
+                    isUnique = !isUnique;
                 }
             }
         }
@@ -213,11 +213,13 @@ class User extends Model implements IUser {
     @AfterCreate
     static async addDefaultContributionStatus(instance: User) {
         if(!instance.membership) {
-          await Membership.create({
-            userId: instance.id,
-            contributionStatus: ContributionStatus.NO_ADHERENT
-          })
-      }
+            Membership.removeAttribute('id'); // Take off the PK by default
+
+            await Membership.create({
+                userId: instance.id,
+                contributionStatus: ContributionStatus.NO_ADHERENT
+            })
+        }
     }
 
     addRoles(roles: Role[]): User {

@@ -9,4 +9,4 @@ userRouter.get('/', Auth.authorize(), User.getAllUsers);
 userRouter.get('/:id', Auth.authorize(), User.getUser);
 userRouter.get('/allInfo/:id', Auth.authorize(), User.getUserWithAllInfo);
 
-userRouter.put('/:id', Auth.authorize(), User.updateAllInfo);
+userRouter.put('/:id', Auth.authorize(), User.updateUser);

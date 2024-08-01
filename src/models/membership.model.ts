@@ -1,12 +1,9 @@
-import { User } from './user.model';
 import { Expose } from 'class-transformer';
 import {
     AllowNull,
     Column,
-    ForeignKey,
     IsDate,
     Model,
-    PrimaryKey,
     Table,
     DataType,
     Unique,
@@ -24,10 +21,8 @@ interface IMembership {
 @Table
 class Membership extends Model implements IMembership {
     @Expose({ groups: ['user'] })
-    @ForeignKey(() => User)
-    @Unique
     @AllowNull(false)
-    @PrimaryKey
+    @Unique
     @Column
     declare userId: number;
 

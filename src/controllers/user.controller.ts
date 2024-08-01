@@ -4,7 +4,6 @@ import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/registration.validator';
 import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repository/user.repository';
-import { setSocialMedias } from '../repository/socialMedias.repository';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -71,29 +70,26 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
             res.status(400).json(`This user doesn't exist`);
         }
     } catch (e) {
-        logger.error(`getUser error`, e);
+        logger.error(`getUserWithAllInfo error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 };
 
-const updateAllInfo = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         const body = req.body;
-        let infoUpdate: number | boolean | null = null;
+        const user: number | null = await setUser(id, body);
 
-        if(body.username) infoUpdate = await setUser(id, body);
-        if(Object.keys(body).includes('twitter')) infoUpdate = await setSocialMedias(id, body);
-
-        if(infoUpdate) {
-            res.status(200).json({ message: 'User update !' });
+        if(user) {
+            res.status(204);
         } else {
-            res.status(400).json(`An error in your form`);
+            res.status(400).json(`An error in your user form`);
         }
     } catch (e) {
-        logger.error(`getUser error`, e);
+        logger.error(`updateUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 }
 
-export { getUser, getAllUsers, checkReferralExist, updateAllInfo, getUserWithAllInfo };
+export { getUser, getAllUsers, checkReferralExist, updateUser, getUserWithAllInfo };

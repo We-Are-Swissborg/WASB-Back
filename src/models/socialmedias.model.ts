@@ -1,16 +1,14 @@
-import { User } from './user.model';
 import { Expose } from 'class-transformer';
 import {
     AllowNull,
     Column,
     CreatedAt,
-    ForeignKey,
     IsDate,
     Model,
-    PrimaryKey,
     Table,
     UpdatedAt,
     Is,
+    Unique,
 } from 'sequelize-typescript';
 
 const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+/;
@@ -29,9 +27,8 @@ interface ISocialMedias {
 @Table
 class SocialMedias extends Model implements ISocialMedias {
     @Expose({ groups: ['user'] })
-    @ForeignKey(() => User)
     @AllowNull(false)
-    @PrimaryKey
+    @Unique
     @Column
     declare userId: number;
 
