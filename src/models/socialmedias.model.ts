@@ -9,6 +9,8 @@ import {
     UpdatedAt,
     Is,
     Unique,
+    AutoIncrement,
+    PrimaryKey,
 } from 'sequelize-typescript';
 
 const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+/;
@@ -26,6 +28,12 @@ interface ISocialMedias {
 
 @Table
 class SocialMedias extends Model implements ISocialMedias {
+    @Expose({ groups: ['user'] })
+    @AutoIncrement
+    @PrimaryKey
+    @Column
+    declare id: number;
+
     @Expose({ groups: ['user'] })
     @AllowNull(false)
     @Unique

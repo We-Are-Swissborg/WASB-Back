@@ -7,6 +7,8 @@ import {
     Table,
     DataType,
     Unique,
+    PrimaryKey,
+    AutoIncrement,
 } from 'sequelize-typescript';
 import ContributionStatus from '../types/ContributionStatus';
 
@@ -20,6 +22,12 @@ interface IMembership {
 
 @Table
 class Membership extends Model implements IMembership {
+    @Expose({ groups: ['user'] })
+    @AutoIncrement
+    @PrimaryKey
+    @Column
+    declare id: number;
+
     @Expose({ groups: ['user'] })
     @AllowNull(false)
     @Unique

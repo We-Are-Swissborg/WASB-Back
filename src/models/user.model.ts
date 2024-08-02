@@ -213,8 +213,6 @@ class User extends Model implements IUser {
     @AfterCreate
     static async addDefaultContributionStatus(instance: User) {
         if(!instance.membership) {
-            Membership.removeAttribute('id'); // Take off the PK by default
-
             await Membership.create({
                 userId: instance.id,
                 contributionStatus: ContributionStatus.NO_ADHERENT

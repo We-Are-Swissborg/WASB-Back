@@ -9,7 +9,7 @@ const updateSocialMediasUser = async (req: Request, res: Response) => {
       const socialMedias: boolean | null  = await setSocialMedias(userId, body);
 
       if(socialMedias) {
-          res.status(204);
+          res.status(204).end();
       } else {
           res.status(400).json(`An error in your social medias form`);
       }

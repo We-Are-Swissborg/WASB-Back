@@ -82,7 +82,7 @@ const updateUser = async (req: Request, res: Response) => {
         const user: number | null = await setUser(id, body);
 
         if(user) {
-            res.status(204);
+            res.status(204).end();
         } else {
             res.status(400).json(`An error in your user form`);
         }

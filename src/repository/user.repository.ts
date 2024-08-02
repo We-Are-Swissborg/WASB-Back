@@ -1,7 +1,5 @@
 import { Op } from 'sequelize';
 import { IUser, User } from '../models/user.model';
-import { SocialMedias } from '../models/socialmedias.model';
-import { Membership } from '../models/membership.model';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -78,8 +76,6 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
  * @returns user or null
 */
 const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
-    SocialMedias.removeAttribute('id'); // Take off the PK by default
-    Membership.removeAttribute('id'); // Take off the PK by default
     const user = await User.findByPk(id, {
         include: ['socialMedias', 'membership']
     });
