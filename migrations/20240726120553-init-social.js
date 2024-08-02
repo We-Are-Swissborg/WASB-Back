@@ -12,6 +12,7 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        unique: true,
         references: {
           model: 'Users',
           key: 'id'
@@ -21,18 +22,22 @@ module.exports = {
       },
       twitter: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: true,
       },
       discord: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: true,
       },
       tiktok: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: true,
       },
       telegram: {
         type: Sequelize.STRING,
+        unique: true,
         allowNull: true,
       },
       createdAt: {

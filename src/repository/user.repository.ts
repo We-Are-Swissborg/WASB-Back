@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
 import { IUser, User } from '../models/user.model';
+import { logger } from '../middlewares/logger.middleware';
+import * as RegistValidator from '../validators/user.validator';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -84,12 +86,31 @@ const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
 };
 
 const setUser = async (id: number, data: IUser): Promise<number | null> => {
+    logger.info('user update', data);
+    let flag = await RegistValidator.usernameAlreadyExist(data.username);
+
+    if (flag) {
+        throw new Error(`Username '${data.username}' already exist !`);
+    }
+
+    flag = await RegistValidator.emailAlreadyExist(data.email);
+    if (flag) {
+        throw new Error(`Email '${data.email}' already exist !`);
+    }
+
+    if(data.walletAddress) flag = await RegistValidator.walletAdressAlreadyExist(data.walletAddress);
+    if (flag) {
+        throw new Error(`Wallet address '${data.walletAddress}' already exist !`);
+    }
+
     const user = await User.update(
         data,
         {
             where: { id: id },
         }
     );
+
+    logger.debug('user update OK', user);
 
     return user[0];
 };

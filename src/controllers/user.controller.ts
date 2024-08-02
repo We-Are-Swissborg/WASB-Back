@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { User } from '../models/user.model';
 import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
-import { referralExist } from '../validators/registration.validator';
+import { referralExist } from '../validators/user.validator';
 import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repository/user.repository';
 
 // const addUser = async (req: Request, res: Response) => {

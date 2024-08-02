@@ -42,25 +42,30 @@ class SocialMedias extends Model implements ISocialMedias {
 
     @Expose({ groups: ['user', 'profil'] })
     // @Is(TWITTER_REGEX)
+    @Unique
     @Column
     declare twitter: string;
 
     @Expose({ groups: ['user', 'profil'] })
     // @Is(DISCORD_REGEX)
+    @Unique
     @Column
     declare discord: string;
 
     @Expose({ groups: ['user', 'profil'] })
     // @Is(TIKTOK_REGEX)
+    @Unique
     @Column
     declare tiktok: string;
 
     @Expose({ groups: ['user', 'profil'] })
     // @Is(TELEGRAM_REGEX)
+    @Unique
     @Column
     declare telegram: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @Unique
     @Column
     declare facebook: string;
 

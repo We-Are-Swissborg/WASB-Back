@@ -6,6 +6,7 @@ module.exports = {
     await queryInterface.addColumn('SocialMedias', 'facebook',  {
         type: Sequelize.STRING,
         allowNull: true,
+        unique: true,
       })
   },
 
