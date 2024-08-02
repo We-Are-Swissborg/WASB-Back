@@ -87,13 +87,14 @@ const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
 
 const setUser = async (id: number, data: IUser): Promise<number | null> => {
     logger.info('user update', data);
-    let flag = await RegistValidator.usernameAlreadyExist(data.username);
+    let flag: number | null = null;
 
+    if(data.username) flag = await RegistValidator.usernameAlreadyExist(data.username);
     if (flag) {
         throw new Error(`Username '${data.username}' already exist !`);
     }
 
-    flag = await RegistValidator.emailAlreadyExist(data.email);
+    if(data.email) flag = await RegistValidator.emailAlreadyExist(data.email);
     if (flag) {
         throw new Error(`Email '${data.email}' already exist !`);
     }
