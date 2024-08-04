@@ -99,7 +99,7 @@ const setUser = async (id: number, data: IUser): Promise<number | null> => {
         throw new Error(`Email '${data.email}' already exist !`);
     }
 
-    if(data.walletAddress) flag = await RegistValidator.walletAdressAlreadyExist(data.walletAddress);
+    if(data.walletAddress) flag = await RegistValidator.walletAddressAlreadyExist(data.walletAddress);
     if (flag) {
         throw new Error(`Wallet address '${data.walletAddress}' already exist !`);
     }

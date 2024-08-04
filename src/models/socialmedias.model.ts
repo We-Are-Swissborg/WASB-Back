@@ -19,11 +19,11 @@ const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_,.']+/;
 const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+/;
 
 interface ISocialMedias {
-    userId: number;
-    twitter: string;
-    discord: string;
-    tiktok: string;
-    telegram: string;
+    userId: number | null;
+    twitter: string | null;
+    discord: string | null;
+    tiktok: string | null;
+    telegram: string | null;
 }
 
 @Table
