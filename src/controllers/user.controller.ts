@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { User } from '../models/user.model';
 import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
-import { referralExist } from '../validators/registration.validator';
-import { getUserById, getUsers } from '../repository/user.repository';
+import { referralExist } from '../validators/user.validator';
+import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repository/user.repository';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -57,4 +57,39 @@ const checkReferralExist = async (req: Request, res: Response) => {
     }
 };
 
-export { getUser, getAllUsers, checkReferralExist };
+const getUserWithAllInfo = async (req: Request, res: Response) => {
+    try {
+        const id: number = Number(req.params.id);
+        const user: User | null = await getUserByIdWithAllInfo(id);
+        let userDTO = null;
+
+        if (user instanceof User) {
+            userDTO = instanceToPlain(user, { groups: ['profil'], excludeExtraneousValues: true });
+            res.status(200).json(userDTO);
+        } else {
+            res.status(400).json(`This user doesn't exist`);
+        }
+    } catch (e) {
+        logger.error(`getUserWithAllInfo error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+const updateUser = async (req: Request, res: Response) => {
+    try {
+        const id: number = Number(req.params.id);
+        const body = req.body;
+        const user: number | null = await setUser(id, body);
+
+        if(user) {
+            res.status(204).end();
+        } else {
+            res.status(400).json(`An error in your user form`);
+        }
+    } catch (e) {
+        logger.error(`updateUser error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+}
+
+export { getUser, getAllUsers, checkReferralExist, updateUser, getUserWithAllInfo };

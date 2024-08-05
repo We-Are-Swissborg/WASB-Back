@@ -1,5 +1,7 @@
 import { Op } from 'sequelize';
-import { User } from '../models/user.model';
+import { IUser, User } from '../models/user.model';
+import { logger } from '../middlewares/logger.middleware';
+import * as RegistValidator from '../validators/user.validator';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -16,9 +18,9 @@ const getUsers = async (): Promise<User[]> => {
     return users;
 };
 
-const getUsersWithSocialNetworks = async (): Promise<User[]> => {
+const getUsersWithSocialMedias = async (): Promise<User[]> => {
     const users = await User.findAll({
-        include: 'socialNetwork',
+        include: 'socialMedias',
     });
     return users;
 };
@@ -27,7 +29,7 @@ const getUsersWithSocialNetworks = async (): Promise<User[]> => {
  * Retrieves a user's data to authenticate them
  * @param {string} username username
  * @returns {Promise<User | null>} User or null
- */
+*/
 const loginByUsername = async (username: string): Promise<User | null> => {
     if (!username) return null;
 
@@ -58,7 +60,7 @@ const getUserNonce = async (wallet: string): Promise<User> => {
  * Retrieve the identifier of the user to whom the referral code belongs
  * @param referral unique referral code
  * @returns user or null
- */
+*/
 const getIdReferent = async (referral: string): Promise<User | null> => {
     const user = await User.findOne({
         attributes: ['id'],
@@ -70,12 +72,58 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
     return user;
 };
 
+/**
+ * Get user info at tables socialMedias, memberships and users.
+ * @param id user
+ * @returns user or null
+*/
+const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
+    const user = await User.findByPk(id, {
+        include: ['socialMedias', 'membership']
+    });
+
+    return user;
+};
+
+const setUser = async (id: number, data: IUser): Promise<number | null> => {
+    logger.info('user update', data);
+    let flag: number | null = null;
+
+    if(data.username) flag = await RegistValidator.usernameAlreadyExist(data.username);
+    if (flag) {
+        throw new Error(`Username '${data.username}' already exist !`);
+    }
+
+    if(data.email) flag = await RegistValidator.emailAlreadyExist(data.email);
+    if (flag) {
+        throw new Error(`Email '${data.email}' already exist !`);
+    }
+
+    if(data.walletAddress) flag = await RegistValidator.walletAddressAlreadyExist(data.walletAddress);
+    if (flag) {
+        throw new Error(`Wallet address '${data.walletAddress}' already exist !`);
+    }
+
+    const user = await User.update(
+        data,
+        {
+            where: { id: id },
+        }
+    );
+
+    logger.debug('user update OK', user);
+
+    return user[0];
+};
+
 export {
     getUserById,
     getUsers,
-    getUsersWithSocialNetworks,
+    getUsersWithSocialMedias,
     getIdReferent,
     getUserByWallet,
     getUserNonce,
     loginByUsername,
+    setUser,
+    getUserByIdWithAllInfo
 };

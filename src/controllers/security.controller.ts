@@ -15,10 +15,10 @@ const registration = async (req: Request, res: Response) => {
     try {
         const form: string = req.body;
         const user: Register = plainToInstance(Register, form, { groups: ['register'] });
-        const admin = false; // Set up when role ok
+        const isAdmin = false; // Set up when role ok
         const newUser = await register(user);
 
-        if (admin) {
+        if (isAdmin) {
             res.status(201);
         } else {
             const token = generateToken(newUser);
