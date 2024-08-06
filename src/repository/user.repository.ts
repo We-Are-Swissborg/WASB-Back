@@ -88,6 +88,8 @@ const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
 const setUser = async (id: number, data: IUser): Promise<number | null> => {
     logger.info('user update', data);
     let flag: number | null = null;
+    if(data.firstName == '') data.firstName = null;
+    if(data.lastName == '') data.lastName = null;
 
     if(data.username) flag = await RegistValidator.usernameAlreadyExist(data.username);
     if (flag) {
