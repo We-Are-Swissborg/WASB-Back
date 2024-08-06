@@ -59,11 +59,12 @@ class User extends Model implements IUser {
     declare id: number;
 
     @Expose({ groups: ['user', 'profil'] })
-    // @Is(NAME_REGEX) TO RETURN AN ERROR IS EMPTY
+    @Is(NAME_REGEX)
     @Column
     declare firstName: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @Is(NAME_REGEX)
     @Column
     declare lastName: string;
 

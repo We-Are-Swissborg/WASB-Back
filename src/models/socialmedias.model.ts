@@ -13,10 +13,10 @@ import {
     PrimaryKey,
 } from 'sequelize-typescript';
 
-const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+/;
+const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+$/;
 const DISCORD_REGEX = /^[a-z0-9._]{2,32}$/;
-const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_,.']+/;
-const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+/;
+const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_.]+$/;
+const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+$/;
 
 interface ISocialMedias {
     userId: number | null;
@@ -41,25 +41,25 @@ class SocialMedias extends Model implements ISocialMedias {
     declare userId: number;
 
     @Expose({ groups: ['user', 'profil'] })
-    // @Is(TWITTER_REGEX)
+    @Is(TWITTER_REGEX)
     @Unique
     @Column
     declare twitter: string;
 
     @Expose({ groups: ['user', 'profil'] })
-    // @Is(DISCORD_REGEX)
+    @Is(DISCORD_REGEX)
     @Unique
     @Column
     declare discord: string;
 
     @Expose({ groups: ['user', 'profil'] })
-    // @Is(TIKTOK_REGEX)
+    @Is(TIKTOK_REGEX)
     @Unique
     @Column
     declare tiktok: string;
 
     @Expose({ groups: ['user', 'profil'] })
-    // @Is(TELEGRAM_REGEX)
+    @Is(TELEGRAM_REGEX)
     @Unique
     @Column
     declare telegram: string;

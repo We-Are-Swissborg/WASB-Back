@@ -8,7 +8,7 @@ const setSocialMedias = async (id: number, data: ISocialMedias): Promise<boolean
 
     // Transform value empty to null, otherwise error not unique is returned
     Object.keys(data).forEach((prop) => {
-      if(data[prop as keyof ISocialMedias] == '') data[prop as keyof ISocialMedias] = null;
+      if(data[prop as keyof ISocialMedias]?.toString().trim() == '') data[prop as keyof ISocialMedias] = null;
     })
 
     if(data.twitter) flag = await SocialMediasValidator.twitterAlreadyExist(data.twitter);
