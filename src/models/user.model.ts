@@ -24,6 +24,7 @@ import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
 import { Membership } from './membership.model';
 import ContributionStatus from '../types/ContributionStatus';
+import { Post } from './post.model';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -164,6 +165,9 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'profil'] })
     @HasOne(() => Membership, {foreignKey: 'userId'})
     declare membership: Membership;
+
+    @HasMany(() => Post, 'userId')
+    declare posts: Post[];
 
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
