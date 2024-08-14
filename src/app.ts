@@ -21,7 +21,7 @@ const server = createServer(app);
 const corsDomains = process.env.CORS_ORIGIN?.split(',');
 const corsOptions = {
     origin: corsDomains,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
     maxAge: 3600,
