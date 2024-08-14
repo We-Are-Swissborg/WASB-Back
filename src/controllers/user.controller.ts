@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user.model';
-import { instanceToPlain } from 'class-transformer';
+import { instanceToPlain, plainToClass } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/user.validator';
 import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repository/user.repository';
@@ -81,7 +81,7 @@ const updateUser = async (req: Request, res: Response) => {
         const body = req.body;
         const user: number | null = await setUser(id, body);
 
-        if(user) {
+        if (user) {
             res.status(204).end();
         } else {
             res.status(400).json(`An error in your user form`);
@@ -90,6 +90,29 @@ const updateUser = async (req: Request, res: Response) => {
         logger.error(`updateUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
-}
+};
 
-export { getUser, getAllUsers, checkReferralExist, updateUser, getUserWithAllInfo };
+const patchUser = async (req: Request, res: Response) => {
+    try {
+        const id: number = Number(req.params.id);
+        logger.info('patchUser', { userId: id });
+
+        const user = plainToClass(User, req.body as string, { groups: ['user'] });
+        user.id = id;
+
+        // Update of user roles
+        if (req.body.roles) {
+            user.addRoles(req.body.roles);
+        }
+
+        user.isNewRecord = false;
+        await user.save();
+
+        res.status(204).end();
+    } catch (e) {
+        logger.error(`updateUser error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+export { getUser, getAllUsers, checkReferralExist, updateUser, getUserWithAllInfo, patchUser };

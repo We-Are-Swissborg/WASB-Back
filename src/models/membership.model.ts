@@ -36,21 +36,21 @@ class Membership extends Model implements IMembership {
 
     @Expose({ groups: ['user', 'profil'] })
     @Column({
-      type: DataType.ENUM(...Object.values(ContributionStatus)),
-      allowNull: false,
+        type: DataType.ENUM(...Object.values(ContributionStatus)),
+        allowNull: false,
     })
     declare contributionStatus: ContributionStatus;
-    
+
     @Expose({ groups: ['user', 'profil'] })
     @IsDate
     @Column
     declare dateContribution: Date;
-    
+
     @Expose({ groups: ['user', 'profil'] })
     @IsDate
     @Column
     declare endDateContribution: Date;
-    
+
     @Expose({ groups: ['user', 'profil'] })
     @Column
     declare contribution: string;
