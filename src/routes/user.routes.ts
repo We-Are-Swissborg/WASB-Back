@@ -10,4 +10,6 @@ userRouter.get('/', Auth.authorize([Role.Admin]), User.getAllUsers);
 userRouter.get('/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUser);
 userRouter.get('/allInfo/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUserWithAllInfo);
 
+
 userRouter.put('/:id', Auth.authorize([Role.Admin], true), User.updateUser);
+userRouter.patch('/:id', Auth.authorize([Role.Admin]), User.patchUser);
