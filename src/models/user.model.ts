@@ -75,6 +75,7 @@ class User extends Model implements IUser {
     declare username: string;
 
     @Column
+    @Expose({ toClassOnly: true })
     private declare roles: string;
 
     @Column
@@ -142,7 +143,7 @@ class User extends Model implements IUser {
 
     @Type(() => SocialMedias)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => SocialMedias, {foreignKey: 'userId'})
+    @HasOne(() => SocialMedias, { foreignKey: 'userId' })
     declare socialMedias: SocialMedias | null;
 
     @Expose({ groups: ['user', 'profil'] })
@@ -162,7 +163,7 @@ class User extends Model implements IUser {
 
     @Type(() => Membership)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => Membership, {foreignKey: 'userId'})
+    @HasOne(() => Membership, { foreignKey: 'userId' })
     declare membership: Membership;
 
     // getters that are not attributes should be tagged using NonAttribute
@@ -175,7 +176,7 @@ class User extends Model implements IUser {
         return `${this.lastName || ''} ${this.firstName || ''}`.trim();
     }
 
-    @Expose({ groups: ['user', 'profil', 'admin'] })
+    @Expose({ groups: ['user', 'profil', 'admin'], toPlainOnly: true, name: 'roles' })
     get getRoles(): NonAttribute<string[]> {
         return JSON.parse(this.roles);
     }
@@ -213,11 +214,11 @@ class User extends Model implements IUser {
 
     @AfterCreate
     static async addDefaultContributionStatus(instance: User) {
-        if(!instance.membership) {
+        if (!instance.membership) {
             await Membership.create({
                 userId: instance.id,
-                contributionStatus: ContributionStatus.NO_ADHERENT
-            })
+                contributionStatus: ContributionStatus.NO_ADHERENT,
+            });
         }
     }
 

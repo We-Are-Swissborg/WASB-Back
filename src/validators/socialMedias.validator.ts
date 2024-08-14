@@ -19,7 +19,7 @@ const tiktokAlreadyExist = async (tiktok: string): Promise<number | null> => {
 
 const telegramAlreadyExist = async (telegram: string): Promise<number | null> => {
     const exist = await SocialMedias.count({ where: { telegram: telegram } });
-  
+
     return exist;
 };
 
