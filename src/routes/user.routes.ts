@@ -6,9 +6,10 @@ import Role from '../types/Role';
 export const userRouter: Router = express.Router();
 
 userRouter.get('/codeRef/:codeRef', User.checkReferralExist);
-userRouter.get('/', Auth.authorize(), User.getAllUsers);
-userRouter.get('/:id', Auth.authorize(), User.getUser);
-userRouter.get('/allInfo/:id', Auth.authorize(), User.getUserWithAllInfo);
+userRouter.get('/', Auth.authorize([Role.Admin]), User.getAllUsers);
+userRouter.get('/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUser);
+userRouter.get('/allInfo/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUserWithAllInfo);
 
-userRouter.put('/:id', Auth.authorize(), User.updateUser);
+
+userRouter.put('/:id', Auth.authorize([Role.Admin], true), User.updateUser);
 userRouter.patch('/:id', Auth.authorize([Role.Admin]), User.patchUser);

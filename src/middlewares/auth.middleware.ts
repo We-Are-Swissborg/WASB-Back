@@ -8,8 +8,9 @@ import { TokenPayload } from '../types/TokenPayload';
  * middleware to check whether user has access to a specific endpoint
  *
  * @param allowedAccessTypes list of allowed access types of a specific endpoint
+ * @param allowSelfModification Checks whether the user can make their own changes
  */
-export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: Response, next: NextFunction) => {
+export const authorize = (allowedAccessTypes?: string[], allowSelfModification: boolean = false) => (req: Request, res: Response, next: NextFunction) => {
     try {
         let jwt = req.headers.authorization;
         logger.debug('token jwt', { jwt });
@@ -27,6 +28,16 @@ export const authorize = (allowedAccessTypes?: string[]) => (req: Request, res: 
         // verify token hasn't expired yet
         const decodedToken: TokenPayload = validateToken(jwt) as TokenPayload;
         logger.debug('token jwt decodedToken', decodedToken.roles);
+
+        // Specific so that a user can modify their profile without having admin rights  
+        if (allowSelfModification) {
+            const userIdFromToken = decodedToken.userId;
+            const userIdFromRequest = req.params.id || req.body.id;  // Adjust this to match your route parameter or body structure
+
+            if (userIdFromToken == userIdFromRequest) {
+                return next();  // Allow self-modification
+            }
+        }
 
         if (allowedAccessTypes === undefined) return next();
         // check access
