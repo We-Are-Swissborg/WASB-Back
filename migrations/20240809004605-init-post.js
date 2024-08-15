@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      userId: {
+      author: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -30,7 +30,6 @@ module.exports = {
       },
       content: {
         type: Sequelize.STRING,
-        unique: true,
         allowNull: false,
       },
       createdAt: {

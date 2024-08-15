@@ -14,7 +14,7 @@ import {
 } from 'sequelize-typescript';
 
 interface IPost {
-    userId: number;
+    author: number;
     title: string;
     image: Buffer;
     content: string;
@@ -31,21 +31,23 @@ class Post extends Model implements IPost {
     @Expose({ groups: ['user', 'blog'] })
     @AllowNull(false)
     @Column
-    declare userId: number;
+    declare author: number;
 
     @Expose({ groups: ['user', 'blog'] })
+    @AllowNull(false)
     @Unique
     @Column
     declare title: string;
 
     @Expose({ groups: ['user', 'blog'] })
+    @AllowNull(false)
     @Column({
       type: DataTypes.BLOB,
     })
     declare image: Buffer;
 
     @Expose({ groups: ['user', 'blog'] })
-    @Unique
+    @AllowNull(false)
     @Column
     declare content: string;
 

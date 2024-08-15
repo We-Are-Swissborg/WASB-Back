@@ -11,13 +11,13 @@ const create = async (post: IPost, file: Express.Multer.File): Promise<Post> => 
   if(!isImage) throw new Error('File is not an image');
 
   const postCreated = await Post.create({
-    userId: post.userId,
+    author : post.author,
     title: post.title,
     image: file.buffer,
     content: content,
   });
 
-  logger.debug('post craete OK');
+  logger.debug('post create OK');
 
   return postCreated;
 };

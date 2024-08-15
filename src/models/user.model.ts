@@ -167,7 +167,7 @@ class User extends Model implements IUser {
     @HasOne(() => Membership, { foreignKey: 'userId' })
     declare membership: Membership;
 
-    @HasMany(() => Post, 'userId')
+    @HasMany(() => Post, 'author')
     declare posts: Post[];
 
     // getters that are not attributes should be tagged using NonAttribute

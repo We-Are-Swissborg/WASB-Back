@@ -27,7 +27,7 @@ const createPost = async (req: Request, res: Response) => {
         if(!req.file) throw new Error('the file is missing');
         const newPost = await create(body, req.file);
 
-        res.status(201).json({ newPost });
+        res.status(201).json(newPost);
     } catch (e: unknown) {
         logger.error(`Creation post error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
@@ -42,7 +42,7 @@ const getAllPosts = async (req: Request, res: Response) => {
         // Replace object with just a Buffer array.
         allPostsDTO.forEach((post: Post, id: number) => allPostsDTO[id].image = Array.from(post.image));
 
-        res.status(200).json({ allPostsDTO });
+        res.status(200).json(allPostsDTO);
     } catch (e: unknown) {
         logger.error(`Get all posts error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
@@ -59,7 +59,7 @@ const getPost = async (req: Request, res: Response) => {
         // Replace object with just a Buffer array.
         postDTO.image = Array.from(post.image);
 
-        res.status(200).json({ postDTO });
+        res.status(200).json(postDTO);
     } catch (e: unknown) {
         logger.error(`Get post error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
