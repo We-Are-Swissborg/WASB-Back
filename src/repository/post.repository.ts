@@ -1,19 +1,16 @@
 import { logger } from "../middlewares/logger.middleware";
 import { IPost, Post } from "../models/post.model";
 import domClean from "../services/domPurify";
-import isFileImage from "../utils/isFileImage";
+import GetRange from "../types/GetRange";
 
-const create = async (post: IPost, file: Express.Multer.File): Promise<Post> => {
+const create = async (post: IPost): Promise<Post> => {
   logger.info('post create', post);
-
   const content = domClean(post.content);
-  const isImage = isFileImage(file);
-  if(!isImage) throw new Error('File is not an image');
 
   const postCreated = await Post.create({
     author : post.author,
     title: post.title,
-    image: file.buffer,
+    image: post.image,
     content: content,
   });
 
@@ -42,4 +39,20 @@ const get = async (id: string): Promise<Post | null> => {
   return post;
 };
 
-export { create, getAll, get };
+const getRange = async (scale: number, selection: number): Promise<GetRange> => {
+  logger.info('get posts range');
+
+  const totalPost = await Post.count();
+
+  const postRange = await Post.findAll({
+    limit: scale,
+    offset: scale * (selection - 1),
+    order: [['createdAt', 'DESC']],
+  });
+
+  logger.debug(`get ${scale} posts on ${totalPost}`);
+
+  return { postRange, totalPost };
+};
+
+export { create, getAll, get, getRange };

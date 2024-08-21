@@ -57,6 +57,7 @@
     "reflect-metadata": "^0.1.14",
     "sequelize": "^6.37.3",
     "sequelize-typescript": "^2.1.6",
+    "sharp": "^0.33.5",
     "sqlite3": "^5.1.7",
     "typescript-eslint": "^7.10.0",
     "winston": "^3.13.0"

@@ -10,8 +10,9 @@ const upload = multer({
 
 export const postRouter: Router = express.Router();
 
-postRouter.post('/preview', Auth.authorize(), Post.preview);
-postRouter.post('/', Auth.authorize([Role.Admin, Role.Moderator]), upload.single('imagePost'), Post.createPost);
+postRouter.post('/preview', Auth.authorize([Role.Admin, Role.Moderator]), upload.single('imagePost'), Post.preview);
+postRouter.post('/', Auth.authorize([Role.Admin, Role.Moderator]), Post.createPost);
 
 postRouter.get('/', Post.getAllPosts);
 postRouter.get('/:idPost', Post.getPost);
+postRouter.get('/range/:pageId', Post.getPostRange);
