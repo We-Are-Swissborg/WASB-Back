@@ -16,3 +16,7 @@ postRouter.post('/', Auth.authorize([Role.Admin, Role.Moderator]), Post.createPo
 postRouter.get('/', Post.getAllPosts);
 postRouter.get('/:idPost', Post.getPost);
 postRouter.get('/range/:pageId', Post.getPostRange);
+
+postRouter.delete('/:idPost', Auth.authorize([Role.Admin, Role.Moderator]), Post.deletePost);
+
+postRouter.put('/:idPost', Auth.authorize([Role.Admin, Role.Moderator]), Post.updatePost);

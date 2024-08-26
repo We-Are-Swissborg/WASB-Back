@@ -1,5 +1,6 @@
 import { logger } from "../middlewares/logger.middleware";
 import { IPost, Post } from "../models/post.model";
+import { User } from "../models/user.model";
 import domClean from "../services/domPurify";
 import GetRange from "../types/GetRange";
 
@@ -32,7 +33,14 @@ const getAll = async (): Promise<Post[]> => {
 const get = async (id: string): Promise<Post | null> => {
   logger.info('get post');
 
-  const post = await Post.findByPk(id);
+  const post = await Post.findByPk(id, {
+    include: [
+      {
+        model: User,
+        attributes:  ['username']
+      }
+    ]
+  });
 
   logger.debug('get post OK');
 
@@ -48,6 +56,12 @@ const getRange = async (scale: number, selection: number): Promise<GetRange> => 
     limit: scale,
     offset: scale * (selection - 1),
     order: [['createdAt', 'DESC']],
+    include: [
+      {
+        model: User,
+        attributes:  ['username']
+      }
+    ]
   });
 
   logger.debug(`get ${scale} posts on ${totalPost}`);
@@ -55,4 +69,22 @@ const getRange = async (scale: number, selection: number): Promise<GetRange> => 
   return { postRange, totalPost };
 };
 
-export { create, getAll, get, getRange };
+const destroy = async (id: number) => {
+  logger.info('delete post');
+
+  const isDelete = await Post.destroy({where: {id: id}});
+  if(!isDelete) throw new Error('Error, post not exist for delete')
+
+  logger.debug(`delete post ${id}`);
+};
+
+const update = async (id: number, data: Post) => {
+  logger.info('update post');
+  const post = await Post.update(data, {where: {id: id}});
+
+  if(!post[0]) throw new Error('Post not exist');
+
+  logger.debug(`update post ${id} OK!`);
+};
+
+export { create, getAll, get, getRange, destroy, update };

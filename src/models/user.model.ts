@@ -17,6 +17,7 @@ import {
     BelongsTo,
     HasMany,
     AfterCreate,
+    AllowNull,
 } from 'sequelize-typescript';
 import { SocialMedias } from './socialmedias.model';
 import { NonAttribute } from 'sequelize';
@@ -69,20 +70,24 @@ class User extends Model implements IUser {
     @Column
     declare lastName: string;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
     @Unique(true)
     @Is(USERNAME_REGEX)
+    @AllowNull(false)
     @Column
     declare username: string;
 
-    @Column
     @Expose({ toClassOnly: true })
+    @AllowNull(false)
+    @Column
     private declare roles: string;
 
+    @AllowNull(false)
     @Column
     declare password: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @AllowNull(false)
     @Unique(true)
     @IsEmail
     @Column
