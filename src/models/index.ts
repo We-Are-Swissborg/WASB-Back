@@ -13,6 +13,7 @@ const sequelize = new Sequelize({
         return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
     },
     logging: (...msg) => logger.debug(msg),
+    logQueryParameters: true,
 });
 
 export default sequelize;
