@@ -85,6 +85,11 @@ const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
     return user;
 };
 
+const update = async (user: User): Promise<void> => {
+    user.isNewRecord = false;
+    await user.save();
+}
+
 const setUser = async (id: number, data: IUser): Promise<number | null> => {
     logger.info('user update', data);
     let flag: number | null = null;
@@ -124,5 +129,6 @@ export {
     getUserNonce,
     loginByUsername,
     setUser,
+    update,
     getUserByIdWithAllInfo,
 };
