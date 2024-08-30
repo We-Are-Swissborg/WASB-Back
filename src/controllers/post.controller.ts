@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 import domClean from '../services/domPurify';
-import { create, destroy, get, getAll, getRange, update } from '../repository/post.repository';
+import { create, destroy, get, getAll, getList, update } from '../repository/post.repository';
 import { instanceToPlain } from 'class-transformer';
 import { Post } from '../models/post.model';
 import imageConvert from '../services/imageConvert';
@@ -11,7 +11,11 @@ const preview = async (req: Request, res: Response) => {
         const body = req.body;
         const file = req.file;
         const clean = body.contentPost && domClean(body.contentPost);
-        const convertToWebp = file && Array.from(await imageConvert(file, {x: 907, y: 445}));
+        const sizeImage = {
+            x: Number(process.env.SIZE_X_IMAGE_POST),
+            y: Number(process.env.SIZE_Y_IMAGE_POST)
+        }
+        const convertToWebp = file && Array.from(await imageConvert(file, {x: sizeImage.x, y: sizeImage.y}));
 
         res.status(200).json({ clean, convertToWebp });
     } catch (e) {
@@ -64,18 +68,19 @@ const getPost = async (req: Request, res: Response) => {
     }
 };
 
-const getPostRange = async (req: Request, res: Response) => {
+const getPostList = async (req: Request, res: Response) => {
     try {
         const pageId = Number(req.params.pageId);
-        const infoPost = await getRange(9, pageId);
-        const postRangeDTO = instanceToPlain(infoPost.postRange, { groups: ['blog'], excludeExtraneousValues: true});
+        const nbCardToDisplay = Number(process.env.NUMBER_CARD_DISPLAY);
+        const infoPost = await getList(nbCardToDisplay, pageId);
+        const postListDTO = instanceToPlain(infoPost.postList, { groups: ['blog'], excludeExtraneousValues: true});
 
         // Replace object with just a Buffer array.
-        postRangeDTO.forEach((post: Post, id: number) => postRangeDTO[id].image = Array.from(post.image));
+        postListDTO.forEach((post: Post, id: number) => postListDTO[id].image = Array.from(post.image));
 
-        res.status(200).json({postRangeDTO, totalPost: infoPost.totalPost});
+        res.status(200).json({postListDTO, totalPost: infoPost.totalPost});
     } catch (e: unknown) {
-        logger.error(`Get post range error`, e);
+        logger.error(`Get post list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 };
@@ -110,7 +115,7 @@ export {
     createPost,
     getAllPosts,
     getPost,
-    getPostRange,
+    getPostList,
     deletePost,
     updatePost
 };

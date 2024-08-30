@@ -2,7 +2,7 @@ import { logger } from "../middlewares/logger.middleware";
 import { IPost, Post } from "../models/post.model";
 import { User } from "../models/user.model";
 import domClean from "../services/domPurify";
-import GetRange from "../types/GetRange";
+import GetList from "../types/GetList";
 
 const create = async (post: IPost): Promise<Post> => {
   logger.info('post create', post);
@@ -47,12 +47,12 @@ const get = async (id: string): Promise<Post | null> => {
   return post;
 };
 
-const getRange = async (scale: number, selection: number): Promise<GetRange> => {
-  logger.info('get posts range');
+const getList = async (scale: number, selection: number): Promise<GetList> => {
+  logger.info('get posts list');
 
   const totalPost = await Post.count();
 
-  const postRange = await Post.findAll({
+  const postList = await Post.findAll({
     limit: scale,
     offset: scale * (selection - 1),
     order: [['createdAt', 'DESC']],
@@ -66,7 +66,7 @@ const getRange = async (scale: number, selection: number): Promise<GetRange> => 
 
   logger.debug(`get ${scale} posts on ${totalPost}`);
 
-  return { postRange, totalPost };
+  return { postList, totalPost };
 };
 
 const destroy = async (id: number) => {
@@ -87,4 +87,4 @@ const update = async (id: number, data: Post) => {
   logger.debug(`update post ${id} OK!`);
 };
 
-export { create, getAll, get, getRange, destroy, update };
+export { create, getAll, get, getList, destroy, update };
