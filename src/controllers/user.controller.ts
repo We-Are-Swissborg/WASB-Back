@@ -3,7 +3,7 @@ import { User } from '../models/user.model';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/user.validator';
-import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repository/user.repository';
+import * as userRepository from '../repository/user.repository';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -13,7 +13,7 @@ import { getUserById, getUserByIdWithAllInfo, getUsers, setUser } from '../repos
 
 const getAllUsers = async (req: Request, res: Response) => {
     try {
-        const users: User[] = await getUsers();
+        const users: User[] = await userRepository.getUsers();
 
         const usersDTO = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true });
         res.status(200).json(usersDTO);
@@ -26,11 +26,10 @@ const getAllUsers = async (req: Request, res: Response) => {
 const getUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
-        const user: User | null = await getUserById(id);
-        let userDTO = null;
+        const user: User | null = await userRepository.getUserById(id);
 
         if (user instanceof User) {
-            userDTO = instanceToPlain(user, { groups: ['user'], excludeExtraneousValues: true });
+            const userDTO = instanceToPlain(user, { groups: ['user'], excludeExtraneousValues: true });
             res.status(200).json(userDTO);
         } else {
             res.status(400).json(`This user doesn't exist`);
@@ -60,7 +59,7 @@ const checkReferralExist = async (req: Request, res: Response) => {
 const getUserWithAllInfo = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
-        const user: User | null = await getUserByIdWithAllInfo(id);
+        const user: User | null = await userRepository.getUserByIdWithAllInfo(id);
         let userDTO = null;
 
         if (user instanceof User) {
@@ -78,10 +77,12 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
-        const body = req.body;
-        const user: number | null = await setUser(id, body);
+        const user = plainToClass(User, req.body as string, { groups: ['user'] });
 
-        if (user) {
+        logger.info(`Update User`, user)
+
+        if (user.id == id) {
+            await userRepository.update(user);
             res.status(204).end();
         } else {
             res.status(400).json(`An error in your user form`);
@@ -96,17 +97,7 @@ const patchUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         logger.info('patchUser', { userId: id });
-
-        const user = plainToClass(User, req.body as string, { groups: ['user'] });
-        user.id = id;
-
-        // Update of user roles
-        if (req.body.roles) {
-            user.addRoles(req.body.roles);
-        }
-
-        user.isNewRecord = false;
-        await user.save();
+        await userRepository.setUser(id, req.body);
 
         res.status(204).end();
     } catch (e) {
