@@ -17,6 +17,7 @@ import {
     BelongsTo,
     HasMany,
     AfterCreate,
+    AllowNull,
 } from 'sequelize-typescript';
 import { SocialMedias } from './socialmedias.model';
 import { NonAttribute } from 'sequelize';
@@ -24,6 +25,7 @@ import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
 import { Membership } from './membership.model';
 import ContributionStatus from '../types/ContributionStatus';
+import { Post } from './post.model';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -68,20 +70,24 @@ class User extends Model implements IUser {
     @Column
     declare lastName: string;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
     @Unique(true)
     @Is(USERNAME_REGEX)
+    @AllowNull(false)
     @Column
     declare username: string;
 
-    @Column
     @Expose({ toClassOnly: true })
+    @AllowNull(false)
+    @Column
     private declare roles: string;
 
+    @AllowNull(false)
     @Column
     declare password: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @AllowNull(false)
     @Unique(true)
     @IsEmail
     @Column
@@ -165,6 +171,9 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'profil'] })
     @HasOne(() => Membership, { foreignKey: 'userId' })
     declare membership: Membership;
+
+    @HasMany(() => Post, 'author')
+    declare posts: Post[];
 
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
