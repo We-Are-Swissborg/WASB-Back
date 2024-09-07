@@ -48,6 +48,28 @@ const options = {
             }),
         ),
     },
+    admin: {
+        dirname: 'logs',
+        filename: `admin.log`,
+        defaultMeta: {
+            service: 'admin-service',
+        },
+        handleExceptions: true,
+        maxsize: 5242880, // 5MB
+        maxFiles: 5,
+        format: format.combine(
+            format.timestamp({
+                format: 'YYYY-MM-DD hh:mm:ss',
+            }),
+            format.align(),
+            format.metadata(),
+            format.splat(),
+            otherErrorFilter(),
+            format.printf(({ level, message, metadata }) => {
+                return `[${level}]: ${message}. ${JSON.stringify(metadata)}`;
+            }),
+        ),
+    },
     console: {
         handleExceptions: true,
         format: format.combine(
@@ -74,4 +96,13 @@ const logger = createLogger({
     exitOnError: false,
 });
 
-export { logger };
+// Créer un logger séparé pour les actions d'administration
+const adminLogger = createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    transports: [
+        new transports.File(options.admin),
+    ],
+    exitOnError: false,
+});
+
+export { logger, adminLogger };

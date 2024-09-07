@@ -3,7 +3,15 @@ import { logger } from '../middlewares/logger.middleware';
 import * as SocialMediasValidator from '../validators/socialMedias.validator';
 
 /**
- * 
+ * Create Social Medias
+ * @param data 
+ */
+const create = async (data: SocialMedias): Promise<void> => {
+    await data.save();
+}
+
+/**
+ * Update Social Medias
  * @param data 
  */
 const update = async (data: SocialMedias): Promise<void> => {
@@ -57,4 +65,4 @@ const setSocialMedias = async (id: number, data: ISocialMedias): Promise<boolean
     return !!socialMediasUser;
 };
 
-export { setSocialMedias, update };
+export { setSocialMedias, create, update };
