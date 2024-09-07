@@ -44,7 +44,7 @@ class Post extends Model implements IPost {
     @Expose({ groups: ['user', 'post', 'blog'] })
     @AllowNull(false)
     @Column({
-      type: DataTypes.BLOB,
+        type: DataTypes.BLOB,
     })
     declare image: Buffer;
 
@@ -66,7 +66,7 @@ class Post extends Model implements IPost {
     declare updatedAt: Date;
 
     @Type(() => User)
-    @Expose({ groups: ['post', 'blog']})
+    @Expose({ groups: ['post', 'blog'] })
     @BelongsTo(() => User, 'author')
     declare infoAuthor: NonAttribute<User>;
 }

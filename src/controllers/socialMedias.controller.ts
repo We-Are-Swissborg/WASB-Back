@@ -4,8 +4,8 @@ import { logger } from '../middlewares/logger.middleware';
 
 /**
  * Update social medias
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const updateSocialMediasUser = async (req: Request, res: Response) => {
     try {

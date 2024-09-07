@@ -36,8 +36,8 @@ sequelize.authenticate().catch(() => logger.error(`Authentication error`));
 // Body parsing Middleware
 app.use(helmet());
 app.use(limiter);
-app.use(express.json({limit: '5mb'}));
-app.use(express.urlencoded({limit: '5mb', extended: true }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 

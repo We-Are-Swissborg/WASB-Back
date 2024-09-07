@@ -99,9 +99,7 @@ const logger = createLogger({
 // Créer un logger séparé pour les actions d'administration
 const adminLogger = createLogger({
     level: process.env.LOG_LEVEL || 'info',
-    transports: [
-        new transports.File(options.admin),
-    ],
+    transports: [new transports.File(options.admin)],
     exitOnError: false,
 });
 

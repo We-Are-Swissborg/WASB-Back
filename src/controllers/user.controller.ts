@@ -14,8 +14,8 @@ import * as socialMediasRep from '../repository/socialMedias.repository';
 
 /**
  * Retrieve all users
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getAllUsers = async (req: Request, res: Response) => {
     try {
@@ -31,8 +31,8 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 /**
  * Retrieve user by ID
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getUser = async (req: Request, res: Response) => {
     try {
@@ -53,8 +53,8 @@ const getUser = async (req: Request, res: Response) => {
 
 /**
  * Verify if referral code exist
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const checkReferralExist = async (req: Request, res: Response) => {
     try {
@@ -74,8 +74,8 @@ const checkReferralExist = async (req: Request, res: Response) => {
 
 /**
  * Retrive all informations for an user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getUserWithAllInfo = async (req: Request, res: Response) => {
     try {
@@ -97,8 +97,8 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
 
 /**
  * Update user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const updateUser = async (req: Request, res: Response) => {
     try {
@@ -111,7 +111,7 @@ const updateUser = async (req: Request, res: Response) => {
             user.addRoles(req.body.roles);
         }
 
-        if(user.socialMedias) {
+        if (user.socialMedias) {
             user.socialMedias.userId = user.id;
         }
 
@@ -132,8 +132,8 @@ const updateUser = async (req: Request, res: Response) => {
 
 /**
  * Update user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const patchUser = async (req: Request, res: Response) => {
     try {

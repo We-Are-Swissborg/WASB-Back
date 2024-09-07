@@ -7,8 +7,8 @@ import * as socialMediasRep from '../../repository/socialMedias.repository';
 
 /**
  * Retrieve all users
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getAllUsers = async (req: Request, res: Response) => {
     try {
@@ -24,8 +24,8 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 /**
  * Retrive all informations for an user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getUserWithAllInfo = async (req: Request, res: Response) => {
     try {
@@ -47,12 +47,12 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
 
 /**
  * Update user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const updateUser = async (req: Request, res: Response) => {
     try {
-        const id: number = Number(req.params.id); 
+        const id: number = Number(req.params.id);
         logger.info(`Update User`, req.body);
 
         const user = plainToClass(User, req.body as string, { groups: ['user'] });
@@ -63,16 +63,15 @@ const updateUser = async (req: Request, res: Response) => {
             logger.info(`Update User roles`, req.body.roles);
         }
 
-        if(user.socialMedias) {
+        if (user.socialMedias) {
             user.socialMedias.userId = user.id;
         }
 
         if (user.id == id) {
             await userRepository.update(user);
-            if(user.socialMedias! && !user.socialMedias.id) {
+            if (user.socialMedias! && !user.socialMedias.id) {
                 await socialMediasRep.create(user.socialMedias!);
-            }
-            else {
+            } else {
                 await socialMediasRep.update(user.socialMedias!);
             }
             res.status(204).end();
@@ -87,8 +86,8 @@ const updateUser = async (req: Request, res: Response) => {
 
 /**
  * Delete user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const deleteUser = async (req: Request, res: Response) => {
     try {
@@ -101,13 +100,12 @@ const deleteUser = async (req: Request, res: Response) => {
 
 /**
  * Create user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const createUser = async (req: Request, res: Response) => {
     try {
         logger.info(`Create User`);
-
     } catch (e) {
         logger.error(`createUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
@@ -116,18 +114,16 @@ const createUser = async (req: Request, res: Response) => {
 
 /**
  * Change status of user
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const changeStatusUser = async (req: Request, res: Response) => {
     try {
         logger.info(`Cahge Status User`);
-
     } catch (e) {
         logger.error(`changeStatusUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 };
-
 
 export { getAllUsers, updateUser, getUserWithAllInfo };

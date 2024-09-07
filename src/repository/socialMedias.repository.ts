@@ -4,20 +4,20 @@ import * as SocialMediasValidator from '../validators/socialMedias.validator';
 
 /**
  * Create Social Medias
- * @param data 
+ * @param data
  */
 const create = async (data: SocialMedias): Promise<void> => {
     await data.save();
-}
+};
 
 /**
  * Update Social Medias
- * @param data 
+ * @param data
  */
 const update = async (data: SocialMedias): Promise<void> => {
     data.isNewRecord = false;
     await data.save();
-}
+};
 
 const setSocialMedias = async (id: number, data: ISocialMedias): Promise<boolean | null> => {
     logger.info('social medias update', data);

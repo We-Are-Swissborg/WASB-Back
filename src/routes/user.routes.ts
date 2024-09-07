@@ -7,7 +7,6 @@ import { socialMediasRouter } from './socialMedias.routes';
 export const userRouter: Router = express.Router();
 userRouter.use('/:id/socialMedias', socialMediasRouter);
 
-
 userRouter.get('/codeRef/:codeRef', User.checkReferralExist);
 userRouter.get('/', Auth.authorize([Role.Admin]), User.getAllUsers);
 userRouter.get('/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUser);
