@@ -69,7 +69,7 @@ const updateUser = async (req: Request, res: Response) => {
 
         if (user.id == id) {
             await userRepository.update(user);
-            if (user.socialMedias! && !user.socialMedias.id) {
+            if (user.socialMedias && !user.socialMedias.id) {
                 await socialMediasRep.create(user.socialMedias!);
             } else {
                 await socialMediasRep.update(user.socialMedias!);
@@ -126,4 +126,4 @@ const changeStatusUser = async (req: Request, res: Response) => {
     }
 };
 
-export { getAllUsers, updateUser, getUserWithAllInfo };
+export { getAllUsers, updateUser, getUserWithAllInfo, deleteUser, createUser, changeStatusUser };
