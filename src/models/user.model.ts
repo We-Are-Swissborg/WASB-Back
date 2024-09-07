@@ -16,11 +16,17 @@ import {
     ForeignKey,
     BelongsTo,
     HasMany,
+    AfterCreate,
+    AllowNull,
+    BeforeValidate,
 } from 'sequelize-typescript';
-import { SocialNetwork } from './socialnetwork.model';
+import { SocialMedias } from './socialmedias.model';
 import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
+import { Membership } from './membership.model';
+import ContributionStatus from '../types/ContributionStatus';
+import { Post } from './post.model';
 
 const NAME_REGEX =
     /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/;
@@ -29,8 +35,8 @@ const USER_REFERRAL_CODE_LENGTH: string = process.env.USER_REFERRAL_CODE_LENGTH 
 
 interface IUser {
     id: number;
-    firstName: string | null;
-    lastName: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
     username: string;
     password: string;
     email: string;
@@ -44,13 +50,12 @@ interface IUser {
     beContacted: boolean;
     nonce: string | null;
     expiresIn: Date | null;
-    roles: string | null;
     referralCode: string;
 }
 
 @Table
 class User extends Model implements IUser {
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['admin', 'user', 'profil'] })
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -59,27 +64,31 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'profil'] })
     @Is(NAME_REGEX)
     @Column
-    declare firstName: string;
+    declare firstName?: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @Is(NAME_REGEX)
     @Column
-    declare lastName: string;
+    declare lastName?: string;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
     @Unique(true)
     @Is(USERNAME_REGEX)
+    @AllowNull(false)
     @Column
     declare username: string;
 
-    @Expose({ groups: ['user', 'profil', 'admin'] })
+    @Expose({ toClassOnly: true })
+    @AllowNull(false)
     @Column
-    declare roles: string;
+    private declare roles: string;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @AllowNull(false)
     @Column
     declare password: string;
 
     @Expose({ groups: ['user', 'profil'] })
+    @AllowNull(false)
     @Unique(true)
     @IsEmail
     @Column
@@ -139,10 +148,10 @@ class User extends Model implements IUser {
     @Column
     declare updatedAt: Date;
 
-    @Type(() => SocialNetwork)
+    @Type(() => SocialMedias)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => SocialNetwork)
-    declare socialNetwork: SocialNetwork | null;
+    @HasOne(() => SocialMedias, { foreignKey: 'userId' })
+    declare socialMedias: SocialMedias | null;
 
     @Expose({ groups: ['user', 'profil'] })
     @Unique(true)
@@ -159,11 +168,27 @@ class User extends Model implements IUser {
     @HasMany(() => User, 'referringUserId')
     declare referrals: User[];
 
+    @Type(() => Membership)
+    @Expose({ groups: ['user', 'profil'] })
+    @HasOne(() => Membership, { foreignKey: 'userId' })
+    declare membership: Membership;
+
+    @HasMany(() => Post, 'author')
+    declare posts: Post[];
+
     // getters that are not attributes should be tagged using NonAttribute
     // to remove them from the model's Attribute Typings.
     @Expose({ groups: ['user', 'profil'] })
-    get fullName(): NonAttribute<string> {
-        return `${this.lastName} ${this.firstName}`;
+    get fullName(): NonAttribute<string | null> {
+        if (!this.lastName && !this.firstName) {
+            return null;
+        }
+        return `${this.lastName || ''} ${this.firstName || ''}`.trim();
+    }
+
+    @Expose({ groups: ['user', 'profil', 'admin'], toPlainOnly: true, name: 'roles' })
+    get getRoles(): NonAttribute<string[]> {
+        return JSON.parse(this.roles);
     }
 
     @BeforeCreate
@@ -178,6 +203,16 @@ class User extends Model implements IUser {
         }
     }
 
+    @BeforeValidate
+    static stringEmptyOrWhitespace(instance: User) {
+        if (!instance.dataValues.firstName?.trim()) {
+            instance.dataValues.firstName = null;
+        }
+        if (!instance.dataValues.lastName?.trim()) {
+            instance.dataValues.lastName = null;
+        }
+    }
+
     /**
      * Generation of a new unique referral code
      * @param {User} instance new user added
@@ -185,15 +220,25 @@ class User extends Model implements IUser {
     @BeforeCreate
     static async generateReferalCode(instance: User) {
         if (instance.referralCode === undefined) {
-            let unique = false;
-            while (!unique) {
+            let isUnique = false;
+            while (!isUnique) {
                 const code = generateRandomCode(Number(USER_REFERRAL_CODE_LENGTH));
                 const userExist = await User.count({ where: { referralCode: code } });
                 if (userExist == 0) {
                     instance.referralCode = code;
-                    unique = !unique;
+                    isUnique = !isUnique;
                 }
             }
+        }
+    }
+
+    @AfterCreate
+    static async addDefaultContributionStatus(instance: User) {
+        if (!instance.membership) {
+            await Membership.create({
+                userId: instance.id,
+                contributionStatus: ContributionStatus.NO_ADHERENT,
+            });
         }
     }
 

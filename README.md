@@ -7,7 +7,7 @@ Mainly based around Swissborg, our community aims to educate and be a pillar in 
 ## Installation
 
 Requirement :
-    - NodeJS v20.6
+    - NodeJS v20.15
     - Sequelize V6
     - Sequeliez CLI V6
 
@@ -31,6 +31,6 @@ Next we need to convert your model so that it matches the queryInterface
 Finally, we can run the following command to generate the changes
 
 ```bash
-npx sequelize db:migrate
-npx sequelize db:seed:all
+npx sequelize db:migrate --env=ENV
+npx sequelize db:seed:all --env=ENV
 ```

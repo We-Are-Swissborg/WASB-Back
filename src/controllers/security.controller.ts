@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 import { login, register, updateLastLogin } from '../services/user.services';
 import { generateToken } from '../services/jwt.services';
 import { plainToInstance } from 'class-transformer';
-import { IUser } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
-import { Register } from '../types/Register';
+import Register from '../types/Register';
 
 /**
  * Register a new member
@@ -16,10 +15,10 @@ const registration = async (req: Request, res: Response) => {
     try {
         const form: string = req.body;
         const user: Register = plainToInstance(Register, form, { groups: ['register'] });
-        const admin = false; // Set up when role ok
-        const newUser: IUser = await register(user);
+        const isAdmin = false; // Set up when role ok
+        const newUser = await register(user);
 
-        if (admin) {
+        if (isAdmin) {
             res.status(201);
         } else {
             const token = generateToken(newUser);

@@ -17,4 +17,10 @@ const referralExist = async (referral: string): Promise<number | null> => {
     return exist;
 };
 
-export { usernameAlreadyExist, emailAlreadyExist, referralExist };
+const walletAddressAlreadyExist = async (walletAddress: string): Promise<number | null> => {
+    const exist = await User.count({ where: { walletAddress: walletAddress } });
+
+    return exist;
+};
+
+export { usernameAlreadyExist, emailAlreadyExist, referralExist, walletAddressAlreadyExist };

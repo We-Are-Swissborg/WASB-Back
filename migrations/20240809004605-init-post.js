@@ -3,16 +3,15 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('SocialMedias', {
+    await queryInterface.createTable('Posts', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
-      userId: {
+      author: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
         references: {
           model: 'Users',
           key: 'id'
@@ -20,25 +19,18 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       },
-      twitter: {
+      title: {
         type: Sequelize.STRING,
         unique: true,
-        allowNull: true,
+        allowNull: false,
       },
-      discord: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: true,
+      image: {
+        type: Sequelize.BLOB,
+        allowNull: false,
       },
-      tiktok: {
+      content: {
         type: Sequelize.STRING,
-        unique: true,
-        allowNull: true,
-      },
-      telegram: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: true,
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -54,6 +46,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('SocialMedias');
+    await queryInterface.dropTable('Posts');
   }
 };
