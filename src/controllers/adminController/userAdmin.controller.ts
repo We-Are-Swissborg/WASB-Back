@@ -91,7 +91,10 @@ const updateUser = async (req: Request, res: Response) => {
  */
 const deleteUser = async (req: Request, res: Response) => {
     try {
-        logger.info(`Delete User`);
+        logger.info(`Delete User`, req.params.id);
+        const id: number = Number(req.params.id);
+        userRepository.deleteUser(id)
+        res.status(200).end();
     } catch (e) {
         logger.error(`deleteUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
