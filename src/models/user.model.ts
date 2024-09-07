@@ -18,6 +18,7 @@ import {
     HasMany,
     AfterCreate,
     AllowNull,
+    BeforeValidate,
 } from 'sequelize-typescript';
 import { SocialMedias } from './socialmedias.model';
 import { NonAttribute } from 'sequelize';
@@ -34,8 +35,8 @@ const USER_REFERRAL_CODE_LENGTH: string = process.env.USER_REFERRAL_CODE_LENGTH 
 
 interface IUser {
     id: number;
-    firstName: string | null;
-    lastName: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
     username: string;
     password: string;
     email: string;
@@ -54,7 +55,7 @@ interface IUser {
 
 @Table
 class User extends Model implements IUser {
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['admin', 'user', 'profil'] })
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -63,12 +64,12 @@ class User extends Model implements IUser {
     @Expose({ groups: ['user', 'profil'] })
     @Is(NAME_REGEX)
     @Column
-    declare firstName: string;
+    declare firstName?: string;
 
     @Expose({ groups: ['user', 'profil'] })
     @Is(NAME_REGEX)
     @Column
-    declare lastName: string;
+    declare lastName?: string;
 
     @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
     @Unique(true)
@@ -199,6 +200,16 @@ class User extends Model implements IUser {
                 currentRoles.splice(0, 0, Role.User);
             }
             instance.roles = JSON.stringify(currentRoles);
+        }
+    }
+
+    @BeforeValidate
+    static stringEmptyOrWhitespace(instance: User) {
+        if (!instance.dataValues.firstName?.trim()) {
+            instance.dataValues.firstName = null;
+        }
+        if (!instance.dataValues.lastName?.trim()) {
+            instance.dataValues.lastName = null;
         }
     }
 

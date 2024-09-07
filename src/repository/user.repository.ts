@@ -88,7 +88,7 @@ const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
 const update = async (user: User): Promise<void> => {
     user.isNewRecord = false;
     await user.save();
-}
+};
 
 const setUser = async (id: number, data: IUser): Promise<number | null> => {
     logger.info('user update', data);

@@ -5,7 +5,7 @@ import multer from 'multer';
 import Role from '../types/Role';
 
 const upload = multer({
-  limits: { fieldSize: 25 * 1024 * 1024 }
+    limits: { fieldSize: 25 * 1024 * 1024 },
 });
 
 export const postRouter: Router = express.Router();

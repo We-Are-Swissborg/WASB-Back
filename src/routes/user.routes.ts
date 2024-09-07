@@ -2,8 +2,10 @@ import express, { Router } from 'express';
 import * as Auth from '../middlewares/auth.middleware';
 import * as User from '../controllers/user.controller';
 import Role from '../types/Role';
+import { socialMediasRouter } from './socialMedias.routes';
 
 export const userRouter: Router = express.Router();
+userRouter.use('/:id/socialMedias', socialMediasRouter);
 
 userRouter.get('/codeRef/:codeRef', User.checkReferralExist);
 userRouter.get('/', Auth.authorize([Role.Admin]), User.getAllUsers);

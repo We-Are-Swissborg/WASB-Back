@@ -13,9 +13,9 @@ const preview = async (req: Request, res: Response) => {
         const clean = body.contentPost && domClean(body.contentPost);
         const sizeImage = {
             x: Number(process.env.SIZE_X_IMAGE_POST),
-            y: Number(process.env.SIZE_Y_IMAGE_POST)
-        }
-        const convertToWebp = file && Array.from(await imageConvert(file, {x: sizeImage.x, y: sizeImage.y}));
+            y: Number(process.env.SIZE_Y_IMAGE_POST),
+        };
+        const convertToWebp = file && Array.from(await imageConvert(file, { x: sizeImage.x, y: sizeImage.y }));
 
         res.status(200).json({ clean, convertToWebp });
     } catch (e) {
@@ -42,7 +42,7 @@ const getAllPosts = async (req: Request, res: Response) => {
         const allPostsDTO = instanceToPlain(allPosts, { groups: ['blog'], excludeExtraneousValues: true });
 
         // Replace object with just a Buffer array.
-        allPostsDTO.forEach((post: Post, id: number) => allPostsDTO[id].image = Array.from(post.image));
+        allPostsDTO.forEach((post: Post, id: number) => (allPostsDTO[id].image = Array.from(post.image)));
 
         res.status(200).json(allPostsDTO);
     } catch (e: unknown) {
@@ -57,7 +57,7 @@ const getPost = async (req: Request, res: Response) => {
         const post = await get(idPost);
         const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
 
-        if(!post) throw new Error('No post find with this id :' + idPost);
+        if (!post) throw new Error('No post find with this id :' + idPost);
         // Replace object with just a Buffer array.
         postDTO.image = Array.from(post.image);
 
@@ -73,12 +73,12 @@ const getPostList = async (req: Request, res: Response) => {
         const pageId = Number(req.params.pageId);
         const nbCardToDisplay = Number(process.env.NUMBER_CARD_DISPLAY);
         const infoPost = await getList(nbCardToDisplay, pageId);
-        const postListDTO = instanceToPlain(infoPost.postList, { groups: ['blog'], excludeExtraneousValues: true});
+        const postListDTO = instanceToPlain(infoPost.postList, { groups: ['blog'], excludeExtraneousValues: true });
 
         // Replace object with just a Buffer array.
-        postListDTO.forEach((post: Post, id: number) => postListDTO[id].image = Array.from(post.image));
+        postListDTO.forEach((post: Post, id: number) => (postListDTO[id].image = Array.from(post.image)));
 
-        res.status(200).json({postListDTO, totalPost: infoPost.totalPost});
+        res.status(200).json({ postListDTO, totalPost: infoPost.totalPost });
     } catch (e: unknown) {
         logger.error(`Get post list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
@@ -100,7 +100,7 @@ const deletePost = async (req: Request, res: Response) => {
 const updatePost = async (req: Request, res: Response) => {
     try {
         const idPost = Number(req.params.idPost);
-        const newPost = req.body
+        const newPost = req.body;
         await update(idPost, newPost);
 
         res.status(204).end();
@@ -110,12 +110,4 @@ const updatePost = async (req: Request, res: Response) => {
     }
 };
 
-export {
-    preview,
-    createPost,
-    getAllPosts,
-    getPost,
-    getPostList,
-    deletePost,
-    updatePost
-};
+export { preview, createPost, getAllPosts, getPost, getPostList, deletePost, updatePost };
