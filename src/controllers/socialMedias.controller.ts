@@ -2,9 +2,14 @@ import { setSocialMedias } from '../repository/socialMedias.repository';
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 
+/**
+ * Update social medias
+ * @param req 
+ * @param res 
+ */
 const updateSocialMediasUser = async (req: Request, res: Response) => {
     try {
-        const userId: number = Number(req.params.userId);
+        const userId: number = Number(req.params.id);
         const body = req.body;
         const socialMedias: boolean | null = await setSocialMedias(userId, body);
 

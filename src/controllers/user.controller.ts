@@ -4,6 +4,7 @@ import { instanceToPlain, plainToClass } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/user.validator';
 import * as userRepository from '../repository/user.repository';
+import * as socialMediasRep from '../repository/socialMedias.repository';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -11,6 +12,11 @@ import * as userRepository from '../repository/user.repository';
 //   res.status(201).json({ message: "Utilisateur ajouté avec succès" });
 // };
 
+/**
+ * Retrieve all users
+ * @param req 
+ * @param res 
+ */
 const getAllUsers = async (req: Request, res: Response) => {
     try {
         const users: User[] = await userRepository.getUsers();
@@ -23,6 +29,11 @@ const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieve user by ID
+ * @param req 
+ * @param res 
+ */
 const getUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
@@ -40,6 +51,11 @@ const getUser = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Verify if referral code exist
+ * @param req 
+ * @param res 
+ */
 const checkReferralExist = async (req: Request, res: Response) => {
     try {
         const codeRef: string = req.params.codeRef;
@@ -56,6 +72,11 @@ const checkReferralExist = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrive all informations for an user
+ * @param req 
+ * @param res 
+ */
 const getUserWithAllInfo = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
@@ -74,15 +95,31 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Update user
+ * @param req 
+ * @param res 
+ */
 const updateUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
+
         const user = plainToClass(User, req.body as string, { groups: ['user'] });
 
-        logger.info(`Update User`, user)
+        // Update of user roles
+        if (req.body.roles) {
+            user.addRoles(req.body.roles);
+        }
+
+        if(user.socialMedias) {
+            user.socialMedias.userId = user.id;
+        }
+
+        logger.info(`Update User`, user);
 
         if (user.id == id) {
             await userRepository.update(user);
+            await socialMediasRep.update(user.socialMedias!);
             res.status(204).end();
         } else {
             res.status(400).json(`An error in your user form`);
@@ -93,6 +130,11 @@ const updateUser = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Update user
+ * @param req 
+ * @param res 
+ */
 const patchUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
