@@ -25,6 +25,14 @@ const getUsersWithSocialMedias = async (): Promise<User[]> => {
     return users;
 };
 
+const deleteUser = async(identifiant: number) : Promise<void> => {
+    await User.destroy({
+        where: {
+          id: identifiant,
+        },
+    });
+};
+
 /**
  * Retrieves a user's data to authenticate them
  * @param {string} username username
@@ -131,4 +139,5 @@ export {
     setUser,
     update,
     getUserByIdWithAllInfo,
+    deleteUser
 };
