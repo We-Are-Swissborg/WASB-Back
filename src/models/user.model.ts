@@ -79,7 +79,6 @@ class User extends Model implements IUser {
     declare username: string;
 
     @Expose({ toClassOnly: true })
-    @AllowNull(false)
     @Column
     private declare roles: string;
 
