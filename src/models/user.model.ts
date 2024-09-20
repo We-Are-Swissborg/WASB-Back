@@ -73,14 +73,14 @@ class User extends Model implements IUser {
 
     @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
     @Unique(true)
+    @AllowNull(false)
     @Is(USERNAME_REGEX)
     @AllowNull(false)
     @Column
     declare username: string;
 
-    @Expose({ toClassOnly: true })
-    @AllowNull(false)
     @Column
+    @Expose({ groups: ['admin'], toClassOnly: true })
     private declare roles: string;
 
     @AllowNull(false)
