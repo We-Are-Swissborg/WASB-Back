@@ -10,7 +10,6 @@ import { adminLogger as logger } from '../middlewares/logger.middleware';
 const getParameters = async (req: Request, res: Response) => {
     try {
         // const users: User[] = await parameterRepository.getUsers();
-
         // const usersDTO = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true });
         // res.status(200).json(usersDTO);
     } catch (e) {

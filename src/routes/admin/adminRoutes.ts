@@ -10,4 +10,4 @@ export const apiAdminRouter: Router = express.Router();
 apiAdminRouter.use(Auth.authorize([Role.Admin]));
 
 apiAdminRouter.use('/users', userRouter);
-apiAdminRouter.use('/parameters', parameterRouter)
+apiAdminRouter.use('/parameters', parameterRouter);

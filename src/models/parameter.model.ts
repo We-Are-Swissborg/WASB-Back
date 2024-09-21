@@ -1,5 +1,16 @@
-import { Expose } from "class-transformer";
-import { AllowNull, AutoIncrement, Column, CreatedAt, IsDate, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
+import { Expose } from 'class-transformer';
+import {
+    AllowNull,
+    AutoIncrement,
+    Column,
+    CreatedAt,
+    IsDate,
+    Model,
+    PrimaryKey,
+    Table,
+    Unique,
+    UpdatedAt,
+} from 'sequelize-typescript';
 
 interface IParameter {
     id: number;

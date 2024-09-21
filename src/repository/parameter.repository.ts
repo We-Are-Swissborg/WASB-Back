@@ -9,7 +9,7 @@ const create = async (parameter: IParameter): Promise<Parameter> => {
         name: parameter.name,
         value: parameter.value,
     });
-    
+
     logger.debug('parameter created');
 
     return newParameter;
@@ -26,11 +26,11 @@ const getAll = async (): Promise<Parameter[]> => {
 };
 
 const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
-    logger.info('getParametersByQuery', {query: query});
+    logger.info('getParametersByQuery', { query: query });
 
     const parameters = await Parameter.findAll({
         where: {
-            name: {[Op.like]: `%${query}%`}
+            name: { [Op.like]: `%${query}%` },
         },
     });
 
@@ -39,7 +39,7 @@ const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
     return parameters;
 };
 
-const destroy = async (id: number): Promise<void>  => {
+const destroy = async (id: number): Promise<void> => {
     logger.info(`delete parameter ${id}`);
 
     const isDelete = await Parameter.destroy({ where: { id: id } });

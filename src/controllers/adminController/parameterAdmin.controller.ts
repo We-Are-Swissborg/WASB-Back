@@ -12,12 +12,12 @@ import * as parameterServices from '../../services/parameter.services';
  */
 const getParameters = async (req: Request, res: Response) => {
     logger.debug(`getParameters`);
-    
+
     try {
         const query = req.query.q as string;
         let parameters = null;
 
-        if(!!query) {
+        if (!!query) {
             parameters = await parameterRepository.getParametersByQuery(query);
         } else {
             parameters = await parameterRepository.getAll();
@@ -89,7 +89,6 @@ const createParameter = async (req: Request, res: Response) => {
         } catch (e: unknown) {
             if (e instanceof Error) res.status(400).json(e.message);
         }
-        
     } catch (e: unknown) {
         logger.error(`createParameter error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });

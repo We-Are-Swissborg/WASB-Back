@@ -93,7 +93,7 @@ const deleteUser = async (req: Request, res: Response) => {
     try {
         logger.info(`Delete User`, req.params.id);
         const id: number = Number(req.params.id);
-        userRepository.deleteUser(id)
+        userRepository.deleteUser(id);
         res.status(200).end();
     } catch (e) {
         logger.error(`deleteUser error`, e);
