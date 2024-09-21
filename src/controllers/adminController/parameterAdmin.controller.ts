@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { adminLogger as logger } from '../../middlewares/logger.middleware';
-import { User } from '../../models/user.model';
-import * as userRepository from '../../repository/user.repository';
-import * as socialMediasRep from '../../repository/socialMedias.repository';
+import { Parameter } from '../../models/parameter.model';
+import * as parameterRepository from '../../repository/parameter.repository';
+import * as parameterServices from '../../services/parameter.services';
 
 /**
  * Retrieve all parameters
@@ -11,11 +11,20 @@ import * as socialMediasRep from '../../repository/socialMedias.repository';
  * @param res
  */
 const getParameters = async (req: Request, res: Response) => {
+    logger.debug(`getParameters`);
+    
     try {
-        const users: User[] = await userRepository.getUsers();
+        const query = req.query.q as string;
+        let parameters = null;
 
-        const usersDTO = instanceToPlain(users, { groups: ['user'], excludeExtraneousValues: true });
-        res.status(200).json(usersDTO);
+        if(!!query) {
+            parameters = await parameterRepository.getParametersByQuery(query);
+        } else {
+            parameters = await parameterRepository.getAll();
+        }
+
+        const parametersDTO = instanceToPlain(parameters, { groups: ['admin'], excludeExtraneousValues: true });
+        res.status(200).json(parametersDTO);
     } catch (e) {
         logger.error(`getParameters error`, e);
         res.status(400).json({ message: 'Oops !, an error has occurred.' });
@@ -30,33 +39,18 @@ const getParameters = async (req: Request, res: Response) => {
 const updateParameter = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
-        logger.info(`Update User`, req.body);
+        logger.debug(`Update parameter`, req.body);
 
-        const user = plainToClass(User, req.body as string, { groups: ['user'] });
+        const parameter = plainToClass(Parameter, req.body as string, { groups: ['admin'] });
 
-        // Update of user roles
-        if (req.body.roles) {
-            user.addRoles(req.body.roles);
-            logger.info(`Update User roles`, req.body.roles);
-        }
-
-        if (user.socialMedias) {
-            user.socialMedias.userId = user.id;
-        }
-
-        if (user.id == id) {
-            await userRepository.update(user);
-            if (user.socialMedias && !user.socialMedias.id) {
-                await socialMediasRep.create(user.socialMedias!);
-            } else {
-                await socialMediasRep.update(user.socialMedias!);
-            }
+        if (parameter.id == id) {
+            await parameterRepository.update(parameter);
             res.status(204).end();
         } else {
-            res.status(400).json(`An error in your user form`);
+            res.status(400).json(`An error in your parameter form`);
         }
     } catch (e) {
-        logger.error(`updateUser error`, e);
+        logger.error(`updateParameter error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }
 };
@@ -70,7 +64,7 @@ const deleteParameter = async (req: Request, res: Response) => {
     try {
         logger.info(`Delete Parameter`, req.params.id);
         const id: number = Number(req.params.id);
-        userRepository.deleteUser(id)
+        parameterRepository.destroy(id);
         res.status(200).end();
     } catch (e) {
         logger.error(`deleteParameter error`, e);
@@ -79,14 +73,24 @@ const deleteParameter = async (req: Request, res: Response) => {
 };
 
 /**
- * Create user
+ * Create parameter
  * @param req
  * @param res
  */
 const createParameter = async (req: Request, res: Response) => {
     try {
         logger.info(`Create Parameter`);
-    } catch (e) {
+        const parameter = plainToClass(Parameter, req.body as string, { groups: ['admin'] });
+        logger.debug(`parameter`, parameter);
+
+        try {
+            await parameterServices.createParameter(parameter);
+            res.status(200).end();
+        } catch (e: unknown) {
+            if (e instanceof Error) res.status(400).json(e.message);
+        }
+        
+    } catch (e: unknown) {
         logger.error(`createParameter error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });
     }

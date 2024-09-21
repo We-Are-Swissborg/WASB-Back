@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { IParameter, Parameter } from '../models/parameter.model';
 
@@ -17,27 +18,43 @@ const create = async (parameter: IParameter): Promise<Parameter> => {
 const getAll = async (): Promise<Parameter[]> => {
     logger.info('get all parameters');
 
-    const allPosts = await Parameter.findAll();
+    const parameters = await Parameter.findAll();
 
     logger.debug('get all parameters');
 
-    return allPosts;
+    return parameters;
 };
 
-const destroy = async (id: number) => {
-    logger.info('delete post');
+const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
+    logger.info('getParametersByQuery', {query: query});
+
+    const parameters = await Parameter.findAll({
+        where: {
+            name: {[Op.like]: `%${query}%`}
+        },
+    });
+
+    logger.debug(`getParametersByQuery : ${parameters.length} element(s)`);
+
+    return parameters;
+};
+
+const destroy = async (id: number): Promise<void>  => {
+    logger.info(`delete parameter ${id}`);
 
     const isDelete = await Parameter.destroy({ where: { id: id } });
-    if (!isDelete) throw new Error('Error, post not exist for delete');
+    if (!isDelete) throw new Error('Error, parameter not exist for delete');
 
-    logger.debug(`delete post ${id}`);
+    logger.debug(`delete parameter ${id}`);
 };
 
-const update = async (id: number) => {
-    logger.info('update post');
+const update = async (parameter: Parameter): Promise<void> => {
+    logger.info(`update parameter ${parameter.id}`);
 
+    parameter.isNewRecord = false;
+    await parameter.save();
 
-    logger.debug(`update post ${id} OK!`);
+    logger.debug(`updated parameter ${parameter.id}!`);
 };
 
-export { create, getAll, destroy, update };
+export { create, getAll, getParametersByQuery, destroy, update };
