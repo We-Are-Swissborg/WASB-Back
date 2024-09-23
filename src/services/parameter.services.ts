@@ -5,15 +5,31 @@ import * as parameterRepository from '../repository/parameter.repository';
 const createParameter = async (parameter: Parameter) => {
     logger.info('createParameter : services', parameter);
 
-    if (!parameter.name || !parameter.name.trim()) {
+    if (!parameter.name?.trim()) {
         throw new Error('A name for the parameter is required');
     }
 
-    if (!parameter.value || !parameter.value.trim()) {
+    if (!parameter.value?.trim()) {
         throw new Error('A value for the parameter is required');
     }
 
     parameterRepository.create(parameter);
 };
 
-export { createParameter };
+const getParameters = async (query: string | null): Promise<Parameter[]> => {
+    logger.info('getParameters : services', { query: query });
+
+    let parameters = null;
+
+    if (!!query) {
+        parameters = await parameterRepository.getParametersByQuery(query);
+    } else {
+        parameters = await parameterRepository.getAll();
+    }
+
+    logger.debug(`getParameters : ${parameters.length} item(s)`);
+
+    return parameters;
+}
+
+export { createParameter, getParameters };

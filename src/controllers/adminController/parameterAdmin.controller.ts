@@ -11,18 +11,11 @@ import * as parameterServices from '../../services/parameter.services';
  * @param res
  */
 const getParameters = async (req: Request, res: Response) => {
-    logger.debug(`getParameters`);
+    logger.info(`Get Parameters`);
 
     try {
         const query = req.query.q as string;
-        let parameters = null;
-
-        if (!!query) {
-            parameters = await parameterRepository.getParametersByQuery(query);
-        } else {
-            parameters = await parameterRepository.getAll();
-        }
-
+        const parameters = await parameterServices.getParameters(query);
         const parametersDTO = instanceToPlain(parameters, { groups: ['admin'], excludeExtraneousValues: true });
         res.status(200).json(parametersDTO);
     } catch (e) {
@@ -37,10 +30,10 @@ const getParameters = async (req: Request, res: Response) => {
  * @param res
  */
 const updateParameter = async (req: Request, res: Response) => {
+    logger.info(`Update parameter`);
+
     try {
         const id: number = Number(req.params.id);
-        logger.debug(`Update parameter`, req.body);
-
         const parameter = plainToClass(Parameter, req.body as string, { groups: ['admin'] });
 
         if (parameter.id == id) {
@@ -61,8 +54,9 @@ const updateParameter = async (req: Request, res: Response) => {
  * @param res
  */
 const deleteParameter = async (req: Request, res: Response) => {
+    logger.info(`Delete Parameter`, {id :req.params.id});
+
     try {
-        logger.info(`Delete Parameter`, req.params.id);
         const id: number = Number(req.params.id);
         parameterRepository.destroy(id);
         res.status(200).end();
@@ -78,8 +72,9 @@ const deleteParameter = async (req: Request, res: Response) => {
  * @param res
  */
 const createParameter = async (req: Request, res: Response) => {
+    logger.info(`Create Parameter`);
+
     try {
-        logger.info(`Create Parameter`);
         const parameter = plainToClass(Parameter, req.body as string, { groups: ['admin'] });
         logger.debug(`parameter`, parameter);
 

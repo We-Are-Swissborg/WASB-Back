@@ -17,12 +17,7 @@ const create = async (parameter: IParameter): Promise<Parameter> => {
 
 const getAll = async (): Promise<Parameter[]> => {
     logger.info('get all parameters');
-
-    const parameters = await Parameter.findAll();
-
-    logger.debug('get all parameters');
-
-    return parameters;
+    return await Parameter.findAll();
 };
 
 const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
@@ -34,7 +29,7 @@ const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
         },
     });
 
-    logger.debug(`getParametersByQuery : ${parameters.length} element(s)`);
+    logger.debug('getParametersByQuery : parameters', { parameters: parameters });
 
     return parameters;
 };

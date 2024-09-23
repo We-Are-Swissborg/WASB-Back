@@ -13,4 +13,4 @@ apiRouter.use('/', securityRouter);
 apiRouter.use('/test', testRouter);
 apiRouter.use('/users', userRouter);
 apiRouter.use('/posts', postRouter);
-apiRouter.use('/parameter', parameterRouter);
+apiRouter.use('/parameters', parameterRouter);
