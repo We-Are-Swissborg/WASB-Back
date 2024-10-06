@@ -20,6 +20,16 @@ const getAll = async (): Promise<Parameter[]> => {
     return await Parameter.findAll();
 };
 
+const getParameter = async (id: number): Promise<Parameter | null> => {
+    logger.info('getParameter', { id: id });
+
+    const parameter = await Parameter.findByPk(id);
+
+    logger.debug('getParametersByQuery : parameters', { parameter: parameter });
+
+    return parameter;
+};
+
 const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
     logger.info('getParametersByQuery', { query: query });
 
@@ -52,4 +62,4 @@ const update = async (parameter: Parameter): Promise<void> => {
     logger.debug(`updated parameter ${parameter.id}!`);
 };
 
-export { create, getAll, getParametersByQuery, destroy, update };
+export { create, getAll, getParametersByQuery, getParameter, destroy, update };

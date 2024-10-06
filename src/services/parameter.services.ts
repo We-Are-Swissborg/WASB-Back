@@ -32,4 +32,14 @@ const getParameters = async (query: string | null): Promise<Parameter[]> => {
     return parameters;
 }
 
-export { createParameter, getParameters };
+const getParameter = async (id: number): Promise<Parameter | null> => {
+    logger.info('getParameter : services', { id: id });
+
+    const parameter = await parameterRepository.getParameter(id);
+
+    logger.debug(`getParameter : ${parameter}`);
+
+    return parameter;
+}
+
+export { createParameter, getParameters, getParameter };

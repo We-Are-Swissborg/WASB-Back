@@ -37,7 +37,7 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
             userDTO = instanceToPlain(user, { groups: ['user'], excludeExtraneousValues: true });
             res.status(200).json(userDTO);
         } else {
-            res.status(400).json(`This user doesn't exist`);
+            res.status(404).json(`This user doesn't exist`);
         }
     } catch (e) {
         logger.error(`getUserWithAllInfo error`, e);

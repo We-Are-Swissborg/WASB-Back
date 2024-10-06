@@ -25,6 +25,32 @@ const getParameters = async (req: Request, res: Response) => {
 };
 
 /**
+ * Retrieve parameter
+ * @param req
+ * @param res
+ */
+const getParameter = async (req: Request, res: Response) => {
+    logger.info(`Get Parameter`);
+
+    try {
+        const id: number = Number(req.params.id);
+        const parameter = await parameterServices.getParameter(id);
+        
+        if(parameter instanceof Parameter) {
+            const parameterDTO = instanceToPlain(parameter, { groups: ['admin'], excludeExtraneousValues: true });
+            res.status(200).json(parameterDTO);
+        }
+        else 
+        {
+            res.status(404).json({ message: 'No records found' });
+        }
+    } catch (e) {
+        logger.error(`getParameter error`, e);
+        res.status(400).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+/**
  * Update parameter
  * @param req
  * @param res
@@ -90,4 +116,4 @@ const createParameter = async (req: Request, res: Response) => {
     }
 };
 
-export { getParameters, updateParameter, deleteParameter, createParameter };
+export { getParameters, getParameter, updateParameter, deleteParameter, createParameter };
