@@ -30,7 +30,7 @@ const getParameters = async (query: string | null): Promise<Parameter[]> => {
     logger.debug(`getParameters : ${parameters.length} item(s)`);
 
     return parameters;
-}
+};
 
 const getParameter = async (id: number): Promise<Parameter | null> => {
     logger.info('getParameter : services', { id: id });
@@ -40,6 +40,6 @@ const getParameter = async (id: number): Promise<Parameter | null> => {
     logger.debug(`getParameter : ${parameter}`);
 
     return parameter;
-}
+};
 
 export { createParameter, getParameters, getParameter };

@@ -35,13 +35,11 @@ const getParameter = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         const parameter = await parameterServices.getParameter(id);
-        
-        if(parameter instanceof Parameter) {
+
+        if (parameter instanceof Parameter) {
             const parameterDTO = instanceToPlain(parameter, { groups: ['admin'], excludeExtraneousValues: true });
             res.status(200).json(parameterDTO);
-        }
-        else 
-        {
+        } else {
             res.status(404).json({ message: 'No records found' });
         }
     } catch (e) {
@@ -80,7 +78,7 @@ const updateParameter = async (req: Request, res: Response) => {
  * @param res
  */
 const deleteParameter = async (req: Request, res: Response) => {
-    logger.info(`Delete Parameter`, {id :req.params.id});
+    logger.info(`Delete Parameter`, { id: req.params.id });
 
     try {
         const id: number = Number(req.params.id);
