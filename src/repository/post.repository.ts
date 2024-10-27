@@ -1,18 +1,15 @@
 import { logger } from '../middlewares/logger.middleware';
 import { IPost, Post } from '../models/post.model';
 import { User } from '../models/user.model';
-import domClean from '../services/domPurify';
-import GetList from '../types/GetList';
 
-const create = async (post: IPost): Promise<Post> => {
+const create = async (post: IPost): Promise<IPost> => {
     logger.info('post create', post);
-    const content = domClean(post.content);
 
     const postCreated = await Post.create({
         author: post.author,
         title: post.title,
         image: post.image,
-        content: content,
+        content: post.content,
     });
 
     logger.debug('post create OK');
@@ -20,17 +17,21 @@ const create = async (post: IPost): Promise<Post> => {
     return postCreated;
 };
 
-const getAll = async (): Promise<Post[]> => {
+const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get all posts');
 
-    const allPosts = await Post.findAll();
+    const allPosts = await Post.findAndCountAll({
+        where: {
+            isPublish: true
+        }
+    });
 
-    logger.debug('get all posts OK');
+    logger.debug(`get ${allPosts.count} posts OK`);
 
     return allPosts;
 };
 
-const get = async (id: string): Promise<Post | null> => {
+const get = async (id: number): Promise<Post | null> => {
     logger.info('get post');
 
     const post = await Post.findByPk(id, {
@@ -47,12 +48,10 @@ const get = async (id: string): Promise<Post | null> => {
     return post;
 };
 
-const getList = async (scale: number, selection: number): Promise<GetList> => {
+const getPosts = async (scale: number, selection: number): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get posts list');
 
-    const totalPost = await Post.count();
-
-    const postList = await Post.findAll({
+    const postList = await Post.findAndCountAll({
         limit: scale,
         offset: scale * (selection - 1),
         order: [['createdAt', 'DESC']],
@@ -62,11 +61,14 @@ const getList = async (scale: number, selection: number): Promise<GetList> => {
                 attributes: ['username'],
             },
         ],
+        where: {
+            isPublish: true
+        }
     });
 
-    logger.debug(`get ${scale} posts on ${totalPost}`);
+    logger.debug(`get ${scale} posts on ${postList.count}`);
 
-    return { postList, totalPost };
+    return postList;
 };
 
 const destroy = async (id: number) => {
@@ -87,4 +89,4 @@ const update = async (id: number, data: Post) => {
     logger.debug(`update post ${id} OK!`);
 };
 
-export { create, getAll, get, getList, destroy, update };
+export { create, getAll, get, getPosts, destroy, update };

@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 import domClean from '../services/domPurify';
-import { create, destroy, get, getAll, getList, update } from '../repository/post.repository';
+import { destroy, get, getAll, update } from '../repository/post.repository';
 import { instanceToPlain } from 'class-transformer';
 import { Post } from '../models/post.model';
 import imageConvert from '../services/imageConvert';
+import * as postServices from '../services/post.services';
 
 const preview = async (req: Request, res: Response) => {
     try {
@@ -27,7 +28,7 @@ const preview = async (req: Request, res: Response) => {
 const createPost = async (req: Request, res: Response) => {
     try {
         const body = req.body;
-        const newPost = await create(body);
+        const newPost = await postServices.createPost(body);
 
         res.status(201).json(newPost);
     } catch (e: unknown) {
@@ -51,34 +52,35 @@ const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
+/// TODO: replace by slug
+// const getPost = async (req: Request, res: Response) => {
+//     try {
+//         const idPost = req.params.idPost.split('-')[1];
+//         const post = await get(idPost);
+//         const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
+
+//         if (!post) throw new Error('No post find with this id :' + idPost);
+//         // Replace object with just a Buffer array.
+//         postDTO.image = Array.from(post.image);
+
+//         res.status(200).json(postDTO);
+//     } catch (e: unknown) {
+//         logger.error(`Get post error`, e);
+//         if (e instanceof Error) res.status(400).json({ message: e.message });
+//     }
+// };
 const getPost = async (req: Request, res: Response) => {
-    try {
-        const idPost = req.params.idPost.split('-')[1];
-        const post = await get(idPost);
-        const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
-
-        if (!post) throw new Error('No post find with this id :' + idPost);
-        // Replace object with just a Buffer array.
-        postDTO.image = Array.from(post.image);
-
-        res.status(200).json(postDTO);
-    } catch (e: unknown) {
-        logger.error(`Get post error`, e);
-        if (e instanceof Error) res.status(400).json({ message: e.message });
-    }
+    res.status(200).json({ message: 'In progress' });
 };
 
 const getPostList = async (req: Request, res: Response) => {
     try {
-        const pageId = Number(req.params.pageId);
-        const nbCardToDisplay = Number(process.env.NUMBER_CARD_DISPLAY);
-        const infoPost = await getList(nbCardToDisplay, pageId);
-        const postListDTO = instanceToPlain(infoPost.postList, { groups: ['blog'], excludeExtraneousValues: true });
+        const postListDTO = instanceToPlain([], { groups: ['blog'], excludeExtraneousValues: true });
 
         // Replace object with just a Buffer array.
         postListDTO.forEach((post: Post, id: number) => (postListDTO[id].image = Array.from(post.image)));
 
-        res.status(200).json({ postListDTO, totalPost: infoPost.totalPost });
+        res.status(200).json({ postListDTO, totalPost: [] });
     } catch (e: unknown) {
         logger.error(`Get post list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });

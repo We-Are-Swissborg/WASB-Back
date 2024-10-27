@@ -6,12 +6,12 @@ import * as parameterRepository from '../../repository/parameter.repository';
 import * as parameterServices from '../../services/parameter.services';
 
 /**
- * Retrieve all parameters
+ * Retrieve post
  * @param req
  * @param res
  */
-const getParameters = async (req: Request, res: Response) => {
-    logger.info(`Get Parameters`);
+const getPost = async (req: Request, res: Response) => {
+    logger.info(`Get Post`);
 
     try {
         const query = req.query.q as string;
@@ -25,11 +25,11 @@ const getParameters = async (req: Request, res: Response) => {
 };
 
 /**
- * Retrieve parameter
+ * Retrieve all post
  * @param req
  * @param res
  */
-const getParameter = async (req: Request, res: Response) => {
+const getPosts = async (req: Request, res: Response) => {
     logger.info(`Get Parameter`);
 
     try {
@@ -104,7 +104,7 @@ const createParameter = async (req: Request, res: Response) => {
 
         try {
             await parameterServices.createParameter(parameter);
-            res.status(200);
+            res.status(200).end();
         } catch (e: unknown) {
             if (e instanceof Error) res.status(400).json(e.message);
         }
@@ -114,4 +114,4 @@ const createParameter = async (req: Request, res: Response) => {
     }
 };
 
-export { getParameters, getParameter, updateParameter, deleteParameter, createParameter };
+export { getPost, getPosts, updateParameter, deleteParameter, createParameter };
