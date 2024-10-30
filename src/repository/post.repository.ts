@@ -1,18 +1,14 @@
 import { logger } from '../middlewares/logger.middleware';
-import { IPost, Post } from '../models/post.model';
+import { Post } from '../models/post.model';
+import { PostCategory } from '../models/postcategory.model';
 import { User } from '../models/user.model';
 
-const create = async (post: IPost): Promise<IPost> => {
+const create = async (post: Post): Promise<Post> => {
     logger.info('post create', post);
 
-    const postCreated = await Post.create({
-        author: post.author,
-        title: post.title,
-        image: post.image,
-        content: post.content,
-    });
+    const postCreated = await post.save();
 
-    logger.debug('post create OK');
+    logger.debug(`post create OK : ${postCreated.id}`, postCreated);
 
     return postCreated;
 };
@@ -21,9 +17,22 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get all posts');
 
     const allPosts = await Post.findAndCountAll({
+        include: [PostCategory, User]
+    });
+
+    logger.debug(`get ${allPosts.count} posts OK`);
+
+    return allPosts;
+};
+
+const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
+    logger.info('get all posts');
+
+    const allPosts = await Post.findAndCountAll({
         where: {
             isPublish: true
-        }
+        },
+        include: [PostCategory, User]
     });
 
     logger.debug(`get ${allPosts.count} posts OK`);
@@ -34,16 +43,18 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
 const get = async (id: number): Promise<Post | null> => {
     logger.info('get post');
 
-    const post = await Post.findByPk(id, {
-        include: [
-            {
-                model: User,
-                attributes: ['username'],
-            },
-        ],
-    });
+    // const post = await Post.findByPk(id, {
+    //     include: [
+    //         {
+    //             model: User,
+    //             attributes: ['username'],
+    //         },
+    //     ],
+    // });
+    
+    const post = await Post.findByPk(id);
 
-    logger.debug('get post OK');
+    logger.debug('get post OK', post);
 
     return post;
 };
@@ -80,13 +91,19 @@ const destroy = async (id: number) => {
     logger.debug(`delete post ${id}`);
 };
 
-const update = async (id: number, data: Post) => {
-    logger.info('update post');
-    const post = await Post.update(data, { where: { id: id } });
+/**
+ * Update a Post
+ * @param {Post} post Update post
+ * @returns {Promise<Post>} Update post
+ */
+const update = async (post: Post): Promise<Post> => {
+    logger.info('post update', post);
 
-    if (!post[0]) throw new Error('Post not exist');
+    post = await post.save();
 
-    logger.debug(`update post ${id} OK!`);
+    logger.debug('post updated');
+
+    return post;
 };
 
-export { create, getAll, get, getPosts, destroy, update };
+export { create, getAll, getOnlyPublished, get, getPosts, destroy, update };

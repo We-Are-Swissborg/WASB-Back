@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { NonAttribute } from 'sequelize';
+import { BelongsToManyAddAssociationMixin, BelongsToManyAddAssociationsMixin, NonAttribute } from 'sequelize';
 import {
     AllowNull,
     Column,
@@ -8,20 +8,20 @@ import {
     Model,
     Table,
     UpdatedAt,
-    Unique,
     AutoIncrement,
     PrimaryKey,
-    BelongsTo,
     ForeignKey,
     BeforeCreate,
     BeforeUpdate,
     Index,
     BelongsToMany,
+    BelongsTo,
 } from 'sequelize-typescript';
 import { User } from './user.model';
 import slugify from 'slugify';
 import { PostCategory } from './postcategory.model';
 import { PostCategoryPost } from './postcategorypost.model';
+import { logger } from '../middlewares/logger.middleware';
 
 interface IPost {
     author: number;
@@ -34,7 +34,7 @@ interface IPost {
 }
 
 @Table
-class Post extends Model implements IPost {    
+class Post extends Model implements IPost {
     @Expose({ groups: ['user', 'post', 'blog'] })
     @AutoIncrement
     @PrimaryKey
@@ -43,24 +43,20 @@ class Post extends Model implements IPost {
 
     @Expose({ groups: ['user', 'post', 'blog'] })
     @ForeignKey(() => User)
-    @AllowNull(false)
     @Column
-    @Index
     declare author: number;
 
     @Expose({ groups: ['user', 'post', 'blog'] })
     @AllowNull(false)
-    @Unique
     @Column({
         validate: {
-            len: [5, 100],
+            len: [3, 100],
             notEmpty: true
         }
     })
     declare title: string;
 
     @Expose({ groups: ['user', 'post', 'blog'] })
-    @AllowNull(false)
     @Column
     declare image: string;
 
@@ -86,8 +82,7 @@ class Post extends Model implements IPost {
     @BelongsTo(() => User, { onDelete: 'SET NULL', hooks: true })
     declare infoAuthor: NonAttribute<User>;
 
-    @Expose({ groups: ['admin'] })
-    @AllowNull(false)
+    @Expose({ groups: ['post', 'blog'] })
     @Column
     declare isPublish: boolean;
 
@@ -98,13 +93,23 @@ class Post extends Model implements IPost {
 
     @Expose({ groups: ['user', 'post', 'blog'] })
     @Index
-    @AllowNull(false)
     @Column
     declare slug: string;
 
     // Relation many-to-many avec Post
+    @Expose({ groups: ['user', 'post', 'blog'] })
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
-    declare categories: PostCategory[];
+    declare categories: NonAttribute<PostCategory[]>;
+
+    declare addCategory: BelongsToManyAddAssociationMixin<
+        PostCategory,
+        PostCategory['id']
+    >;
+
+    declare addCategories: BelongsToManyAddAssociationsMixin<
+        PostCategory,
+        PostCategory['id']
+    >;
 
     @BeforeCreate
     @BeforeUpdate
@@ -129,10 +134,8 @@ class Post extends Model implements IPost {
     @BeforeCreate
     @BeforeUpdate
     static setPublishedAt(post: Post) {
-        if (post.isPublish && !post.publishedAt) {
+        if (post.isPublish && post.changed('isPublish')) {
             post.publishedAt = new Date();
-        } else if (!post.isPublish) {
-            post.publishedAt = undefined;
         }
     }
 }

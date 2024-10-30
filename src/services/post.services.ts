@@ -1,9 +1,9 @@
 import { logger } from '../middlewares/logger.middleware';
-import { IPost, Post } from '../models/post.model';
+import { Post } from '../models/post.model';
 import * as postRepository from '../repository/post.repository';
 import domClean from './domPurify';
 
-const createPost = async (post: Post): Promise<IPost> => {
+const createPost = async (post: Post): Promise<Post> => {
     logger.info('createPost : services', post);
     post.content = domClean(post.content);
 
@@ -22,7 +22,7 @@ const createPost = async (post: Post): Promise<IPost> => {
     return postCreated;
 };
 
-const getPosts = async (query: string | null): Promise<Post[]> => {
+const getPosts = async (query?: string | null): Promise<Post[]> => {
     logger.info('getPosts : services', { query: query });
 
     let posts = null;
@@ -43,9 +43,33 @@ const getPost = async (id: number): Promise<Post | null> => {
 
     const post = await postRepository.get(id);
 
-    logger.debug(`getPost : ${post}`);
+    logger.debug(`getPost youhou :`, post);
 
     return post;
 };
 
-export { createPost, getPosts, getPost };
+/**
+ * Update a post
+ * @param {Post} category Update post
+ * @returns {Promise<Post>} Update post
+ */
+const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
+    logger.info('update post : services');
+
+    if(id !== updatedPost.id) {
+        throw new Error('The encoded data do not coincide with those supplied');
+    }
+
+    if(!updatedPost.title) {
+        throw new Error('A title for the post is required');
+    }
+
+    if(updatedPost.title.length < 3) {
+        throw new Error('A title for the post must contain more than 3 characters');
+    }
+
+    updatedPost = await postRepository.update(updatedPost);
+    return updatedPost;
+};
+
+export { createPost, getPosts, getPost, updatePost };

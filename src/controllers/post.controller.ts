@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 import domClean from '../services/domPurify';
-import { destroy, get, getAll, update } from '../repository/post.repository';
-import { instanceToPlain } from 'class-transformer';
+import { destroy, getOnlyPublished } from '../repository/post.repository';
+import { instanceToPlain, plainToClass } from 'class-transformer';
 import { Post } from '../models/post.model';
 import imageConvert from '../services/imageConvert';
-import * as postServices from '../services/post.services';
+import * as PostServices from '../services/post.services';
 
 const preview = async (req: Request, res: Response) => {
     try {
@@ -28,7 +28,7 @@ const preview = async (req: Request, res: Response) => {
 const createPost = async (req: Request, res: Response) => {
     try {
         const body = req.body;
-        const newPost = await postServices.createPost(body);
+        const newPost = await PostServices.createPost(body);
 
         res.status(201).json(newPost);
     } catch (e: unknown) {
@@ -39,7 +39,7 @@ const createPost = async (req: Request, res: Response) => {
 
 const getAllPosts = async (req: Request, res: Response) => {
     try {
-        const allPosts = await getAll();
+        const allPosts = await getOnlyPublished();
         const allPostsDTO = instanceToPlain(allPosts, { groups: ['blog'], excludeExtraneousValues: true });
 
         // Replace object with just a Buffer array.
@@ -101,11 +101,17 @@ const deletePost = async (req: Request, res: Response) => {
 
 const updatePost = async (req: Request, res: Response) => {
     try {
-        const idPost = Number(req.params.idPost);
-        const newPost = req.body;
-        await update(idPost, newPost);
+        const id: number = Number(req.params.id);
 
-        res.status(204).end();
+        const post = await Post.findByPk(id);
+        if (!post) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
+        post.set(req.body);
+        const updatedPost = await PostServices.updatePost(id, post);
+
+        res.status(200).json(updatedPost);
     } catch (e: unknown) {
         logger.error(`Update post error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
