@@ -41,11 +41,7 @@ const getPosts = async (query?: string | null): Promise<Post[]> => {
 const getPost = async (id: number): Promise<Post | null> => {
     logger.info('getPost : services', { id: id });
 
-    const post = await postRepository.get(id);
-
-    logger.debug(`getPost youhou :`, post);
-
-    return post;
+    return await postRepository.get(id);
 };
 
 /**

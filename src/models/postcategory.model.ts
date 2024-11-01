@@ -45,7 +45,6 @@ class PostCategory extends Model implements IPostCategory {
     @Column
     declare updatedAt: Date;
 
-    // Relation many-to-many avec Post
     @BelongsToMany(() => Post, () => PostCategoryPost)
     declare posts: Post[];
 }

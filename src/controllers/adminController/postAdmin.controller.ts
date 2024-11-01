@@ -4,6 +4,7 @@ import * as PostRepository from "../../repository/post.repository";
 import * as PostServices from "../../services/post.services";
 import { logger } from "../../middlewares/logger.middleware";
 import { Post } from '../../models/post.model';
+import { PostCategory } from '../../models/postcategory.model';
 
 /**
  * Retrieve all posts
@@ -15,7 +16,7 @@ const getAllPosts = async (req: Request, res: Response) => {
 
     try {
         const allPosts = await PostServices.getPosts();
-        const allPostsDTO = instanceToPlain(allPosts, { groups: ['blog'], excludeExtraneousValues: true });
+        const allPostsDTO = instanceToPlain(allPosts, { groups: ['admin'], excludeExtraneousValues: true });
 
         // Replace object with just a Buffer array.
         // allPostsDTO.forEach((post: Post, id: number) => (allPostsDTO[id].image = Array.from(post.image)));
@@ -62,7 +63,7 @@ const createPost = async (req: Request, res: Response) => {
         const post = plainToClass(Post, req.body as string, { groups: ['post'] });
         post.author = 13; // Todo : to delete
         const newPost = await PostServices.createPost(post);
-        newPost.addCategories([1, 2]);
+        newPost.setCategories(post.categories.map(category => category.id));
 
         res.status(201).json(newPost);
     } catch (e: unknown) {
@@ -81,14 +82,16 @@ const updatePost = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-
-        const post = await Post.findByPk(id);
-        if (!post) {
+        const updatePost = plainToClass(Post, req.body as string, { groups: ['post'] });
+        const postRetrieve = await Post.findByPk(id);
+        if (!postRetrieve) {
             res.status(404).json({ error: 'Post not found' });
             return;
         }
-        post.set(req.body);
-        const updatedPost = await PostServices.updatePost(id, post);
+        postRetrieve.set(req.body);
+        await postRetrieve.setCategories(updatePost.categories.map(category => category.id));
+
+        const updatedPost = await PostServices.updatePost(id, postRetrieve);
 
         res.status(200).json(updatedPost);
     } catch (e: unknown) {

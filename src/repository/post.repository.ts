@@ -43,18 +43,21 @@ const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
 const get = async (id: number): Promise<Post | null> => {
     logger.info('get post');
 
-    // const post = await Post.findByPk(id, {
-    //     include: [
-    //         {
-    //             model: User,
-    //             attributes: ['username'],
-    //         },
-    //     ],
-    // });
-    
-    const post = await Post.findByPk(id);
+    const post = await Post.findByPk(id, {
+        include: [
+            {
+                model: User,
+                attributes: ['username'],
+            },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] }
+            }
+        ],
+    });
 
-    logger.debug('get post OK', post);
+    logger.debug('get post OK');
 
     return post;
 };
