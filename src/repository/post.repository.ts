@@ -17,12 +17,48 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get all posts');
 
     const allPosts = await Post.findAndCountAll({
+        distinct: true, // avoid over-counting due to include
         include: [PostCategory, User]
     });
 
     logger.debug(`get ${allPosts.count} posts OK`);
 
     return allPosts;
+};
+
+/**
+ * 
+ * @param skip 
+ * @param limit 
+ * @returns 
+ */
+const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
+    logger.info('get posts pagination');
+
+    const posts  = await Post.findAndCountAll({
+        where: {
+            isPublish: true
+        },
+        limit: limit,
+        offset: skip,
+        distinct: true, // avoid over-counting due to include
+        include: [
+            {
+                model: User,
+                attributes: ['username'],
+            },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] }
+            }
+        ],
+        order: [['publishedAt', 'DESC']],
+    });
+
+    logger.debug(`get ${posts.count} posts`);
+
+    return posts;
 };
 
 const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
@@ -62,27 +98,35 @@ const get = async (id: number): Promise<Post | null> => {
     return post;
 };
 
-const getPosts = async (scale: number, selection: number): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('get posts list');
+/**
+ * 
+ * @param slug 
+ * @returns 
+ */
+const getBySlug = async (slug: string): Promise<Post | null> => {
+    logger.info('get post by slug');
 
-    const postList = await Post.findAndCountAll({
-        limit: scale,
-        offset: scale * (selection - 1),
-        order: [['createdAt', 'DESC']],
+    const post = await Post.findOne({
+        where: {
+            isPublish: true,
+            slug: slug
+        },
         include: [
             {
                 model: User,
                 attributes: ['username'],
             },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] }
+            }
         ],
-        where: {
-            isPublish: true
-        }
     });
 
-    logger.debug(`get ${scale} posts on ${postList.count}`);
+    logger.debug('get post OK');
 
-    return postList;
+    return post;
 };
 
 const destroy = async (id: number) => {
@@ -109,4 +153,4 @@ const update = async (post: Post): Promise<Post> => {
     return post;
 };
 
-export { create, getAll, getOnlyPublished, get, getPosts, destroy, update };
+export { create, getAll, getOnlyPublished, get, getBySlug, getPostsPagination, destroy, update };

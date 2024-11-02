@@ -52,35 +52,41 @@ const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-/// TODO: replace by slug
-// const getPost = async (req: Request, res: Response) => {
-//     try {
-//         const idPost = req.params.idPost.split('-')[1];
-//         const post = await get(idPost);
-//         const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
-
-//         if (!post) throw new Error('No post find with this id :' + idPost);
-//         // Replace object with just a Buffer array.
-//         postDTO.image = Array.from(post.image);
-
-//         res.status(200).json(postDTO);
-//     } catch (e: unknown) {
-//         logger.error(`Get post error`, e);
-//         if (e instanceof Error) res.status(400).json({ message: e.message });
-//     }
-// };
 const getPost = async (req: Request, res: Response) => {
-    res.status(200).json({ message: 'In progress' });
+    logger.info(`PostController: getPost ->`, req.params);
+
+    try {
+        const post = await PostServices.getPostBySlug(req.params.slug);
+        const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
+
+        if (!post) throw new Error('No post find');
+        // Replace object with just a Buffer array.
+        // postDTO.image = Array.from(post.image);
+
+        res.status(200).json(postDTO);
+    } catch (e: unknown) {
+        logger.error(`Get post error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
 };
 
-const getPostList = async (req: Request, res: Response) => {
+const getPosts = async (req: Request, res: Response) => {
+    logger.info(`PostController: getPosts ->`, req.query);
+
     try {
-        const postListDTO = instanceToPlain([], { groups: ['blog'], excludeExtraneousValues: true });
+        const page = parseInt(String(req.query.page || '1'), 10);
+        const limit = parseInt(String(req.query.limit || '10'), 10);
+
+        const posts = await PostServices.getPostsPagination(page, limit);
+
+        const postListDTO = instanceToPlain(posts.rows, { groups: ['blog'], excludeExtraneousValues: true });
+
+        const totalPages = Math.ceil(posts.count / limit);
 
         // Replace object with just a Buffer array.
-        postListDTO.forEach((post: Post, id: number) => (postListDTO[id].image = Array.from(post.image)));
+        // postListDTO.forEach((post: Post, id: number) => (postListDTO[id].image = Array.from(post.image)));
 
-        res.status(200).json({ postListDTO, totalPost: [] });
+        res.status(200).json({ posts: postListDTO, totalPages: totalPages, totalPosts: posts.count, currentPage: page });
     } catch (e: unknown) {
         logger.error(`Get post list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
@@ -118,4 +124,4 @@ const updatePost = async (req: Request, res: Response) => {
     }
 };
 
-export { preview, createPost, getAllPosts, getPost, getPostList, deletePost, updatePost };
+export { preview, createPost, getAllPosts, getPost, getPosts, deletePost, updatePost };

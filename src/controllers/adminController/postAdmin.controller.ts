@@ -4,7 +4,6 @@ import * as PostRepository from "../../repository/post.repository";
 import * as PostServices from "../../services/post.services";
 import { logger } from "../../middlewares/logger.middleware";
 import { Post } from '../../models/post.model';
-import { PostCategory } from '../../models/postcategory.model';
 
 /**
  * Retrieve all posts
@@ -61,9 +60,8 @@ const createPost = async (req: Request, res: Response) => {
 
     try {
         const post = plainToClass(Post, req.body as string, { groups: ['post'] });
-        post.author = 13; // Todo : to delete
         const newPost = await PostServices.createPost(post);
-        newPost.setCategories(post.categories.map(category => category.id));
+        await newPost.setCategories(post.categories.map(category => category.id));
 
         res.status(201).json(newPost);
     } catch (e: unknown) {

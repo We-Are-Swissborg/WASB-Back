@@ -13,9 +13,8 @@ export const postRouter: Router = express.Router();
 postRouter.post('/preview', Auth.authorize([Role.Admin, Role.Moderator]), upload.single('imagePost'), Post.preview);
 postRouter.post('/', Auth.authorize([Role.Admin, Role.Moderator]), Post.createPost);
 
-postRouter.get('/', Post.getAllPosts);
-postRouter.get('/:idPost', Post.getPost);
-postRouter.get('/list/:pageId', Post.getPostList);
+postRouter.get('/', Post.getPosts);
+postRouter.get('/:slug', Post.getPost);
 
 postRouter.delete('/:idPost', Auth.authorize([Role.Admin, Role.Moderator]), Post.deletePost);
 
