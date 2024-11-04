@@ -18,7 +18,7 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
 
     const allPosts = await Post.findAndCountAll({
         distinct: true, // avoid over-counting due to include
-        include: [PostCategory, User]
+        include: [PostCategory, User],
     });
 
     logger.debug(`get ${allPosts.count} posts OK`);
@@ -27,17 +27,17 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
 };
 
 /**
- * 
- * @param skip 
- * @param limit 
- * @returns 
+ *
+ * @param skip
+ * @param limit
+ * @returns
  */
 const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get posts pagination');
 
-    const posts  = await Post.findAndCountAll({
+    const posts = await Post.findAndCountAll({
         where: {
-            isPublish: true
+            isPublish: true,
         },
         limit: limit,
         offset: skip,
@@ -50,8 +50,8 @@ const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: 
             {
                 model: PostCategory,
                 attributes: ['id', 'title'],
-                through: { attributes: [] }
-            }
+                through: { attributes: [] },
+            },
         ],
         order: [['publishedAt', 'DESC']],
     });
@@ -66,9 +66,9 @@ const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
 
     const allPosts = await Post.findAndCountAll({
         where: {
-            isPublish: true
+            isPublish: true,
         },
-        include: [PostCategory, User]
+        include: [PostCategory, User],
     });
 
     logger.debug(`get ${allPosts.count} posts OK`);
@@ -88,8 +88,8 @@ const get = async (id: number): Promise<Post | null> => {
             {
                 model: PostCategory,
                 attributes: ['id', 'title'],
-                through: { attributes: [] }
-            }
+                through: { attributes: [] },
+            },
         ],
     });
 
@@ -99,9 +99,9 @@ const get = async (id: number): Promise<Post | null> => {
 };
 
 /**
- * 
- * @param slug 
- * @returns 
+ *
+ * @param slug
+ * @returns
  */
 const getBySlug = async (slug: string): Promise<Post | null> => {
     logger.info('get post by slug');
@@ -109,7 +109,7 @@ const getBySlug = async (slug: string): Promise<Post | null> => {
     const post = await Post.findOne({
         where: {
             isPublish: true,
-            slug: slug
+            slug: slug,
         },
         include: [
             {
@@ -119,8 +119,8 @@ const getBySlug = async (slug: string): Promise<Post | null> => {
             {
                 model: PostCategory,
                 attributes: ['id', 'title'],
-                through: { attributes: [] }
-            }
+                through: { attributes: [] },
+            },
         ],
     });
 

@@ -1,9 +1,4 @@
-import {
-    Model,
-    Table,
-    Column,
-    ForeignKey,
-} from 'sequelize-typescript';
+import { Model, Table, Column, ForeignKey } from 'sequelize-typescript';
 import { Post } from './post.model';
 import { PostCategory } from './postcategory.model';
 

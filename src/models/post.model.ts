@@ -51,8 +51,8 @@ class Post extends Model implements IPost {
     @Column({
         validate: {
             len: [3, 100],
-            notEmpty: true
-        }
+            notEmpty: true,
+        },
     })
     declare title: string;
 
@@ -101,14 +101,14 @@ class Post extends Model implements IPost {
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
     declare categories: PostCategory[];
 
-    declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>
+    declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>;
 
     @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     get image64(): NonAttribute<string | null> {
         if (this.image) {
             return getFileToBase64(this.image);
-        } 
-        return null;     
+        }
+        return null;
     }
 
     @BeforeCreate

@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import * as Post from '../../controllers/adminController/postAdmin.controller';
-import {uploadMiddleware} from '../../middlewares/upload.middleware';
+import { uploadMiddleware } from '../../middlewares/upload.middleware';
 
 export const postRouter: Router = express.Router();
 const inputFileName = 'imagePost';

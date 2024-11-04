@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { instanceToPlain, plainToClass } from "class-transformer";
-import * as PostRepository from "../../repository/post.repository";
-import * as PostServices from "../../services/post.services";
-import { logger } from "../../middlewares/logger.middleware";
+import { instanceToPlain, plainToClass } from 'class-transformer';
+import * as PostRepository from '../../repository/post.repository';
+import * as PostServices from '../../services/post.services';
+import { logger } from '../../middlewares/logger.middleware';
 import { Post } from '../../models/post.model';
 import { getFileToBase64 } from '../../services/file.servies';
 import { OUTPUT_DIR } from '../../middlewares/upload.middleware';
@@ -48,8 +48,8 @@ const getPost = async (req: Request, res: Response) => {
 
 /**
  * Create Post
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const createPost = async (req: Request, res: Response) => {
     logger.info(`PostAdminController : Create Post`);
@@ -57,7 +57,7 @@ const createPost = async (req: Request, res: Response) => {
     try {
         const post = plainToClass(Post, req.body as string, { groups: ['post'] });
         const newPost = await PostServices.createPost(post);
-        await newPost.setCategories(post.categories.map(category => category.id));
+        await newPost.setCategories(post.categories.map((category) => category.id));
 
         res.status(201).json(newPost);
     } catch (e: unknown) {
@@ -68,8 +68,8 @@ const createPost = async (req: Request, res: Response) => {
 
 /**
  * Update Post
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const updatePost = async (req: Request, res: Response) => {
     logger.info(`PostAdminController : Update Post`);
@@ -83,7 +83,7 @@ const updatePost = async (req: Request, res: Response) => {
             return;
         }
         postRetrieve.set(req.body);
-        await postRetrieve.setCategories(updatePost.categories.map(category => category.id));
+        await postRetrieve.setCategories(updatePost.categories.map((category) => category.id));
 
         const updatedPost = await PostServices.updatePost(id, postRetrieve);
 
@@ -111,12 +111,12 @@ const uploadImage = async (req: Request, res: Response) => {
         console.error('Error uploading post image:', error);
         res.status(500).json({ message: 'Error uploading image' });
     }
-}
+};
 
 /**
  * Delete Post
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const deletePost = async (req: Request, res: Response) => {
     logger.info(`Delete Post`);

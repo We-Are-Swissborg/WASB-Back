@@ -1,5 +1,5 @@
-import { logger } from "../middlewares/logger.middleware";
-import { PostCategory } from "../models/postcategory.model";
+import { logger } from '../middlewares/logger.middleware';
+import { PostCategory } from '../models/postcategory.model';
 
 /**
  * Create a new category
@@ -60,7 +60,7 @@ const findById = async (id: number): Promise<PostCategory | null> => {
     logger.debug('findById', { category: category });
 
     return category;
-}
+};
 
 /**
  * Retrieve all categories
@@ -75,6 +75,5 @@ const findAll = async (): Promise<PostCategory[]> => {
 
     return categories;
 };
-
 
 export { create, update, destroy, findById, findAll };

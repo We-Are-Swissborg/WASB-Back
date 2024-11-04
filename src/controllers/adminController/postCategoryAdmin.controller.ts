@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { instanceToPlain, plainToClass } from "class-transformer";
-import { PostCategory } from "../../models/postcategory.model";
-import { logger } from "../../middlewares/logger.middleware";
-import * as categoryService from '../../services/postCategory.services'
-import * as categoryRepository from '../../repository/postCategory.repository'
+import { instanceToPlain, plainToClass } from 'class-transformer';
+import { PostCategory } from '../../models/postcategory.model';
+import { logger } from '../../middlewares/logger.middleware';
+import * as categoryService from '../../services/postCategory.services';
+import * as categoryRepository from '../../repository/postCategory.repository';
 
 /**
  * Create category
@@ -114,6 +114,5 @@ const getCategory = async (req: Request, res: Response) => {
         res.status(400).json({ message: 'Oops !, an error has occurred.' });
     }
 };
-
 
 export { createCategory, updateCategory, deleteCategory, getCategory, getCategories };

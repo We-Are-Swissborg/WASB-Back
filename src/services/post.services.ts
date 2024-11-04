@@ -33,10 +33,10 @@ const getPosts = async (): Promise<Post[]> => {
 };
 
 /**
- * 
- * @param page 
- * @param limit 
- * @returns 
+ *
+ * @param page
+ * @param limit
+ * @returns
  */
 const getPostsPagination = async (page: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
     logger.info('getPostsPagination : services', { page: page, limit: limit });
@@ -58,9 +58,9 @@ const getPost = async (id: number): Promise<Post | null> => {
 };
 
 /**
- * 
- * @param slug 
- * @returns 
+ *
+ * @param slug
+ * @returns
  */
 const getPostBySlug = async (slug: string): Promise<Post | null> => {
     logger.info('getPostBySlug : services', { slug: slug });
@@ -76,15 +76,15 @@ const getPostBySlug = async (slug: string): Promise<Post | null> => {
 const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
     logger.info('update post : services');
 
-    if(id !== updatedPost.id) {
+    if (id !== updatedPost.id) {
         throw new Error('The encoded data do not coincide with those supplied');
     }
 
-    if(!updatedPost.title) {
+    if (!updatedPost.title) {
         throw new Error('A title for the post is required');
     }
 
-    if(updatedPost.title.length < 3) {
+    if (updatedPost.title.length < 3) {
         throw new Error('A title for the post must contain more than 3 characters');
     }
 

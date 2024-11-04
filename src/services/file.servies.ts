@@ -24,4 +24,4 @@ const getFileToBase64 = (filePath: string, mimetype?: string) => {
     return `data:${mimeType};base64,${base64Image}`;
 };
 
-export { imageConvert, getFileToBase64 } ;
+export { imageConvert, getFileToBase64 };

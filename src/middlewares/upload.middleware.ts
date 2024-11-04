@@ -24,7 +24,7 @@ const uploadMiddleware = () => {
         }
     };
 
-    return  multer({ storage, fileFilter });
-}
+    return multer({ storage, fileFilter });
+};
 
 export { uploadMiddleware, OUTPUT_DIR };

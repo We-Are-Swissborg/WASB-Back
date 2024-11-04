@@ -32,7 +32,12 @@ const getPosts = async (req: Request, res: Response) => {
 
         const totalPages = Math.ceil(posts.count / limit);
 
-        res.status(200).json({ posts: postListDTO, totalPages: totalPages, totalPosts: posts.count, currentPage: page });
+        res.status(200).json({
+            posts: postListDTO,
+            totalPages: totalPages,
+            totalPosts: posts.count,
+            currentPage: page,
+        });
     } catch (e: unknown) {
         logger.error(`Get posts list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });

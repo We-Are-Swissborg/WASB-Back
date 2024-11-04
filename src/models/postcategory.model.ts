@@ -20,7 +20,7 @@ interface IPostCategory {
 }
 
 @Table
-class PostCategory extends Model implements IPostCategory {    
+class PostCategory extends Model implements IPostCategory {
     @Expose({ groups: ['admin', 'post', 'blog'] })
     @AutoIncrement
     @PrimaryKey
