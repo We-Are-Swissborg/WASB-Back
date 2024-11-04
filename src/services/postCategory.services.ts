@@ -1,5 +1,5 @@
-import { logger } from "../middlewares/logger.middleware";
-import { PostCategory } from "../models/postcategory.model";
+import { logger } from '../middlewares/logger.middleware';
+import { PostCategory } from '../models/postcategory.model';
 import * as categoryRepository from '../repository/postCategory.repository';
 
 /**
@@ -11,12 +11,12 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
     logger.info('create category : services');
 
     category.title = category.title.trim();
-    
-    if(!category.title) {
+
+    if (!category.title) {
         throw new Error('A title for the category is required');
     }
 
-    if(category.title.length < 3) {
+    if (category.title.length < 3) {
         throw new Error('A title for the category must contain more than 3 characters');
     }
 
@@ -26,7 +26,7 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
 };
 
 const getCategory = async (id: number) => {
-    logger.info('getCategory : services', {id: id});
+    logger.info('getCategory : services', { id: id });
 
     const category = await categoryRepository.findById(id);
 
@@ -53,15 +53,15 @@ const getCategories = async () => {
 const update = async (id: number, updatedcategory: PostCategory): Promise<PostCategory> => {
     logger.info('update category : services');
 
-    if(id !== updatedcategory.id) {
+    if (id !== updatedcategory.id) {
         throw new Error('The encoded data do not coincide with those supplied');
     }
 
-    if(!updatedcategory.title) {
+    if (!updatedcategory.title) {
         throw new Error('A title for the category is required');
     }
 
-    if(updatedcategory.title.length < 3) {
+    if (updatedcategory.title.length < 3) {
         throw new Error('A title for the category must contain more than 3 characters');
     }
 

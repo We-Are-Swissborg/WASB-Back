@@ -23,34 +23,34 @@ module.exports = {
       },
     });
 
-    await queryInterface.createTable('PostCategoryPost', {
+    await queryInterface.createTable('PostCategoryPosts', {
       postId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Posts', // nom de la table Posts
+          model: 'Posts',
           key: 'id',
         },
-        onDelete: 'CASCADE', // si un Post est supprimé, supprimer les liens associés
+        onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-        primaryKey: true, // Définir la clé primaire composite avec postCategoryId
+        primaryKey: true,
       },
       postCategoryId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'PostCategories', // nom de la table PostCategories
+          model: 'PostCategories',
           key: 'id',
         },
-        onDelete: 'CASCADE', // si une catégorie est supprimée, supprimer les liens associés
+        onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-        primaryKey: true, // Définir la clé primaire composite avec postId
+        primaryKey: true,
       }
     });
 
     await queryInterface.changeColumn('Posts', 'image', {
       type: Sequelize.STRING,
-      allowNull: false,
+      allowNull: true,
     });
 
     await queryInterface.addColumn('Posts', 'isPublish',  {
@@ -68,17 +68,6 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: false,
     });
-
-    await queryInterface.addColumn('Posts', 'categoryId',  {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'PostCategory',
-        key: 'id'
-      },
-      onDelete: 'SET NULL',
-      onUpdate: 'CASCADE',
-    });
   },
 
   async down (queryInterface, Sequelize) {
@@ -86,11 +75,10 @@ module.exports = {
       type: Sequelize.BLOB,
       allowNull: false,
     });
-    await queryInterface.removeColumn('Posts', 'categoryId');
     await queryInterface.removeColumn('Posts', 'slug');
     await queryInterface.removeColumn('Posts', 'isPublish');
     await queryInterface.removeColumn('Posts', 'publishedAt');
     await queryInterface.dropTable('PostCategories');
-    await queryInterface.dropTable('PostCategoryPost');
+    await queryInterface.dropTable('PostCategoryPosts');
   }
 };

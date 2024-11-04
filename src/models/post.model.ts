@@ -1,5 +1,4 @@
 import { Expose, Type } from 'class-transformer';
-import { NonAttribute } from 'sequelize';
 import {
     AllowNull,
     Column,
@@ -8,20 +7,21 @@ import {
     Model,
     Table,
     UpdatedAt,
-    Unique,
     AutoIncrement,
     PrimaryKey,
-    BelongsTo,
     ForeignKey,
     BeforeCreate,
     BeforeUpdate,
     Index,
     BelongsToMany,
+    BelongsTo,
 } from 'sequelize-typescript';
 import { User } from './user.model';
 import slugify from 'slugify';
 import { PostCategory } from './postcategory.model';
 import { PostCategoryPost } from './postcategorypost.model';
+import { BelongsToManySetAssociationsMixin, NonAttribute } from 'sequelize';
+import { getFileToBase64 } from '../services/file.servies';
 
 interface IPost {
     author: number;
@@ -34,42 +34,38 @@ interface IPost {
 }
 
 @Table
-class Post extends Model implements IPost {    
-    @Expose({ groups: ['user', 'post', 'blog'] })
+class Post extends Model implements IPost {
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @AutoIncrement
     @PrimaryKey
     @Column
     declare id: number;
 
-    @Expose({ groups: ['user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @ForeignKey(() => User)
-    @AllowNull(false)
     @Column
-    @Index
     declare author: number;
 
-    @Expose({ groups: ['user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @AllowNull(false)
-    @Unique
     @Column({
         validate: {
-            len: [5, 100],
-            notEmpty: true
-        }
+            len: [3, 100],
+            notEmpty: true,
+        },
     })
     declare title: string;
 
-    @Expose({ groups: ['user', 'post', 'blog'] })
-    @AllowNull(false)
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @Column
     declare image: string;
 
-    @Expose({ groups: ['user', 'post'] })
+    @Expose({ groups: ['admin', 'user', 'post'] })
     @AllowNull(false)
     @Column
     declare content: string;
 
-    @Expose({ groups: ['user', 'post'] })
+    @Expose({ groups: ['admin', 'user', 'post'] })
     @CreatedAt
     @IsDate
     @Column
@@ -82,29 +78,38 @@ class Post extends Model implements IPost {
     declare updatedAt: Date;
 
     @Type(() => User)
-    @Expose({ groups: ['post', 'blog'] })
+    @Expose({ groups: ['admin', 'post', 'blog'] })
     @BelongsTo(() => User, { onDelete: 'SET NULL', hooks: true })
-    declare infoAuthor: NonAttribute<User>;
+    declare infoAuthor: User;
 
-    @Expose({ groups: ['admin'] })
-    @AllowNull(false)
+    @Expose({ groups: ['admin', 'post', 'blog'] })
     @Column
     declare isPublish: boolean;
 
-    @Expose({ groups: ['user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @IsDate
     @Column
     declare publishedAt?: Date;
 
-    @Expose({ groups: ['user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @Index
-    @AllowNull(false)
     @Column
     declare slug: string;
 
     // Relation many-to-many avec Post
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
     declare categories: PostCategory[];
+
+    declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>;
+
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    get image64(): NonAttribute<string | null> {
+        if (this.image) {
+            return getFileToBase64(this.image);
+        }
+        return null;
+    }
 
     @BeforeCreate
     @BeforeUpdate
@@ -129,10 +134,8 @@ class Post extends Model implements IPost {
     @BeforeCreate
     @BeforeUpdate
     static setPublishedAt(post: Post) {
-        if (post.isPublish && !post.publishedAt) {
+        if (post.isPublish && post.changed('isPublish')) {
             post.publishedAt = new Date();
-        } else if (!post.isPublish) {
-            post.publishedAt = undefined;
         }
     }
 }

@@ -20,7 +20,7 @@ interface IPostCategory {
 }
 
 @Table
-class PostCategory extends Model implements IPostCategory {    
+class PostCategory extends Model implements IPostCategory {
     @Expose({ groups: ['admin', 'post', 'blog'] })
     @AutoIncrement
     @PrimaryKey
@@ -45,7 +45,6 @@ class PostCategory extends Model implements IPostCategory {
     @Column
     declare updatedAt: Date;
 
-    // Relation many-to-many avec Post
     @BelongsToMany(() => Post, () => PostCategoryPost)
     declare posts: Post[];
 }

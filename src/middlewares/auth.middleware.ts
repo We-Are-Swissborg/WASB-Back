@@ -10,9 +10,8 @@ import { TokenPayload } from '../types/TokenPayload';
  * @param allowedAccessTypes list of allowed access types of a specific endpoint
  * @param allowSelfModification Checks whether the user can make their own changes
  */
-export const authorize =
-    (allowedAccessTypes?: string[], allowSelfModification: boolean = false) => {
-        return (req: Request, res: Response, next: NextFunction): void => {
+export const authorize = (allowedAccessTypes?: string[], allowSelfModification: boolean = false) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
         try {
             let jwt = req.headers.authorization;
             logger.debug('token jwt', { jwt });
@@ -68,4 +67,4 @@ export const authorize =
             return;
         }
     };
-}
+};
