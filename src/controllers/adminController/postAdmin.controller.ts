@@ -4,6 +4,8 @@ import * as PostRepository from "../../repository/post.repository";
 import * as PostServices from "../../services/post.services";
 import { logger } from "../../middlewares/logger.middleware";
 import { Post } from '../../models/post.model';
+import { getFileToBase64 } from '../../services/file.servies';
+import { OUTPUT_DIR } from '../../middlewares/upload.middleware';
 
 /**
  * Retrieve all posts
@@ -16,9 +18,6 @@ const getAllPosts = async (req: Request, res: Response) => {
     try {
         const allPosts = await PostServices.getPosts();
         const allPostsDTO = instanceToPlain(allPosts, { groups: ['admin'], excludeExtraneousValues: true });
-
-        // Replace object with just a Buffer array.
-        // allPostsDTO.forEach((post: Post, id: number) => (allPostsDTO[id].image = Array.from(post.image)));
 
         res.status(200).json(allPostsDTO);
     } catch (e: unknown) {
@@ -40,9 +39,6 @@ const getPost = async (req: Request, res: Response) => {
         const post = await PostServices.getPost(id);
         const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
 
-        // Replace object with just a Buffer array.
-        // allPostsDTO.forEach((post: Post, id: number) => (allPostsDTO[id].image = Array.from(post.image)));
-
         res.status(200).json(postDTO);
     } catch (e: unknown) {
         logger.error(`Get post error`, e);
@@ -56,7 +52,7 @@ const getPost = async (req: Request, res: Response) => {
  * @param res 
  */
 const createPost = async (req: Request, res: Response) => {
-    logger.info(`Create Post`);
+    logger.info(`PostAdminController : Create Post`);
 
     try {
         const post = plainToClass(Post, req.body as string, { groups: ['post'] });
@@ -76,7 +72,7 @@ const createPost = async (req: Request, res: Response) => {
  * @param res 
  */
 const updatePost = async (req: Request, res: Response) => {
-    logger.info(`Update Post`);
+    logger.info(`PostAdminController : Update Post`);
 
     try {
         const id: number = Number(req.params.id);
@@ -98,6 +94,25 @@ const updatePost = async (req: Request, res: Response) => {
     }
 };
 
+const uploadImage = async (req: Request, res: Response) => {
+    logger.info(`PostAdminController : Upload Image Post`);
+
+    try {
+        if (!req.file) {
+            res.status(400).json({ message: 'No file uploaded' });
+            return;
+        }
+
+        const filePath = `/${OUTPUT_DIR}/${req.file.filename}`;
+        const base64String = getFileToBase64(filePath, req.file.mimetype);
+
+        res.status(201).json({ base64: base64String, filePath });
+    } catch (error) {
+        console.error('Error uploading post image:', error);
+        res.status(500).json({ message: 'Error uploading image' });
+    }
+}
+
 /**
  * Delete Post
  * @param req 
@@ -117,4 +132,4 @@ const deletePost = async (req: Request, res: Response) => {
     }
 };
 
-export { getPost, getAllPosts, createPost, updatePost, deletePost };
+export { getPost, getAllPosts, createPost, updatePost, deletePost, uploadImage };

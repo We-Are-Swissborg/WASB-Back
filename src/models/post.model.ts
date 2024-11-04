@@ -20,7 +20,8 @@ import { User } from './user.model';
 import slugify from 'slugify';
 import { PostCategory } from './postcategory.model';
 import { PostCategoryPost } from './postcategorypost.model';
-import { BelongsToManySetAssociationsMixin } from 'sequelize';
+import { BelongsToManySetAssociationsMixin, NonAttribute } from 'sequelize';
+import { getFileToBase64 } from '../services/file.servies';
 
 interface IPost {
     author: number;
@@ -102,6 +103,13 @@ class Post extends Model implements IPost {
 
     declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>
 
+    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    get image64(): NonAttribute<string | null> {
+        if (this.image) {
+            return getFileToBase64(this.image);
+        } 
+        return null;     
+    }
 
     @BeforeCreate
     @BeforeUpdate
