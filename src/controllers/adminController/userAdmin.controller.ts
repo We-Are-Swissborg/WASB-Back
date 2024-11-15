@@ -122,7 +122,7 @@ const createUser = async (req: Request, res: Response) => {
  */
 const changeStatusUser = async (req: Request, res: Response) => {
     try {
-        logger.info(`Cahge Status User`);
+        logger.info(`Change Status User`);
     } catch (e) {
         logger.error(`changeStatusUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });

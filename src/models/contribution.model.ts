@@ -18,7 +18,6 @@ interface IContribution {
     duration: number;
     isActive: boolean;
 }
-
 @Table
 class Contribution extends Model implements IContribution {
     @Expose({ groups: ['admin', 'user'] })
@@ -26,33 +25,27 @@ class Contribution extends Model implements IContribution {
     @PrimaryKey
     @Column
     declare id: number;
-
     @Expose({ groups: ['admin', 'user'] })
     @AllowNull(false)
     @Column
     declare title: string;
-
     @Expose({ groups: ['admin'] })
     @AllowNull(false)
     @Column
     declare amount: number;
-
     @Expose({ groups: ['admin'] })
     @AllowNull(false)
     @Column
     declare duration: number;
-
     @Expose({ groups: ['admin'] })
     @AllowNull(false)
     @Column
     declare isActive: boolean;
-
     @Expose({ groups: ['admin'] })
     @CreatedAt
     @IsDate
     @Column
     declare createdAt: Date;
-
     @Expose({ groups: ['admin'] })
     @UpdatedAt
     @IsDate

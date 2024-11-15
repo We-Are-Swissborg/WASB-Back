@@ -16,7 +16,6 @@ import {
     ForeignKey,
     BelongsTo,
     HasMany,
-    AfterCreate,
     AllowNull,
     BeforeValidate,
 } from 'sequelize-typescript';
@@ -25,7 +24,6 @@ import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
 import { Membership } from './membership.model';
-import ContributionStatus from '../types/ContributionStatus';
 import { Post } from './post.model';
 
 const NAME_REGEX =
@@ -170,8 +168,8 @@ class User extends Model implements IUser {
 
     @Type(() => Membership)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => Membership, { foreignKey: 'userId' })
-    declare membership: Membership;
+    @HasMany(() => Membership, { foreignKey: 'userId' })
+    declare memberships: Membership[];
 
     @HasMany(() => Post, 'author')
     declare posts: Post[];
@@ -229,16 +227,6 @@ class User extends Model implements IUser {
                     isUnique = !isUnique;
                 }
             }
-        }
-    }
-
-    @AfterCreate
-    static async addDefaultContributionStatus(instance: User) {
-        if (!instance.membership) {
-            await Membership.create({
-                userId: instance.id,
-                contributionStatus: ContributionStatus.NO_ADHERENT,
-            });
         }
     }
 

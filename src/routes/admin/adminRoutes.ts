@@ -5,6 +5,7 @@ import * as Auth from '../../middlewares/auth.middleware';
 import Role from '../../types/Role';
 import { categoryRouter } from './postCategory.routes';
 import { postRouter } from './post.routes';
+import { contributionRouter } from './contributionAdmin.routes';
 
 export const apiAdminRouter: Router = express.Router();
 
@@ -15,3 +16,4 @@ apiAdminRouter.use('/users', userRouter);
 apiAdminRouter.use('/parameters', parameterRouter);
 apiAdminRouter.use('/postCategories', categoryRouter);
 apiAdminRouter.use('/posts', postRouter);
+apiAdminRouter.use('/contributions', contributionRouter);
