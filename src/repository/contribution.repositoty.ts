@@ -3,8 +3,8 @@ import { Contribution } from '../models/contribution.model';
 
 /**
  * Create a new contribution
- * @param contribution 
- * @returns 
+ * @param contribution
+ * @returns
  */
 const create = async (contribution: Contribution): Promise<Contribution> => {
     logger.info('contribution create', contribution);
@@ -18,8 +18,8 @@ const create = async (contribution: Contribution): Promise<Contribution> => {
 
 /**
  * Retrieve contribution by identifiant
- * @param id 
- * @returns 
+ * @param id
+ * @returns
  */
 const getContribution = async (id: number): Promise<Contribution | null> => {
     logger.info('getContribution', { id: id });
@@ -32,8 +32,8 @@ const getContribution = async (id: number): Promise<Contribution | null> => {
 };
 
 /**
- * Retrieve all active contributions 
- * @returns 
+ * Retrieve all active contributions
+ * @returns
  */
 const getActiveContributions = async (): Promise<Contribution[]> => {
     logger.info('getActiveContributions');
@@ -41,7 +41,7 @@ const getActiveContributions = async (): Promise<Contribution[]> => {
     const contributions = await Contribution.findAll({
         where: {
             isActive: true,
-        }
+        },
     });
 
     logger.debug('getActiveContributions : contributions', { contributions: contributions });
@@ -50,8 +50,8 @@ const getActiveContributions = async (): Promise<Contribution[]> => {
 };
 
 /**
- * Retrieve all contributions 
- * @returns 
+ * Retrieve all contributions
+ * @returns
  */
 const getContributions = async (): Promise<Contribution[]> => {
     logger.info('getContributions');
@@ -64,8 +64,8 @@ const getContributions = async (): Promise<Contribution[]> => {
 };
 
 /**
- * 
- * @param id 
+ *
+ * @param id
  */
 const destroy = async (id: number): Promise<void> => {
     logger.info(`delete contribution ${id}`);
@@ -76,8 +76,8 @@ const destroy = async (id: number): Promise<void> => {
 };
 
 /**
- * 
- * @param contribution 
+ *
+ * @param contribution
  */
 const update = async (contribution: Contribution): Promise<void> => {
     logger.info(`update contribution ${contribution.id}`);

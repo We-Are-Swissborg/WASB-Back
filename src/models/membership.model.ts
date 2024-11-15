@@ -101,8 +101,7 @@ class Membership extends Model implements IMembership {
 
     @BeforeUpdate
     static async contributionStatusChanged(instance: Membership) {
-        if (instance.changed('contributionStatus') 
-            && instance.contributionStatus === ContributionStatus.ACCEPTED) {
+        if (instance.changed('contributionStatus') && instance.contributionStatus === ContributionStatus.ACCEPTED) {
             const now = new Date();
             instance.dateContribution = new Date(now);
             instance.endDateContribution = new Date(now);

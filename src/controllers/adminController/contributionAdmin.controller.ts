@@ -8,8 +8,8 @@ const fileNameLogger = 'contributionAdminController';
 
 /**
  * Create new contribution
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const createContribution = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: createContribution ->`);
@@ -18,18 +18,21 @@ const createContribution = async (req: Request, res: Response) => {
         const contribution = plainToClass(Contribution, req.body as string, { groups: ['admin'] });
 
         const contributionCreated = await ContributionServices.createContribution(contribution);
-        const contributionDTO = instanceToPlain(contributionCreated, { groups: ['admin'], excludeExtraneousValues: true });
+        const contributionDTO = instanceToPlain(contributionCreated, {
+            groups: ['admin'],
+            excludeExtraneousValues: true,
+        });
         res.status(201).json(contributionDTO);
     } catch (e: unknown) {
         logger.error(`Get post error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
-}
+};
 
 /**
  * Retrieve contribution
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getContribution = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getContribution ->`);
@@ -50,8 +53,8 @@ const getContribution = async (req: Request, res: Response) => {
 
 /**
  * Retrieve contributions
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getContributions = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getContributions ->`);

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { validateToken } from '../services/jwt.services';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
-import { TokenPayload } from '../types/TokenPayload'; 
+import { TokenPayload } from '../types/TokenPayload';
 import { AsyncLocalStorage } from 'async_hooks';
 
 const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
@@ -10,9 +10,9 @@ const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
 export const getUserFromContext = (): TokenPayload | undefined => {
     logger.info(`[getUserFromContext] : in`);
     const context = asyncLocalStorage.getStore();
-    logger.info(`[getUserFromContext] : context`, {context: context});
+    logger.info(`[getUserFromContext] : context`, { context: context });
     return context;
-}
+};
 
 /**
  * middleware to check whether user has access to a specific endpoint
@@ -64,7 +64,7 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
                 res.status(401).json({ message: 'No enough privileges to access endpoint' });
                 return;
             }
-            
+
             asyncLocalStorage.run(decodedToken, () => next());
         } catch (error) {
             if (error as TokenExpiredError) {

@@ -5,8 +5,8 @@ import ContributionStatus from '../types/ContributionStatus';
 
 /**
  * Create a new membership
- * @param membership 
- * @returns 
+ * @param membership
+ * @returns
  */
 const create = async (membership: Membership): Promise<Membership> => {
     logger.info('membership create', membership);
@@ -17,7 +17,6 @@ const create = async (membership: Membership): Promise<Membership> => {
 
     return membershipCreated;
 };
-
 
 const getMembership = async (id: number): Promise<Membership | null> => {
     logger.info('getMembership', { id: id });
@@ -30,8 +29,8 @@ const getMembership = async (id: number): Promise<Membership | null> => {
 };
 
 /**
- * 
- * @param id 
+ *
+ * @param id
  */
 const destroy = async (id: number): Promise<void> => {
     logger.info(`delete membership ${id}`);
@@ -42,8 +41,8 @@ const destroy = async (id: number): Promise<void> => {
 };
 
 /**
- * 
- * @param membership 
+ *
+ * @param membership
  */
 const update = async (membership: Membership): Promise<void> => {
     logger.info(`update membership ${membership.id}`);
@@ -55,7 +54,7 @@ const update = async (membership: Membership): Promise<void> => {
 };
 
 /**
- * 
+ *
  */
 const checkIfAlreadyAffiliate = async (userId: number): Promise<boolean> => {
     logger.info(`checkIfAlreadyAffiliate : ${userId}`);
@@ -63,15 +62,15 @@ const checkIfAlreadyAffiliate = async (userId: number): Promise<boolean> => {
     const isExist = await Membership.count({
         where: {
             userId: userId,
-            [Op.or]: [ 
-                { endDateContribution: {[Op.gte] : new Date() }},
-                { contributionStatus: ContributionStatus.IN_PROGRESS }
-            ]
-        }
+            [Op.or]: [
+                { endDateContribution: { [Op.gte]: new Date() } },
+                { contributionStatus: ContributionStatus.IN_PROGRESS },
+            ],
+        },
     });
 
     return isExist > 0;
-}
+};
 
 const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> => {
     logger.info(`getAllMembershipsByUser : ${userId}`);
@@ -84,6 +83,6 @@ const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> =>
     });
 
     return memberships;
-}
+};
 
 export { create, getMembership, destroy, update, checkIfAlreadyAffiliate, getAllMembershipsByUser };

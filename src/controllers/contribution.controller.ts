@@ -7,8 +7,8 @@ const fileNameLogger = 'contributionController';
 
 /**
  * Retrieve contributions
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getContributions = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getContributions ->`);

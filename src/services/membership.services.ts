@@ -1,11 +1,11 @@
-import { logger } from "../middlewares/logger.middleware";
-import { Membership } from "../models/membership.model";
-import * as MembershipRepository from "../repository/membership.repository";
+import { logger } from '../middlewares/logger.middleware';
+import { Membership } from '../models/membership.model';
+import * as MembershipRepository from '../repository/membership.repository';
 
 /**
  * Create association membership application
  * @param membership membership application
- * @returns 
+ * @returns
  */
 const createMembership = async (membership: Membership): Promise<Membership> => {
     logger.info('createMembership : services', membership);
@@ -22,7 +22,7 @@ const createMembership = async (membership: Membership): Promise<Membership> => 
     if (alreadyExist) {
         throw new Error('You already have a membership');
     }
-    logger.debug('response checkIfAlreadyAffiliate', {alreadyExist:alreadyExist});
+    logger.debug('response checkIfAlreadyAffiliate', { alreadyExist: alreadyExist });
 
     const membershipCreated = await MembershipRepository.create(membership);
 
@@ -39,12 +39,12 @@ const createMembership = async (membership: Membership): Promise<Membership> => 
 /**
  * Retrieve all memberships by user
  * @param userId user identifiant
- * @returns 
+ * @returns
  */
 const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> => {
-    logger.info('getAllMembershipsByUser : services', {userId: userId});
+    logger.info('getAllMembershipsByUser : services', { userId: userId });
 
     return await MembershipRepository.getAllMembershipsByUser(userId);
-}
+};
 
-export {createMembership, getAllMembershipsByUser};
+export { createMembership, getAllMembershipsByUser };

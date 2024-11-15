@@ -89,13 +89,15 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
  */
 const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
     const user = await User.findByPk(id, {
-        include: [{
-            model: SocialMedias,
-        },
-        {
-            model: Membership,
-            right: true,
-        }],
+        include: [
+            {
+                model: SocialMedias,
+            },
+            {
+                model: Membership,
+                right: true,
+            },
+        ],
     });
 
     return user;

@@ -9,8 +9,8 @@ const fileNameLogger = 'membershipController';
 
 /**
  * Create user affiliations
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const createMembership = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: createMembership ->`);
@@ -29,12 +29,12 @@ const createMembership = async (req: Request, res: Response) => {
         logger.error(`Get membership error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
-}
+};
 
 // /**
 //  * Retrieve last user affiliations
-//  * @param req 
-//  * @param res 
+//  * @param req
+//  * @param res
 //  */
 // const getMembership = async (req: Request, res: Response) => {
 //     logger.info(`${fileNameLogger}: getMembership ->`);
@@ -54,8 +54,8 @@ const createMembership = async (req: Request, res: Response) => {
 
 /**
  * Retrieve all user affiliations
- * @param req 
- * @param res 
+ * @param req
+ * @param res
  */
 const getAllMembershipsByUser = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getAllMembershipsByUser ->`);
