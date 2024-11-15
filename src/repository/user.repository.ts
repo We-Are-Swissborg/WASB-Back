@@ -25,10 +25,10 @@ const getUsersWithSocialMedias = async (): Promise<User[]> => {
     return users;
 };
 
-const deleteUser = async(identifiant: number) : Promise<void> => {
+const deleteUser = async (identifiant: number): Promise<void> => {
     await User.destroy({
         where: {
-          id: identifiant,
+            id: identifiant,
         },
     });
 };
@@ -139,5 +139,5 @@ export {
     setUser,
     update,
     getUserByIdWithAllInfo,
-    deleteUser
+    deleteUser,
 };

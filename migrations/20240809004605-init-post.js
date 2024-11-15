@@ -21,12 +21,10 @@ module.exports = {
       },
       title: {
         type: Sequelize.STRING,
-        unique: true,
         allowNull: false,
       },
       image: {
         type: Sequelize.BLOB,
-        allowNull: false,
       },
       content: {
         type: Sequelize.STRING,
@@ -35,12 +33,9 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.NOW
       },
       updatedAt: {
         type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW
       }
     });
   },

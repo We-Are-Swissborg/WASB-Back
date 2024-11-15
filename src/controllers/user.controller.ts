@@ -81,10 +81,9 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         const user: User | null = await userRepository.getUserByIdWithAllInfo(id);
-        let userDTO = null;
 
         if (user instanceof User) {
-            userDTO = instanceToPlain(user, { groups: ['profil'], excludeExtraneousValues: true });
+            const userDTO = instanceToPlain(user, { groups: ['profil'], excludeExtraneousValues: true });
             res.status(200).json(userDTO);
         } else {
             res.status(400).json(`This user doesn't exist`);

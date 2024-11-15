@@ -10,25 +10,25 @@ import { TokenPayload } from '../types/TokenPayload';
  * @param allowedAccessTypes list of allowed access types of a specific endpoint
  * @param allowSelfModification Checks whether the user can make their own changes
  */
-export const authorize =
-    (allowedAccessTypes?: string[], allowSelfModification: boolean = false) =>
-    (req: Request, res: Response, next: NextFunction) => {
+export const authorize = (allowedAccessTypes?: string[], allowSelfModification: boolean = false) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
         try {
             let jwt = req.headers.authorization;
             logger.debug('token jwt', { jwt });
 
             if (!jwt) {
                 logger.warn('Invalid token');
-                return res.status(401).json({ message: 'Invalid token' });
+                res.status(401).json({ message: 'Invalid token' });
+                return;
             }
 
             // remove Bearer if using Bearer Authorization mechanism
-            if (jwt.toLowerCase().startsWith('bearer')) {
+            if (jwt?.toLowerCase().startsWith('bearer')) {
                 jwt = jwt.slice('bearer'.length).trim();
             }
 
             // verify token hasn't expired yet
-            const decodedToken: TokenPayload = validateToken(jwt) as TokenPayload;
+            const decodedToken: TokenPayload = validateToken(jwt!) as TokenPayload;
             logger.debug('token jwt decodedToken', decodedToken.roles);
 
             // Specific so that a user can modify their profile without having admin rights
@@ -37,26 +37,34 @@ export const authorize =
                 const userIdFromRequest = req.params.id || req.body.id; // Adjust this to match your route parameter or body structure
 
                 if (userIdFromToken == userIdFromRequest) {
-                    return next(); // Allow self-modification
+                    next(); // Allow self-modification
+                    return;
                 }
             }
 
-            if (allowedAccessTypes === undefined) return next();
+            if (allowedAccessTypes === undefined) {
+                next();
+                return;
+            }
             // check access
             const hasAccessToEndpoint = allowedAccessTypes?.some((at) => decodedToken.roles?.some((uat) => uat === at));
 
             if (!hasAccessToEndpoint) {
-                return res.status(401).json({ message: 'No enough privileges to access endpoint' });
+                res.status(401).json({ message: 'No enough privileges to access endpoint' });
+                return;
             }
 
-            return next();
+            next();
         } catch (error) {
             if (error as TokenExpiredError) {
                 logger.error('Expired token', error);
-                return res.status(401).json({ message: 'Expired token' });
+                res.status(401).json({ message: 'Expired token' });
+                return;
             }
 
             logger.error('Failed to authorize user', error);
-            return res.status(500).json({ message: 'Failed to authorize user' });
+            res.status(500).json({ message: 'Failed to authorize user' });
+            return;
         }
     };
+};
