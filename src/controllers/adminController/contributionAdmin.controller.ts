@@ -24,7 +24,7 @@ const createContribution = async (req: Request, res: Response) => {
         });
         res.status(201).json(contributionDTO);
     } catch (e: unknown) {
-        logger.error(`Get post error`, e);
+        logger.error(`Create contribution error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 };
@@ -42,7 +42,7 @@ const getContribution = async (req: Request, res: Response) => {
         const contribution = await ContributionServices.getContribution(id);
         if (!contribution) throw new Error('No contribution find');
 
-        const contributionDTO = instanceToPlain(contribution, { groups: ['user'], excludeExtraneousValues: true });
+        const contributionDTO = instanceToPlain(contribution, { groups: ['admin'], excludeExtraneousValues: true });
 
         res.status(200).json(contributionDTO);
     } catch (e: unknown) {
@@ -66,9 +66,51 @@ const getContributions = async (req: Request, res: Response) => {
 
         res.status(200).json(contributionsDTO);
     } catch (e: unknown) {
-        logger.error(`Get posts list error`, e);
+        logger.error(`Get contributions error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 };
 
-export { createContribution, getContribution, getContributions };
+/**
+ * Update contribution
+ * @param req
+ * @param res
+ */
+const updateContribution = async (req: Request, res: Response) => {
+    logger.info(`Update contribution`);
+
+    try {
+        const id: number = Number(req.params.id);
+        const contribution = plainToClass(Contribution, req.body as string, { groups: ['admin'] });
+
+        if (contribution.id == id) {
+            const contributionUpdated = await ContributionServices.updateContribution(contribution);
+            res.status(200).json(contributionUpdated);
+        } else {
+            res.status(400).json(`An error in your parameter form`);
+        }
+    } catch (e) {
+        logger.error(`update Contribution error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+/**
+ * Delete contribution
+ * @param req
+ * @param res
+ */
+const deleteContribution = async (req: Request, res: Response) => {
+    logger.info(`Delete contribution`);
+
+    try {
+        const id: number = Number(req.params.id);
+        await ContributionServices.destroy(id);
+        res.status(204).end();
+    } catch (e) {
+        logger.error(`delete Contribution error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+export { createContribution, getContribution, getContributions, updateContribution, deleteContribution };

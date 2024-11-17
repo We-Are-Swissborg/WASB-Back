@@ -6,3 +6,5 @@ export const contributionRouter: Router = express.Router();
 contributionRouter.get('/', Contribution.getContributions);
 contributionRouter.get('/:id', Contribution.getContribution);
 contributionRouter.post('/', Contribution.createContribution);
+contributionRouter.put('/:id', Contribution.updateContribution);
+contributionRouter.delete('/:id', Contribution.deleteContribution);

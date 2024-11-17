@@ -76,16 +76,18 @@ const destroy = async (id: number): Promise<void> => {
 };
 
 /**
- *
+ * Update contribution
  * @param contribution
  */
-const update = async (contribution: Contribution): Promise<void> => {
+const update = async (contribution: Contribution): Promise<Contribution> => {
     logger.info(`update contribution ${contribution.id}`);
 
     contribution.isNewRecord = false;
-    await contribution.save();
+    contribution = await contribution.save();
 
     logger.debug(`updated contribution ${contribution.id}!`);
+
+    return contribution;
 };
 
 export { create, getContribution, getContributions, getActiveContributions, destroy, update };

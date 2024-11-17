@@ -60,4 +60,40 @@ const getActiveContributions = async (): Promise<Contribution[]> => {
     return await ContributionRepository.getActiveContributions();
 };
 
-export { createContribution, getContribution, getContributions, getActiveContributions };
+/**
+ * Update a contribution
+ * @param contribution membership application
+ * @returns
+ */
+const updateContribution = async (contribution: Contribution): Promise<Contribution> => {
+    logger.info('updateContribution : services', contribution);
+
+    if (!contribution.title) {
+        throw new Error('Title not defined');
+    }
+
+    if (!contribution.amount) {
+        throw new Error('Amount not defined');
+    }
+
+    if (!contribution.duration) {
+        throw new Error('Duration not defined');
+    }
+
+    const contributionUpdated = await ContributionRepository.update(contribution);
+
+    logger.debug('Contribution updated', { contribution: contributionUpdated });
+
+    return contributionUpdated;
+};
+
+const destroy = async (id: number) => {
+    logger.info('delete contribution');
+
+    const isDelete = await Contribution.destroy({ where: { id: id } });
+    if (!isDelete) throw new Error('Error, contribution not exist for delete');
+
+    logger.debug(`delete contribution ${id}`);
+};
+
+export { createContribution, getContribution, getContributions, getActiveContributions, updateContribution, destroy };

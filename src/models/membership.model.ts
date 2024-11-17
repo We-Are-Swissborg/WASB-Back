@@ -82,7 +82,7 @@ class Membership extends Model implements IMembership {
     @Column
     declare note: string;
 
-    @Expose({ groups: ['admin'] })
+    @Expose({ groups: ['admin', 'user'] })
     @CreatedAt
     @IsDate
     @Column
