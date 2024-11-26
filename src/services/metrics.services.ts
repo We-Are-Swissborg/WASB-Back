@@ -42,7 +42,7 @@ const getCryptoAvailable = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({cryptoAvailable});
-  } catch (e: unknown) {
+  } catch {
     logger.error(`Metrics not found.`);
     res.status(400).json({ message: `Metrics not found.` });
   }
@@ -56,7 +56,7 @@ const getOneCrypto = async (req: Request, res: Response) => {
     if(!metrics || !metrics[crypto]) throw new Error;
 
      res.status(200).json({metricsCrypto: metrics[crypto]});
-  } catch (e: unknown) {
+  } catch {
     logger.error(crypto + ` metrics not found.`);
     res.status(400).json({ message: crypto + ` metrics not found.` });
   }
