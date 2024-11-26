@@ -70,7 +70,7 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
     };
 };
 
-export const authorizeMetrics = (req: Request, res: Response, next: NextFunction) => {
+export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void | Promise<void> => {
     try {
         let idMetrics = req.headers.authorization;
         const ipMetrics = req.socket.remoteAddress;
@@ -102,6 +102,7 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
         return next();
     } catch (error) {
         logger.error('Failed to authorize metrics serve :', error);
-        return res.status(500).json('Failed to authorize metrics server : ' + error);
+        res.status(500).json('Failed to authorize metrics server : ' + error);
+        return;
     }
 };
