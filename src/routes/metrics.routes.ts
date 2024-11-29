@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import * as Auth from '../middlewares/auth.middleware';
-import * as Metrics from '../services/metrics.services';
+import * as Metrics from '../controllers/metrics.controller';
 
 export const metricsRouter: Router = express.Router();
 

@@ -15,5 +15,4 @@ apiRouter.use('/test', testRouter);
 apiRouter.use('/users', userRouter);
 apiRouter.use('/posts', postRouter);
 apiRouter.use('/parameters', parameterRouter);
-apiRouter.use('/posts', postRouter);
 apiRouter.use('/metrics', metricsRouter);

@@ -70,7 +70,7 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
     };
 };
 
-export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void | Promise<void> => {
+export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
     try {
         let idMetrics = req.headers.authorization;
         const ipMetrics = req.socket.remoteAddress;
