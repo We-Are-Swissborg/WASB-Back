@@ -103,8 +103,12 @@ const createParameter = async (req: Request, res: Response) => {
         logger.debug(`parameter`, parameter);
 
         try {
-            await parameterServices.createParameter(parameter);
-            res.status(200);
+            const parameterCreated = await parameterServices.createParameter(parameter);            
+            const parameterDTO = instanceToPlain(parameterCreated, {
+                groups: ['admin'],
+                excludeExtraneousValues: true,
+            });
+            res.status(201).json(parameterDTO);
         } catch (e: unknown) {
             if (e instanceof Error) res.status(400).json(e.message);
         }

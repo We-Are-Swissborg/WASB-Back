@@ -1,14 +1,11 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { IParameter, Parameter } from '../models/parameter.model';
+import { Parameter } from '../models/parameter.model';
 
-const create = async (parameter: IParameter): Promise<Parameter> => {
+const create = async (parameter: Parameter): Promise<Parameter> => {
     logger.info('parameter create', parameter);
 
-    const newParameter = await Parameter.create({
-        name: parameter.name,
-        value: parameter.value,
-    });
+    const newParameter = await parameter.save();
 
     logger.debug('parameter created');
 

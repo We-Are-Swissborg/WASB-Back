@@ -15,7 +15,10 @@ import {
 interface IParameter {
     id: number;
     name: string;
+    code: string;
     value: string;
+    isActive: Boolean;
+
 }
 
 @Table
@@ -36,6 +39,12 @@ class Parameter extends Model implements IParameter {
     @AllowNull(false)
     @Unique
     @Column
+    declare code: string;
+
+    @Expose({ groups: ['all', 'admin'] })
+    @AllowNull(false)
+    @Unique
+    @Column
     declare value: string;
 
     @Expose({ groups: ['admin'] })
@@ -49,6 +58,10 @@ class Parameter extends Model implements IParameter {
     @IsDate
     @Column
     declare updatedAt: Date;
+
+    @Expose({ groups: ['admin'] })
+    @Column
+    declare isActive: Boolean;
 }
 
 export { Parameter, IParameter };

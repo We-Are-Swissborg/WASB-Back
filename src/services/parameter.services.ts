@@ -2,7 +2,7 @@ import { logger } from '../middlewares/logger.middleware';
 import { Parameter } from '../models/parameter.model';
 import * as parameterRepository from '../repository/parameter.repository';
 
-const createParameter = async (parameter: Parameter) => {
+const createParameter = async (parameter: Parameter): Promise<Parameter> => {
     logger.info('createParameter : services', parameter);
 
     if (!parameter.name?.trim()) {
@@ -13,7 +13,11 @@ const createParameter = async (parameter: Parameter) => {
         throw new Error('A value for the parameter is required');
     }
 
-    parameterRepository.create(parameter);
+    if (!parameter.code?.trim()) {
+        throw new Error('A Code for the parameter is required');
+    }
+
+    return await parameterRepository.create(parameter);
 };
 
 const getParameters = async (query: string | null): Promise<Parameter[]> => {
