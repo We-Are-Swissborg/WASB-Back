@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
     Column,
     IsDate,
@@ -14,7 +14,7 @@ import {
     BeforeCreate,
     BeforeUpdate,
 } from 'sequelize-typescript';
-import ContributionStatus from '../types/ContributionStatus';
+import { ContributionStatus } from '../types/ContributionStatus';
 import { User } from './user.model';
 import { Contribution } from './contribution.model';
 
@@ -42,7 +42,8 @@ class Membership extends Model implements IMembership {
     declare userId: number;
 
     @Expose({ groups: ['admin'] })
-    @BelongsTo(() => User, 'userId')
+    @Type(() => User)
+    @BelongsTo(() => User, { foreignKey: 'userId', as: 'user' })
     declare user: User;
 
     @Expose({ groups: ['admin', 'user', 'profil'] })
@@ -56,7 +57,8 @@ class Membership extends Model implements IMembership {
     declare validateUserId: number;
 
     @Expose({ groups: ['admin'] })
-    @BelongsTo(() => User, 'validateUserId')
+    @Type(() => User)
+    @BelongsTo(() => User, { foreignKey: 'validateUserId', as: 'validateBy' })
     declare validateBy?: User;
 
     @Expose({ groups: ['admin', 'user', 'profil'] })
@@ -74,7 +76,8 @@ class Membership extends Model implements IMembership {
     @Column
     declare contributionId: number;
 
-    @Expose({ groups: ['admin', 'user'] })
+    @Expose({ groups: ['admin', 'user', 'profil'] })
+    @Type(() => Contribution)
     @BelongsTo(() => Contribution, 'contributionId')
     declare contribution?: Contribution;
 
@@ -97,16 +100,6 @@ class Membership extends Model implements IMembership {
     @BeforeCreate
     static async addDefaultStatus(instance: Membership) {
         instance.contributionStatus = ContributionStatus.IN_PROGRESS;
-    }
-
-    @BeforeUpdate
-    static async contributionStatusChanged(instance: Membership) {
-        if (instance.changed('contributionStatus') && instance.contributionStatus === ContributionStatus.ACCEPTED) {
-            const now = new Date();
-            instance.dateContribution = new Date(now);
-            instance.endDateContribution = new Date(now);
-            instance.endDateContribution.setMonth(now.getMonth() + instance.contribution!.duration);
-        }
     }
 }
 

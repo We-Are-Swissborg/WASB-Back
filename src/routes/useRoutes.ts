@@ -4,7 +4,7 @@ import { securityRouter } from './security.routes';
 import { testRouter } from './test.Routes';
 import { postRouter } from './post.routes';
 import { parameterRouter } from './parameter.routes';
-import { apiAdminRouter } from './admin/adminRoutes';
+import { apiAdminRouter } from './admin/admin.routes';
 import { contributionRouter } from './contribution.routes';
 import { membershipRouter } from './membership.routes';
 

@@ -69,7 +69,7 @@ class User extends Model implements IUser {
     @Column
     declare lastName?: string;
 
-    @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post', 'admin'] })
     @Unique(true)
     @AllowNull(false)
     @Is(USERNAME_REGEX)
@@ -184,9 +184,9 @@ class User extends Model implements IUser {
         return `${this.lastName || ''} ${this.firstName || ''}`.trim();
     }
 
-    @Expose({ groups: ['user', 'profil', 'admin'], toPlainOnly: true, name: 'roles' })
+    @Expose({ groups: ['user', 'profil'], toPlainOnly: true, name: 'roles' })
     get getRoles(): NonAttribute<string[]> {
-        return JSON.parse(this.roles);
+        return this.roles ? JSON.parse(this.roles) : [];
     }
 
     @BeforeCreate

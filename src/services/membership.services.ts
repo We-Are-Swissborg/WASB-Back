@@ -47,4 +47,37 @@ const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> =>
     return await MembershipRepository.getAllMembershipsByUser(userId);
 };
 
-export { createMembership, getAllMembershipsByUser };
+/**
+ * Retrieve all memberships in Status 'In Progress'
+ * @param userId user identifiant
+ * @returns
+ */
+const getMembershipsInProgress = async (): Promise<Membership[]> => {
+    logger.info('getMembershipsInProgress : services');
+
+    return await MembershipRepository.getMebershipInProgress();
+};
+
+/**
+ * Retrieve membership by identifiant
+ * @param userId user identifiant
+ * @returns
+ */
+const getMembership = async (id: number): Promise<Membership | null> => {
+    logger.info('getMembership : services');
+
+    return await MembershipRepository.getMembership(id);
+};
+
+/**
+ * Update Membership
+ * @param userId user identifiant
+ * @returns
+ */
+const updatedMembership = async (membership: Membership): Promise<Membership> => {
+    logger.info('updatedMembership : services');
+
+    return await MembershipRepository.update(membership);
+};
+
+export { createMembership, getAllMembershipsByUser, getMembershipsInProgress, getMembership, updatedMembership };

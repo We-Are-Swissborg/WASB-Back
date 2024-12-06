@@ -64,7 +64,7 @@ const updateParameter = async (req: Request, res: Response) => {
             await parameterRepository.update(parameter);
             res.status(204).end();
         } else {
-            res.status(400).json(`An error in your parameter form`);
+            res.status(400).json({ message: `An error in your parameter form` });
         }
     } catch (e) {
         logger.error(`updateParameter error`, e);

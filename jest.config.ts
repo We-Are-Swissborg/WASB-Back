@@ -5,5 +5,6 @@ const config: Config.InitialOptions = {
   transform: {
   '^.+\\.tsx?$': 'ts-jest',
   },
+  setupFilesAfterEnv: ['./tests/jest.setup.ts'],
 };
 export default config;

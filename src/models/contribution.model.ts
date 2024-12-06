@@ -31,7 +31,7 @@ class Contribution extends Model implements IContribution {
     @Column
     declare title: string;
 
-    @Expose({ groups: ['admin'] })
+    @Expose({ groups: ['admin', 'user'] })
     @AllowNull(false)
     @Column
     declare amount: number;

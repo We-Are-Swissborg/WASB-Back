@@ -3,9 +3,10 @@ import { userRouter } from './userAdmin.routes';
 import { parameterRouter } from './parameterAdmin.routes';
 import * as Auth from '../../middlewares/auth.middleware';
 import Role from '../../types/Role';
-import { categoryRouter } from './postCategory.routes';
-import { postRouter } from './post.routes';
+import { categoryRouter } from './postCategoryAdmin.routes';
+import { postRouter } from './postAdmin.routes';
 import { contributionRouter } from './contributionAdmin.routes';
+import { membershipRouter } from './membershipAdmin.routes';
 
 export const apiAdminRouter: Router = express.Router();
 
@@ -17,3 +18,4 @@ apiAdminRouter.use('/parameters', parameterRouter);
 apiAdminRouter.use('/postCategories', categoryRouter);
 apiAdminRouter.use('/posts', postRouter);
 apiAdminRouter.use('/contributions', contributionRouter);
+apiAdminRouter.use('/memberships', membershipRouter);
