@@ -18,7 +18,6 @@ interface IParameter {
     code: string;
     value: string;
     isActive: Boolean;
-
 }
 
 @Table

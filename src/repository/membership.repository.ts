@@ -137,12 +137,4 @@ const getMemberships = async (): Promise<Membership[]> => {
     return memberships;
 };
 
-export {
-    create,
-    getMembership,
-    destroy,
-    update,
-    checkIfAlreadyAffiliate,
-    getAllMembershipsByUser,
-    getMemberships,
-};
+export { create, getMembership, destroy, update, checkIfAlreadyAffiliate, getAllMembershipsByUser, getMemberships };

@@ -7,7 +7,6 @@ import * as parameterServices from '../../services/parameter.services';
 
 const fileNameLogger = 'parameterAdminController';
 
-
 /**
  * Retrieve all parameters
  * @param req
@@ -106,7 +105,7 @@ const createParameter = async (req: Request, res: Response) => {
         logger.debug(`parameter`, parameter);
 
         try {
-            const parameterCreated = await parameterServices.createParameter(parameter);            
+            const parameterCreated = await parameterServices.createParameter(parameter);
             const parameterDTO = instanceToPlain(parameterCreated, {
                 groups: ['admin'],
                 excludeExtraneousValues: true,

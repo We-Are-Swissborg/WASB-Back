@@ -18,7 +18,7 @@ const getParameters = async (req: Request, res: Response) => {
         const parameters = await parameterServices.getParameters(code);
         const parametersDTO = instanceToPlain(parameters, { groups: ['all'], excludeExtraneousValues: true });
         logger.info(`${parametersDTO}: Get Parameters`, parametersDTO);
-        
+
         res.status(200).json(parametersDTO);
     } catch (e) {
         logger.error(`getParameters error`, e);
