@@ -5,13 +5,16 @@ import { Parameter } from '../../models/parameter.model';
 import * as parameterRepository from '../../repository/parameter.repository';
 import * as parameterServices from '../../services/parameter.services';
 
+const fileNameLogger = 'parameterAdminController';
+
+
 /**
  * Retrieve all parameters
  * @param req
  * @param res
  */
 const getParameters = async (req: Request, res: Response) => {
-    logger.info(`Get Parameters`);
+    logger.info(`${fileNameLogger}: Get Parameters`);
 
     try {
         const query = req.query.q as string;
@@ -30,7 +33,7 @@ const getParameters = async (req: Request, res: Response) => {
  * @param res
  */
 const getParameter = async (req: Request, res: Response) => {
-    logger.info(`Get Parameter`);
+    logger.info(`${fileNameLogger}: Get Parameter`);
 
     try {
         const id: number = Number(req.params.id);

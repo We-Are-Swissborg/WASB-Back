@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { logger } from '../../middlewares/logger.middleware';
+import { adminLogger as logger } from '../../middlewares/logger.middleware';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import * as ContributionServices from '../../services/contribution.services';
 import { Contribution } from '../../models/contribution.model';

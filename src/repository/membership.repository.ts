@@ -112,13 +112,10 @@ const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> =>
     return memberships;
 };
 
-const getMebershipInProgress = async (): Promise<Membership[]> => {
-    logger.info(`getMebershipInProgress`);
+const getMemberships = async (): Promise<Membership[]> => {
+    logger.info(`getMemberships`);
 
     const memberships = await Membership.findAll({
-        where: {
-            contributionStatus: ContributionStatus.IN_PROGRESS,
-        },
         order: [['createdAt', 'DESC']],
         include: [
             {
@@ -135,7 +132,7 @@ const getMebershipInProgress = async (): Promise<Membership[]> => {
         ],
     });
 
-    logger.info(`getMebershipInProgress retrieve`, memberships);
+    logger.info(`getMemberships retrieve`, memberships);
 
     return memberships;
 };
@@ -147,5 +144,5 @@ export {
     update,
     checkIfAlreadyAffiliate,
     getAllMembershipsByUser,
-    getMebershipInProgress,
+    getMemberships,
 };

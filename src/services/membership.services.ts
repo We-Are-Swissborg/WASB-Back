@@ -52,10 +52,10 @@ const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> =>
  * @param userId user identifiant
  * @returns
  */
-const getMembershipsInProgress = async (): Promise<Membership[]> => {
-    logger.info('getMembershipsInProgress : services');
+const getMemberships = async (): Promise<Membership[]> => {
+    logger.info('getMemberships : services');
 
-    return await MembershipRepository.getMebershipInProgress();
+    return await MembershipRepository.getMemberships();
 };
 
 /**
@@ -80,4 +80,4 @@ const updatedMembership = async (membership: Membership): Promise<Membership> =>
     return await MembershipRepository.update(membership);
 };
 
-export { createMembership, getAllMembershipsByUser, getMembershipsInProgress, getMembership, updatedMembership };
+export { createMembership, getAllMembershipsByUser, getMemberships, getMembership, updatedMembership };

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
-import { logger } from '../../middlewares/logger.middleware';
+import { adminLogger as logger } from '../../middlewares/logger.middleware';
 import * as MembershipServices from '../../services/membership.services';
 import { Membership } from '../../models/membership.model';
 import { ContributionWorkflow } from '../../workflows/contribution.workflow';
@@ -17,7 +17,7 @@ const getMemberships = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getMemberships ->`);
 
     try {
-        const memberships = await MembershipServices.getMembershipsInProgress();
+        const memberships = await MembershipServices.getMemberships();
         const membershipsDTO = instanceToPlain(memberships, { groups: ['admin'], excludeExtraneousValues: true });
 
         res.status(200).json(membershipsDTO);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { PostCategory } from '../../models/postcategory.model';
-import { logger } from '../../middlewares/logger.middleware';
+import { adminLogger as logger } from '../../middlewares/logger.middleware';
 import * as categoryService from '../../services/postCategory.services';
 import * as categoryRepository from '../../repository/postCategory.repository';
 
