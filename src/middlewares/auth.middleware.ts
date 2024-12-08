@@ -3,7 +3,8 @@ import { validateToken } from '../services/jwt.services';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
 import { TokenPayload } from '../types/TokenPayload';
-
+import NodeCache from "node-cache";
+const cache = new NodeCache();
 /**
  * middleware to check whether user has access to a specific endpoint
  *
@@ -67,4 +68,41 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
             return;
         }
     };
+};
+
+export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
+    try {
+        let idMetrics = req.headers.authorization;
+        const ipMetrics = req.socket.remoteAddress;
+        const date = new Date();
+
+        logger.debug('ID metrics', { idMetrics });
+
+        const verifyDataValid = (data: unknown, message: string) => {
+            if (!data) {
+                logger.warn(message);
+                throw new Error(message);
+            }
+        }
+        verifyDataValid(idMetrics, 'ID metrics required');
+
+        // remove Bearer if using Bearer Authorization mechanism
+        if (idMetrics?.toLowerCase().startsWith('bearer')) {
+            idMetrics = idMetrics.slice('bearer'.length).trim();
+        }
+
+        verifyDataValid(idMetrics === process.env.METRICS_ID, 'Invalid ID metrics');
+        verifyDataValid(ipMetrics === process.env.METRICS_IP, 'Invalid IP metrics');
+        verifyDataValid(date.getMinutes() === 0, 'Invalid hour metrics request');
+        verifyDataValid(!cache.get('hasAlreadyReqMetrics'), 'Metrics request already done');
+        cache.set('hasAlreadyReqMetrics', true, process.env.TTL_METRICS_REQUEST as string);
+
+        logger.debug('Metrics request authorized');
+
+        return next();
+    } catch (error) {
+        logger.error('Failed to authorize metrics serve :', error);
+        res.status(500).json('Failed to authorize metrics server : ' + error);
+        return;
+    }
 };
