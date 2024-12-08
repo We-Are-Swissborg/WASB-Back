@@ -4,6 +4,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
 import { TokenPayload } from '../types/TokenPayload';
 import { AsyncLocalStorage } from 'async_hooks';
+import NodeCache from "node-cache";
 
 const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
 
@@ -13,7 +14,6 @@ export const getUserFromContext = (): TokenPayload | undefined => {
     logger.info(`[getUserFromContext] : context`, { context: context });
     return context;
 };
-import NodeCache from "node-cache";
 const cache = new NodeCache();
 /**
  * middleware to check whether user has access to a specific endpoint
