@@ -37,7 +37,7 @@ const getUserWithAllInfo = async (req: Request, res: Response) => {
             userDTO = instanceToPlain(user, { groups: ['user'], excludeExtraneousValues: true });
             res.status(200).json(userDTO);
         } else {
-            res.status(400).json(`This user doesn't exist`);
+            res.status(404).json(`This user doesn't exist`);
         }
     } catch (e) {
         logger.error(`getUserWithAllInfo error`, e);
@@ -93,7 +93,7 @@ const deleteUser = async (req: Request, res: Response) => {
     try {
         logger.info(`Delete User`, req.params.id);
         const id: number = Number(req.params.id);
-        userRepository.deleteUser(id)
+        userRepository.deleteUser(id);
         res.status(200).end();
     } catch (e) {
         logger.error(`deleteUser error`, e);
@@ -122,7 +122,7 @@ const createUser = async (req: Request, res: Response) => {
  */
 const changeStatusUser = async (req: Request, res: Response) => {
     try {
-        logger.info(`Cahge Status User`);
+        logger.info(`Change Status User`);
     } catch (e) {
         logger.error(`changeStatusUser error`, e);
         res.status(500).json({ message: 'Oops !, an error has occurred.' });

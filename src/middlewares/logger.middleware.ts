@@ -64,7 +64,6 @@ const options = {
             format.align(),
             format.metadata(),
             format.splat(),
-            otherErrorFilter(),
             format.printf(({ level, message, metadata }) => {
                 return `[${level}]: ${message}. ${JSON.stringify(metadata)}`;
             }),

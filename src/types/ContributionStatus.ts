@@ -1,8 +1,5 @@
-enum ContributionStatus {
-    NO_ADHERENT = 'no adherent',
-    ADHERENT = 'adherent',
+export enum ContributionStatus {
     IN_PROGRESS = 'in progress',
     NOT_ACCEPTED = 'not accepted',
+    ACCEPTED = 'accepted',
 }
-
-export default ContributionStatus;

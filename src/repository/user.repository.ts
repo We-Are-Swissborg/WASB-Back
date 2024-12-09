@@ -2,6 +2,8 @@ import { Op } from 'sequelize';
 import { IUser, User } from '../models/user.model';
 import { logger } from '../middlewares/logger.middleware';
 import * as RegistValidator from '../validators/user.validator';
+import { SocialMedias } from '../models/socialmedias.model';
+import { Membership } from '../models/membership.model';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -25,10 +27,10 @@ const getUsersWithSocialMedias = async (): Promise<User[]> => {
     return users;
 };
 
-const deleteUser = async(identifiant: number) : Promise<void> => {
+const deleteUser = async (identifiant: number): Promise<void> => {
     await User.destroy({
         where: {
-          id: identifiant,
+            id: identifiant,
         },
     });
 };
@@ -87,7 +89,15 @@ const getIdReferent = async (referral: string): Promise<User | null> => {
  */
 const getUserByIdWithAllInfo = async (id: number): Promise<User | null> => {
     const user = await User.findByPk(id, {
-        include: ['socialMedias', 'membership'],
+        include: [
+            {
+                model: SocialMedias,
+            },
+            {
+                model: Membership,
+                right: true,
+            },
+        ],
     });
 
     return user;
@@ -139,5 +149,5 @@ export {
     setUser,
     update,
     getUserByIdWithAllInfo,
-    deleteUser
+    deleteUser,
 };

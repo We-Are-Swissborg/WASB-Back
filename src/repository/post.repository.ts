@@ -1,36 +1,82 @@
 import { logger } from '../middlewares/logger.middleware';
-import { IPost, Post } from '../models/post.model';
+import { Post } from '../models/post.model';
+import { PostCategory } from '../models/postcategory.model';
 import { User } from '../models/user.model';
-import domClean from '../services/domPurify';
-import GetList from '../types/GetList';
 
-const create = async (post: IPost): Promise<Post> => {
+const create = async (post: Post): Promise<Post> => {
     logger.info('post create', post);
-    const content = domClean(post.content);
 
-    const postCreated = await Post.create({
-        author: post.author,
-        title: post.title,
-        image: post.image,
-        content: content,
-    });
+    const postCreated = await post.save();
 
-    logger.debug('post create OK');
+    logger.debug(`post create OK : ${postCreated.id}`, postCreated);
 
     return postCreated;
 };
 
-const getAll = async (): Promise<Post[]> => {
+const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get all posts');
 
-    const allPosts = await Post.findAll();
+    const allPosts = await Post.findAndCountAll({
+        distinct: true, // avoid over-counting due to include
+        include: [PostCategory, User],
+    });
 
-    logger.debug('get all posts OK');
+    logger.debug(`get ${allPosts.count} posts OK`);
 
     return allPosts;
 };
 
-const get = async (id: string): Promise<Post | null> => {
+/**
+ *
+ * @param skip
+ * @param limit
+ * @returns
+ */
+const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
+    logger.info('get posts pagination');
+
+    const posts = await Post.findAndCountAll({
+        where: {
+            isPublish: true,
+        },
+        limit: limit,
+        offset: skip,
+        distinct: true, // avoid over-counting due to include
+        include: [
+            {
+                model: User,
+                attributes: ['username'],
+            },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] },
+            },
+        ],
+        order: [['publishedAt', 'DESC']],
+    });
+
+    logger.debug(`get ${posts.count} posts`);
+
+    return posts;
+};
+
+const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
+    logger.info('get all posts');
+
+    const allPosts = await Post.findAndCountAll({
+        where: {
+            isPublish: true,
+        },
+        include: [PostCategory, User],
+    });
+
+    logger.debug(`get ${allPosts.count} posts OK`);
+
+    return allPosts;
+};
+
+const get = async (id: number): Promise<Post | null> => {
     logger.info('get post');
 
     const post = await Post.findByPk(id, {
@@ -38,6 +84,11 @@ const get = async (id: string): Promise<Post | null> => {
             {
                 model: User,
                 attributes: ['username'],
+            },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] },
             },
         ],
     });
@@ -47,26 +98,35 @@ const get = async (id: string): Promise<Post | null> => {
     return post;
 };
 
-const getList = async (scale: number, selection: number): Promise<GetList> => {
-    logger.info('get posts list');
+/**
+ *
+ * @param slug
+ * @returns
+ */
+const getBySlug = async (slug: string): Promise<Post | null> => {
+    logger.info('get post by slug');
 
-    const totalPost = await Post.count();
-
-    const postList = await Post.findAll({
-        limit: scale,
-        offset: scale * (selection - 1),
-        order: [['createdAt', 'DESC']],
+    const post = await Post.findOne({
+        where: {
+            isPublish: true,
+            slug: slug,
+        },
         include: [
             {
                 model: User,
                 attributes: ['username'],
             },
+            {
+                model: PostCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] },
+            },
         ],
     });
 
-    logger.debug(`get ${scale} posts on ${totalPost}`);
+    logger.debug('get post OK');
 
-    return { postList, totalPost };
+    return post;
 };
 
 const destroy = async (id: number) => {
@@ -78,13 +138,19 @@ const destroy = async (id: number) => {
     logger.debug(`delete post ${id}`);
 };
 
-const update = async (id: number, data: Post) => {
-    logger.info('update post');
-    const post = await Post.update(data, { where: { id: id } });
+/**
+ * Update a Post
+ * @param {Post} post Update post
+ * @returns {Promise<Post>} Update post
+ */
+const update = async (post: Post): Promise<Post> => {
+    logger.info('post update', post);
 
-    if (!post[0]) throw new Error('Post not exist');
+    post = await post.save();
 
-    logger.debug(`update post ${id} OK!`);
+    logger.debug('post updated');
+
+    return post;
 };
 
-export { create, getAll, get, getList, destroy, update };
+export { create, getAll, getOnlyPublished, get, getBySlug, getPostsPagination, destroy, update };
