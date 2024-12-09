@@ -1,14 +1,11 @@
 import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { IParameter, Parameter } from '../models/parameter.model';
+import { Parameter } from '../models/parameter.model';
 
-const create = async (parameter: IParameter): Promise<Parameter> => {
+const create = async (parameter: Parameter): Promise<Parameter> => {
     logger.info('parameter create', parameter);
 
-    const newParameter = await Parameter.create({
-        name: parameter.name,
-        value: parameter.value,
-    });
+    const newParameter = await parameter.save();
 
     logger.debug('parameter created');
 
@@ -25,21 +22,22 @@ const getParameter = async (id: number): Promise<Parameter | null> => {
 
     const parameter = await Parameter.findByPk(id);
 
-    logger.debug('getParametersByQuery : parameters', { parameter: parameter });
+    logger.debug('getParameter : parameters', { parameter: parameter });
 
     return parameter;
 };
 
-const getParametersByQuery = async (query: string): Promise<Parameter[]> => {
-    logger.info('getParametersByQuery', { query: query });
+const getParametersByCode = async (code: string): Promise<Parameter[]> => {
+    logger.info('getParametersByCode', { code: code });
 
     const parameters = await Parameter.findAll({
         where: {
-            name: { [Op.like]: `%${query}%` },
+            code: { [Op.like]: `%${code}%` },
+            isActive: true,
         },
     });
 
-    logger.debug('getParametersByQuery : parameters', { parameters: parameters });
+    logger.debug('getParametersByCode : parameters', { parameters: parameters });
 
     return parameters;
 };
@@ -62,4 +60,4 @@ const update = async (parameter: Parameter): Promise<void> => {
     logger.debug(`updated parameter ${parameter.id}!`);
 };
 
-export { create, getAll, getParametersByQuery, getParameter, destroy, update };
+export { create, getAll, getParametersByCode, getParameter, destroy, update };

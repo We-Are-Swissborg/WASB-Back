@@ -2,27 +2,31 @@ import { logger } from '../middlewares/logger.middleware';
 import { Parameter } from '../models/parameter.model';
 import * as parameterRepository from '../repository/parameter.repository';
 
-const createParameter = async (parameter: Parameter) => {
+const createParameter = async (parameter: Parameter): Promise<Parameter> => {
     logger.info('createParameter : services', parameter);
 
     if (!parameter.name?.trim()) {
-        throw new Error('A name for the parameter is required');
+        throw new Error('A Name for the parameter is required');
     }
 
     if (!parameter.value?.trim()) {
-        throw new Error('A value for the parameter is required');
+        throw new Error('A Value for the parameter is required');
     }
 
-    parameterRepository.create(parameter);
+    if (!parameter.code?.trim()) {
+        throw new Error('A Code for the parameter is required');
+    }
+
+    return await parameterRepository.create(parameter);
 };
 
-const getParameters = async (query: string | null): Promise<Parameter[]> => {
-    logger.info('getParameters : services', { query: query });
+const getParameters = async (code: string | null): Promise<Parameter[]> => {
+    logger.info('getParameters : services', { code: code });
 
     let parameters = null;
 
-    if (!!query) {
-        parameters = await parameterRepository.getParametersByQuery(query);
+    if (!!code) {
+        parameters = await parameterRepository.getParametersByCode(code);
     } else {
         parameters = await parameterRepository.getAll();
     }

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import * as PostRepository from '../../repository/post.repository';
 import * as PostServices from '../../services/post.services';
-import { logger } from '../../middlewares/logger.middleware';
+import { adminLogger as logger } from '../../middlewares/logger.middleware';
 import { Post } from '../../models/post.model';
 import { getFileToBase64 } from '../../services/file.servies';
 import { OUTPUT_DIR } from '../../middlewares/upload.middleware';

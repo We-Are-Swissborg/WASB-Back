@@ -112,23 +112,20 @@ class Post extends Model implements IPost {
     }
 
     @BeforeCreate
-    @BeforeUpdate
     static async generateSlug(post: Post) {
-        if (!post.slug) {
-            const baseSlug = slugify(post.title, { lower: true, strict: true });
-            let slug = baseSlug;
+        const baseSlug = slugify(post.title, { lower: true, strict: true });
+        let slug = baseSlug;
 
-            let postWithSlug = await Post.findOne({ where: { slug } });
-            let counter = 1;
+        let postWithSlug = await Post.findOne({ where: { slug } });
+        let counter = 1;
 
-            while (postWithSlug) {
-                slug = `${baseSlug}-${counter}`;
-                postWithSlug = await Post.findOne({ where: { slug } });
-                counter++;
-            }
-
-            post.slug = slug;
+        while (postWithSlug) {
+            slug = `${baseSlug}-${counter}`;
+            postWithSlug = await Post.findOne({ where: { slug } });
+            counter++;
         }
+
+        post.slug = slug;
     }
 
     @BeforeCreate

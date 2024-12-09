@@ -16,7 +16,6 @@ import {
     ForeignKey,
     BelongsTo,
     HasMany,
-    AfterCreate,
     AllowNull,
     BeforeValidate,
 } from 'sequelize-typescript';
@@ -25,7 +24,6 @@ import { NonAttribute } from 'sequelize';
 import Role from '../types/Role';
 import { generateRandomCode } from '../utils/generator';
 import { Membership } from './membership.model';
-import ContributionStatus from '../types/ContributionStatus';
 import { Post } from './post.model';
 
 const NAME_REGEX =
@@ -71,7 +69,7 @@ class User extends Model implements IUser {
     @Column
     declare lastName?: string;
 
-    @Expose({ groups: ['user', 'profil', 'blog', 'post'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post', 'admin'] })
     @Unique(true)
     @AllowNull(false)
     @Is(USERNAME_REGEX)
@@ -170,8 +168,8 @@ class User extends Model implements IUser {
 
     @Type(() => Membership)
     @Expose({ groups: ['user', 'profil'] })
-    @HasOne(() => Membership, { foreignKey: 'userId' })
-    declare membership: Membership;
+    @HasMany(() => Membership, { foreignKey: 'userId' })
+    declare memberships: Membership[];
 
     @HasMany(() => Post, 'author')
     declare posts: Post[];
@@ -186,9 +184,9 @@ class User extends Model implements IUser {
         return `${this.lastName || ''} ${this.firstName || ''}`.trim();
     }
 
-    @Expose({ groups: ['user', 'profil', 'admin'], toPlainOnly: true, name: 'roles' })
+    @Expose({ groups: ['user', 'profil'], toPlainOnly: true, name: 'roles' })
     get getRoles(): NonAttribute<string[]> {
-        return JSON.parse(this.roles);
+        return this.roles ? JSON.parse(this.roles) : [];
     }
 
     @BeforeCreate
@@ -229,16 +227,6 @@ class User extends Model implements IUser {
                     isUnique = !isUnique;
                 }
             }
-        }
-    }
-
-    @AfterCreate
-    static async addDefaultContributionStatus(instance: User) {
-        if (!instance.membership) {
-            await Membership.create({
-                userId: instance.id,
-                contributionStatus: ContributionStatus.NO_ADHERENT,
-            });
         }
     }
 

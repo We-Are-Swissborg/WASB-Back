@@ -3,7 +3,17 @@ import { validateToken } from '../services/jwt.services';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
 import { TokenPayload } from '../types/TokenPayload';
+import { AsyncLocalStorage } from 'async_hooks';
 import NodeCache from "node-cache";
+
+const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
+
+export const getUserFromContext = (): TokenPayload | undefined => {
+    logger.info(`[getUserFromContext] : in`);
+    const context = asyncLocalStorage.getStore();
+    logger.info(`[getUserFromContext] : context`, { context: context });
+    return context;
+};
 const cache = new NodeCache();
 /**
  * middleware to check whether user has access to a specific endpoint
@@ -38,13 +48,14 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
                 const userIdFromRequest = req.params.id || req.body.id; // Adjust this to match your route parameter or body structure
 
                 if (userIdFromToken == userIdFromRequest) {
-                    next(); // Allow self-modification
+                    //next(); // Allow self-modification
+                    asyncLocalStorage.run(decodedToken, () => next());
                     return;
                 }
             }
 
             if (allowedAccessTypes === undefined) {
-                next();
+                asyncLocalStorage.run(decodedToken, () => next());
                 return;
             }
             // check access
@@ -55,7 +66,7 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
                 return;
             }
 
-            next();
+            asyncLocalStorage.run(decodedToken, () => next());
         } catch (error) {
             if (error as TokenExpiredError) {
                 logger.error('Expired token', error);

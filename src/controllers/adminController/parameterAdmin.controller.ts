@@ -5,13 +5,15 @@ import { Parameter } from '../../models/parameter.model';
 import * as parameterRepository from '../../repository/parameter.repository';
 import * as parameterServices from '../../services/parameter.services';
 
+const fileNameLogger = 'parameterAdminController';
+
 /**
  * Retrieve all parameters
  * @param req
  * @param res
  */
 const getParameters = async (req: Request, res: Response) => {
-    logger.info(`Get Parameters`);
+    logger.info(`${fileNameLogger}: Get Parameters`);
 
     try {
         const query = req.query.q as string;
@@ -30,7 +32,7 @@ const getParameters = async (req: Request, res: Response) => {
  * @param res
  */
 const getParameter = async (req: Request, res: Response) => {
-    logger.info(`Get Parameter`);
+    logger.info(`${fileNameLogger}: Get Parameter`);
 
     try {
         const id: number = Number(req.params.id);
@@ -64,7 +66,7 @@ const updateParameter = async (req: Request, res: Response) => {
             await parameterRepository.update(parameter);
             res.status(204).end();
         } else {
-            res.status(400).json(`An error in your parameter form`);
+            res.status(400).json({ message: `An error in your parameter form` });
         }
     } catch (e) {
         logger.error(`updateParameter error`, e);
@@ -103,8 +105,12 @@ const createParameter = async (req: Request, res: Response) => {
         logger.debug(`parameter`, parameter);
 
         try {
-            await parameterServices.createParameter(parameter);
-            res.status(200);
+            const parameterCreated = await parameterServices.createParameter(parameter);
+            const parameterDTO = instanceToPlain(parameterCreated, {
+                groups: ['admin'],
+                excludeExtraneousValues: true,
+            });
+            res.status(201).json(parameterDTO);
         } catch (e: unknown) {
             if (e instanceof Error) res.status(400).json(e.message);
         }
