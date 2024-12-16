@@ -31,27 +31,6 @@ const createMembership = async (req: Request, res: Response) => {
     }
 };
 
-// /**
-//  * Retrieve last user affiliations
-//  * @param req
-//  * @param res
-//  */
-// const getMembership = async (req: Request, res: Response) => {
-//     logger.info(`${fileNameLogger}: getMembership ->`);
-
-//     try {
-//         const post = await PostServices.getPostBySlug(req.params.slug);
-//         if (!post) throw new Error('No post find');
-
-//         const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
-
-//         res.status(200).json(postDTO);
-//     } catch (e: unknown) {
-//         logger.error(`Get post error`, e);
-//         if (e instanceof Error) res.status(400).json({ message: e.message });
-//     }
-// };
-
 /**
  * Retrieve all user affiliations
  * @param req

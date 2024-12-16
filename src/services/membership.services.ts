@@ -26,11 +26,6 @@ const createMembership = async (membership: Membership): Promise<Membership> => 
 
     const membershipCreated = await MembershipRepository.create(membership);
 
-    //TODO: not here
-    // const user = await UserRepository.getUserById(membership.userId);
-    // user?.addRoles([Role.Member]);
-    // await UserRepository.update(user!);
-
     logger.debug('Membership created', { membership: membershipCreated });
 
     return membershipCreated;

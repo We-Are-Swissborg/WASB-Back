@@ -33,10 +33,7 @@ class Workflow {
             await state.onEnter(context);
         }
 
-        logger.debug(`Setting status to ${status}`);
         context.membership.contributionStatus = status;
-        // await context.membership.save();
-        logger.debug(`Status saved as ${context.membership.contributionStatus}`);
         return context.membership;
     }
 }
@@ -47,11 +44,13 @@ export const ContributionWorkflow = new Workflow();
 ContributionWorkflow.registerState({
     status: ContributionStatus.ACCEPTED,
     onEnter: async (context) => {
-        const { membership } = context;
+        const { membership, note, validateUserId } = context;
         const now = new Date();
         membership.dateContribution = now;
         membership.endDateContribution = new Date(now);
         membership.endDateContribution.setMonth(now.getMonth() + (membership.contribution?.duration || 0));
+        membership.validateUserId = validateUserId;
+        if (note) membership.note = note;
     },
 });
 
@@ -62,6 +61,7 @@ ContributionWorkflow.registerState({
         if (!note) throw new Error('Note is required for REJECTED status');
         membership.note = note;
         membership.validateUserId = validateUserId;
+        membership.endDateContribution = new Date();
     },
 });
 
