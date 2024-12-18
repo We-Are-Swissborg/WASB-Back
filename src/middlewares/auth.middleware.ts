@@ -88,6 +88,8 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
         const date = new Date();
 
         logger.debug('ID metrics', { idMetrics });
+        logger.debug('IP metrics', { ipMetrics });
+        logger.debug('process.env.METRICS_IP', { METRICS_IP: process.env.METRICS_IP });
 
         const verifyDataValid = (data: unknown, message: string) => {
             if (!data) {
