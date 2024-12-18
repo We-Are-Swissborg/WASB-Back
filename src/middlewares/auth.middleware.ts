@@ -84,12 +84,9 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
 export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
     try {
         let idMetrics = req.headers.authorization;
-        const ipMetrics = req.socket.remoteAddress;
         const date = new Date();
 
         logger.debug('ID metrics', { idMetrics });
-        logger.debug('IP metrics', { ipMetrics });
-        logger.debug('process.env.METRICS_IP', { METRICS_IP: process.env.METRICS_IP });
 
         const verifyDataValid = (data: unknown, message: string) => {
             if (!data) {
@@ -105,8 +102,6 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
         }
 
         verifyDataValid(idMetrics === process.env.METRICS_ID, 'Invalid ID metrics');
-        verifyDataValid(ipMetrics === process.env.METRICS_IP, 'Invalid IP metrics');
-        verifyDataValid(date.getMinutes() === 0, 'Invalid hour metrics request');
         verifyDataValid(!cache.get('hasAlreadyReqMetrics'), 'Metrics request already done');
         cache.set('hasAlreadyReqMetrics', true, process.env.TTL_METRICS_REQUEST as string);
 
