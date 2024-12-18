@@ -72,7 +72,7 @@ const changeStatusMembership = async (req: Request, res: Response) => {
 
             let updatedMembership = await ContributionWorkflow.transitionTo(
                 updatedStatusMembership.contributionStatus,
-                { membership, validateUserId: updatedStatusMembership.validatedBy },
+                { membership, validateUserId: updatedStatusMembership.validatedBy, note: updatedStatusMembership.note },
             );
 
             if (updatedMembership.id === membership.id) {

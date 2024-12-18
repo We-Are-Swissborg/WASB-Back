@@ -4,7 +4,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
 import { TokenPayload } from '../types/TokenPayload';
 import { AsyncLocalStorage } from 'async_hooks';
-import NodeCache from "node-cache";
+import NodeCache from 'node-cache';
 
 const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
 
@@ -94,7 +94,7 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
                 logger.warn(message);
                 throw new Error(message);
             }
-        }
+        };
         verifyDataValid(idMetrics, 'ID metrics required');
 
         // remove Bearer if using Bearer Authorization mechanism

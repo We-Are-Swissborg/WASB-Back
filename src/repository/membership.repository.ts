@@ -100,7 +100,7 @@ const getAllMembershipsByUser = async (userId: number): Promise<Membership[]> =>
         where: {
             userId: userId,
         },
-        order: [['endDateContribution', 'DESC']],
+        order: [['createdAt', 'DESC']],
         include: [
             {
                 model: Contribution,
