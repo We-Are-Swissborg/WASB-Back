@@ -1,0 +1,24 @@
+{
+    "jsc": {
+        "parser": {
+            "syntax": "typescript",
+            "tsx": false,
+            "decorators": true
+        },
+        "target": "esnext",
+        "transform": {
+            "decoratorMetadata": true
+        },
+        "baseUrl": "src",
+        "paths": {
+            "*": ["*"]
+        }
+    },
+    "module": {
+        "type": "es6",
+        "strict": true,
+        "noInterop": false
+    },
+    "sourceMaps": true,
+    "minify": true
+}

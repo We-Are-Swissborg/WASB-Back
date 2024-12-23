@@ -12,7 +12,6 @@ import {
     CreatedAt,
     UpdatedAt,
     BeforeCreate,
-    BeforeUpdate,
 } from 'sequelize-typescript';
 import { ContributionStatus } from '../types/ContributionStatus';
 import { User } from './user.model';
