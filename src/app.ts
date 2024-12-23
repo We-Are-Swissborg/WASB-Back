@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { apiRouter } from './routes/useRoutes';
 import cors from 'cors';
 import { logger } from './middlewares/logger.middleware';
-import sequelize from './models';
+import sequelize from './models/sequelize';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 

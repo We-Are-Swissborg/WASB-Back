@@ -1,7 +1,7 @@
 import { Contribution } from '../src/models/contribution.model';
 import { Membership } from '../src/models/membership.model';
-import {ContributionStatus} from '../src/types/ContributionStatus';
-import {ContributionWorkflow} from '../src/workflows/contribution.workflow';
+import { ContributionStatus } from '../src/types/ContributionStatus';
+import { ContributionWorkflow } from '../src/workflows/contribution.workflow';
 
 test('should transition to ACCEPTED and update dates', async () => {
     const contribution = await Contribution.create({ id: 1, title: 'Test', duration: 6, amount: 100, isActive: true });
