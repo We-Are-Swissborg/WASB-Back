@@ -84,7 +84,6 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
 export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
     try {
         let idMetrics = req.headers.authorization;
-        const date = new Date();
 
         logger.debug('ID metrics', { idMetrics });
 
