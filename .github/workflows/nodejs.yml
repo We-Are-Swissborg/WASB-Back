@@ -1,20 +1,17 @@
 name: Node.js CI
 
-env:
-  NODE_VERSION: '20.15' # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
 on:
   push:
     branches: [ "develop" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop" ] 
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [${{ env.NODE_VERSION }}]
+        node-version: ['20.15'] # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v4
