@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "build": "npx tsc",
-    "dev": "npx dotenvx run --env-file=.env --env-file=.env.local --overload --verbose -- nodemon src/app.ts",
-    "start": "tsc && npx dotenvx run --env-file=.env --env-file=.env.production --overload -- pm2 start ecosystem.config.js",
+    "dev": "npx dotenvx run -f .env -f .env.local --overload --verbose -- nodemon src/app.ts",
+    "start": "tsc && npx dotenvx run -f .env -f .env.production --overload -- pm2 start ecosystem.config.js",
     "test": "jest --coverage",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint -c eslint.config.mjs ./src",
@@ -15,6 +15,7 @@
   "author": "Valdior",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@jest/globals": "^29.7.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
@@ -27,7 +28,9 @@
     "@types/node": "^22.7.5",
     "@types/sequelize": "^4.28.20",
     "@types/validator": "^13.12.2",
-    "eslint": "^9.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "eslint": "^9.17.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-n": "^17.13.2",
     "eslint-plugin-promise": "^7.1.0",
@@ -37,7 +40,8 @@
     "sequelize-cli": "^6.6.2",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.18.2"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.19.2",
@@ -62,7 +66,6 @@
     "sharp": "^0.33.5",
     "slugify": "^1.6.6",
     "sqlite3": "^5.1.7",
-    "typescript-eslint": "^8.9.0",
     "winston": "^3.15.0"
   }
 }
