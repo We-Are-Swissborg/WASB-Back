@@ -84,10 +84,10 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
 export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
     try {
         let idMetrics = req.headers.authorization;
-        let lastUpdate = new Date(req.body.metrics.lastUpdate);
-        let minutesLU = lastUpdate.getMinutes();
-        let totalSecond = (minutesLU * 60) + lastUpdate.getSeconds();
-        let ttl = Number(process.env.TTL_METRICS_REQUEST as string) - totalSecond;
+        const lastUpdate = new Date(req.body.metrics.lastUpdate);
+        const minutesLU = lastUpdate.getMinutes();
+        const totalSecond = (minutesLU * 60) + lastUpdate.getSeconds();
+        const ttl = Number(process.env.TTL_METRICS_REQUEST as string) - totalSecond;
 
         logger.debug('ID metrics', { idMetrics });
 
