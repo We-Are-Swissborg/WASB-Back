@@ -84,6 +84,10 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
 export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
     try {
         let idMetrics = req.headers.authorization;
+        let lastUpdate = new Date(req.body.metrics.lastUpdate);
+        let minutesLU = lastUpdate.getMinutes();
+        let totalSecond = (minutesLU * 60) + lastUpdate.getSeconds();
+        let ttl = Number(process.env.TTL_METRICS_REQUEST as string) - totalSecond;
 
         logger.debug('ID metrics', { idMetrics });
 
@@ -102,7 +106,7 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
 
         verifyDataValid(idMetrics === process.env.METRICS_ID, 'Invalid ID metrics');
         verifyDataValid(!cache.get('hasAlreadyReqMetrics'), 'Metrics request already done');
-        cache.set('hasAlreadyReqMetrics', true, process.env.TTL_METRICS_REQUEST as string);
+        cache.set('hasAlreadyReqMetrics', true, ttl);
 
         logger.debug('Metrics request authorized');
 
