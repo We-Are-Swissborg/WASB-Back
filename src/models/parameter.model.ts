@@ -17,7 +17,7 @@ interface IParameter {
     name: string;
     code: string;
     value: string;
-    isActive: Boolean;
+    isActive: boolean;
 }
 
 @Table
@@ -60,7 +60,7 @@ class Parameter extends Model implements IParameter {
 
     @Expose({ groups: ['admin'] })
     @Column
-    declare isActive: Boolean;
+    declare isActive: boolean;
 }
 
 export { Parameter, IParameter };

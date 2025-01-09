@@ -4,10 +4,7 @@ import tseslint from "typescript-eslint";
 
 
 export default [
-  {
-    files: ["**/*.js"], 
-    languageOptions: {sourceType: "commonjs"}
-  },
+  {files: ["**/*.{js,mjs,cjs,ts}"]},
   {
     languageOptions: { globals: globals.browser }
   },
