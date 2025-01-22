@@ -7,6 +7,7 @@ import {
     Column,
     CreatedAt,
     DataType,
+    Default,
     ForeignKey,
     Index,
     IsDate,
@@ -18,6 +19,8 @@ import {
 import slugify from 'slugify';
 import { User } from './user.model';
 import { Address } from './address.model';
+import { getFileToBase64 } from '../services/file.servies';
+import { NonAttribute } from 'sequelize';
 
 interface ISession {
     id: number;
@@ -26,11 +29,12 @@ interface ISession {
     description: string;
     image: string;
     startDateTime: Date;
-    endDateTime: Date;
+    endDateTime?: Date;
     organizerBy?: User;
     numberOfParticipants: number;
     url: string;
     membersOnly: boolean;
+    status: SessionStatus;
 }
 
 enum SessionStatus {
@@ -80,9 +84,8 @@ class Session extends Model implements ISession {
     declare startDateTime: Date;
 
     @Expose({ groups: ['admin', 'all'] })
-    @IsDate
     @Column
-    declare endDateTime: Date;
+    declare endDateTime?: Date;
 
     @ForeignKey(() => User)
     declare organizerById?: number;
@@ -99,13 +102,14 @@ class Session extends Model implements ISession {
     @Expose({ groups: ['all, admin'] })
     @Type(() => Address)
     @BelongsTo(() => Address, 'addressId')
-    declare address: Address;
+    declare address?: Address;
 
     @Expose({ groups: ['all, admin'] })
     @Column
     declare url: string;
 
     @Expose({ groups: ['all, admin'] })
+    @Default(false)
     @Column
     declare membersOnly: boolean;
 
@@ -130,6 +134,14 @@ class Session extends Model implements ISession {
     @Type(() => User)
     @BelongsTo(() => User)
     declare updatedBy: User;
+
+    @Expose({ groups: ['admin', 'all'] })
+    get image64(): NonAttribute<string | null> {
+        if (this.image) {
+            return getFileToBase64(this.image);
+        }
+        return null;
+    }
 
     @BeforeCreate
     static async generateSlug(instance: Session) {
