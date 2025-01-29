@@ -79,7 +79,7 @@ class User extends Model implements IUser {
 
     @Column
     @Expose({ groups: ['admin'], toClassOnly: true })
-    private declare roles: string;
+    declare private roles: string;
 
     @AllowNull(false)
     @Column

@@ -1,5 +1,6 @@
+import { Op } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { Session } from '../models/session.model';
+import { Session, SessionStatus } from '../models/session.model';
 
 const create = async (session: Session): Promise<Session> => {
     logger.info('session create', session);
@@ -37,6 +38,12 @@ const getSessionsPagination = async (skip: number, limit: number): Promise<{ row
     logger.info('get posts pagination');
 
     const sessions = await Session.findAndCountAll({
+        where: {
+            status: {
+                [Op.ne]: SessionStatus.Draft,
+                [Op.gte]: new Date(),
+            },
+        },
         limit: limit,
         offset: skip,
         distinct: true, // avoid over-counting due to include

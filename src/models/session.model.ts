@@ -38,12 +38,12 @@ interface ISession {
 }
 
 enum SessionStatus {
-    Planned  = 'Planned',
-    Ongoing  = 'Ongoing',
-    Completed  = 'Completed',
-    Cancelled  = 'Cancelled',
-    Postponed   = 'Postponed',
-    Draft = 'Draft'
+    Planned = 'Planned',
+    Ongoing = 'Ongoing',
+    Completed = 'Completed',
+    Cancelled = 'Cancelled',
+    Postponed = 'Postponed',
+    Draft = 'Draft',
 }
 
 @Table
@@ -71,7 +71,7 @@ class Session extends Model implements ISession {
     @Expose({ groups: ['all', 'admin'] })
     @Column
     declare image: string;
-    
+
     @Expose({ groups: ['all', 'admin'] })
     @Column({
         type: DataType.ENUM(...Object.values(SessionStatus)),
@@ -90,7 +90,7 @@ class Session extends Model implements ISession {
     @ForeignKey(() => User)
     declare organizerById?: number;
 
-    @Expose({ groups: ['admin'] })
+    @Expose({ groups: ['admin', 'all'] })
     @Type(() => User)
     @BelongsTo(() => User)
     declare organizerBy?: User;
@@ -104,11 +104,11 @@ class Session extends Model implements ISession {
     @BelongsTo(() => Address, 'addressId')
     declare address?: Address;
 
-    @Expose({ groups: ['all, admin'] })
+    @Expose({ groups: ['all', 'admin'] })
     @Column
     declare url: string;
 
-    @Expose({ groups: ['all, admin'] })
+    @Expose({ groups: ['all', 'admin'] })
     @Default(false)
     @Column
     declare membersOnly: boolean;

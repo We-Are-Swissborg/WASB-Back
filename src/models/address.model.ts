@@ -1,5 +1,5 @@
-import { Expose } from "class-transformer";
-import { AutoIncrement, Column, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Expose } from 'class-transformer';
+import { AutoIncrement, Column, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 interface IAddress {
     id: number;
@@ -38,7 +38,7 @@ class Address extends Model implements IAddress {
 
     @Expose({ groups: ['all', 'admin'] })
     @Column
-    declare country: string;    
+    declare country: string;
 
     @Expose({ groups: ['all', 'admin'] })
     @Column
@@ -53,4 +53,4 @@ class Address extends Model implements IAddress {
     declare capacity?: number;
 }
 
-export { Address, IAddress }
+export { Address, IAddress };

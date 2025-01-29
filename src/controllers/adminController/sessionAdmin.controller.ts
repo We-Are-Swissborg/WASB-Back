@@ -35,14 +35,10 @@ const getSessions = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger} : getSessions ->`, req.query);
 
     try {
-        const page = parseInt(String(req.query.page || '1'), 10);
-        const limit = parseInt(String(req.query.limit || '10'), 10);
-
-        const sessions = await SessionServices.getSessionsPagination(page, limit);
-
+        const sessions = await SessionServices.getSessions();
         const sessionListDTO = instanceToPlain(sessions.rows, { groups: ['admin'], excludeExtraneousValues: true });
 
-        res.status(200).json(sessionListDTO);
+        res.status(200).json(sessionListDTO).end();
     } catch (e: unknown) {
         logger.error(`Get getSessions list error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
@@ -91,11 +87,14 @@ const updateSession = async (req: Request, res: Response) => {
 
         if (session.id == id) {
             const contributionUpdated = await SessionServices.updateSession(session);
-            const sessionDTO = instanceToPlain(contributionUpdated, { groups: ['admin'], excludeExtraneousValues: true });
+            const sessionDTO = instanceToPlain(contributionUpdated, {
+                groups: ['admin'],
+                excludeExtraneousValues: true,
+            });
             res.status(200).json(sessionDTO);
         } else {
             res.status(400).json({ message: `An error in your session` });
-        }        
+        }
     } catch (e) {
         logger.error(`updateSession error`, e);
         res.status(400).json({ message: 'Oops !, an error has occurred.' });

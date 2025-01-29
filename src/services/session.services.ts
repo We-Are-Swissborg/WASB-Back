@@ -1,7 +1,7 @@
-import { Session } from "../models/session.model";
+import { Session } from '../models/session.model';
 import { logger } from '../middlewares/logger.middleware';
 import * as SessionRepository from '../repository/session.repository';
-import domClean from "./domPurify";
+import domClean from './domPurify';
 
 const createSession = async (session: Session): Promise<Session> => {
     logger.info('createSession : services', session);
@@ -22,11 +22,11 @@ const createSession = async (session: Session): Promise<Session> => {
     return sessionCreated;
 };
 
-const getSessions = async (query: string | null): Promise<Session[]> => {
+const getSessions = async (): Promise<{ rows: Session[]; count: number }> => {
     logger.info('getSessions : services');
 
     let sessions = null;
-    
+
     // if (!!query) {
     //     sessions = await SessionRepository.getParametersByCode(code);
     // } else {
@@ -34,7 +34,7 @@ const getSessions = async (query: string | null): Promise<Session[]> => {
 
     logger.debug(`getSessions : ${sessions.count} item(s)`);
 
-    return sessions.rows;
+    return sessions;
 };
 
 /**
