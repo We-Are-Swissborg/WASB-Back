@@ -7,4 +7,4 @@ export const securityRouter: Router = express.Router();
 securityRouter.post('/register', Security.registration);
 securityRouter.post('/auth', Security.authCredentials);
 securityRouter.post('/authWallet', SecurityWeb3.authWallet);
-securityRouter.post('/nonce', SecurityWeb3.nonce);
+securityRouter.get('/getNonce', SecurityWeb3.getNonce);
