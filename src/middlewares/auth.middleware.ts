@@ -86,7 +86,7 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
         let idMetrics = req.headers.authorization;
         const lastUpdate = new Date(req.body.metrics.lastUpdate);
         const minutesLU = lastUpdate.getMinutes();
-        const totalSecond = (minutesLU * 60) + lastUpdate.getSeconds();
+        const totalSecond = minutesLU * 60 + lastUpdate.getSeconds();
         const ttl = Number(process.env.TTL_METRICS_REQUEST as string) - totalSecond;
 
         logger.debug('ID metrics', { idMetrics });
