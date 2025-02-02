@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
-import { updateLastLogin } from '../services/user.services';
+// import { updateLastLogin } from '../services/user.services';
 import { confirmSignMessage } from '../services/security.web3.services';
-import { generateToken } from '../services/jwt.services';
-import { instanceToPlain } from 'class-transformer';
+// import { generateToken } from '../services/jwt.services';
+// import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { createNonce, verifyAndUseNonce } from '../cache/nonceUtils';
-
 
 // /**
 //  * Generate Nonce for user
