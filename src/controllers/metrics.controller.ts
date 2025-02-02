@@ -26,7 +26,8 @@ const setMetricsCache = async (req: Request, res: Response) => {
 
 const getCryptoAvailable = async (req: Request, res: Response) => {
     try {
-        const metrics: Record<'crypto', Record<string, object>> & Record<'lastUpdate', Date> | undefined = metricsCache.get('metrics');
+        const metrics: (Record<'crypto', Record<string, object>> & Record<'lastUpdate', Date>) | undefined =
+            metricsCache.get('metrics');
         if (!metrics) throw new Error();
 
         const cryptoList: Record<string, object> = metrics.crypto;
@@ -34,7 +35,7 @@ const getCryptoAvailable = async (req: Request, res: Response) => {
 
         const cryptoAvailable: Record<'crypto', object> & Record<'lastUpdate', Date> = {
             crypto: getCryptoWithValue(cryptoList),
-            lastUpdate: lastUpdate
+            lastUpdate: lastUpdate,
         }; // Get crypto with walue for main metrics page.
 
         res.status(200).json({ cryptoAvailable });
@@ -47,16 +48,17 @@ const getCryptoAvailable = async (req: Request, res: Response) => {
 const getOneCrypto = async (req: Request, res: Response) => {
     const crypto = req.params.crypto;
     try {
-        const metrics: Record<'crypto', Record<string, string>> & Record<'lastUpdate', Date> | undefined = metricsCache.get('metrics');
+        const metrics: (Record<'crypto', Record<string, string>> & Record<'lastUpdate', Date>) | undefined =
+            metricsCache.get('metrics');
 
         if (!metrics || !metrics.crypto[crypto]) throw new Error();
 
         const metricsCrypto = {
             crypto: metrics.crypto[crypto],
-            lastUpdate: metrics.lastUpdate
-        }
+            lastUpdate: metrics.lastUpdate,
+        };
 
-        res.status(200).json({metricsCrypto});
+        res.status(200).json({ metricsCrypto });
     } catch {
         logger.error(crypto + ` metrics not found.`);
         res.status(400).json({ message: crypto + ` metrics not found.` });

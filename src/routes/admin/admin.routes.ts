@@ -7,6 +7,7 @@ import { categoryRouter } from './postCategoryAdmin.routes';
 import { postRouter } from './postAdmin.routes';
 import { contributionRouter } from './contributionAdmin.routes';
 import { membershipRouter } from './membershipAdmin.routes';
+import { sessionRouter } from './sessionAdmin.routes';
 
 export const apiAdminRouter: Router = express.Router();
 
@@ -19,3 +20,4 @@ apiAdminRouter.use('/postCategories', categoryRouter);
 apiAdminRouter.use('/posts', postRouter);
 apiAdminRouter.use('/contributions', contributionRouter);
 apiAdminRouter.use('/memberships', membershipRouter);
+apiAdminRouter.use('/sessions', sessionRouter);

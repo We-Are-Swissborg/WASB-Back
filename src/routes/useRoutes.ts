@@ -8,6 +8,7 @@ import { apiAdminRouter } from './admin/admin.routes';
 import { contributionRouter } from './contribution.routes';
 import { membershipRouter } from './membership.routes';
 import { metricsRouter } from './metrics.routes';
+import { sessionRouter } from './session.routes';
 
 export const apiRouter: Router = express.Router();
 apiRouter.use('/admin/', apiAdminRouter);
@@ -20,3 +21,4 @@ apiRouter.use('/parameters', parameterRouter);
 apiRouter.use('/contributions', contributionRouter);
 apiRouter.use('/memberships', membershipRouter);
 apiRouter.use('/metrics', metricsRouter);
+apiRouter.use('/sessions', sessionRouter);
