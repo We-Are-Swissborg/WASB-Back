@@ -7,7 +7,8 @@ Mainly based around Swissborg, our community aims to educate and be a pillar in 
 ## Installation
 
 Requirement :
-    - NodeJS v20.15
+    - NodeJS v22.13
+    - NPM 11.1
     - Sequelize V6
     - Sequeliez CLI V6
 

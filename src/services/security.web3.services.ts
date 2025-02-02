@@ -1,11 +1,7 @@
 import type { SolanaSignInOutput } from '@solana/wallet-standard-features' with { 'resolution-mode': 'import' };
 import { ed25519 } from '@noble/curves/ed25519';
-import { User } from '../models/user.model.js';
 import { logger } from '../middlewares/logger.middleware';
 // import { getUserByWallet } from '../repository/user.repository';
-
-import { generateKeyPair, getBase58Codec, getBase58Decoder, getBase58Encoder, getUtf8Encoder, parseBase58RpcAccount } from "@solana/web3.js";
-import { createPublicKey } from 'crypto';
 
 // /**
 //  * Generate a nonce for a wallet user
@@ -61,11 +57,8 @@ const confirmSignMessage = async (output: SolanaSignInOutput): Promise<void> => 
         // logger.info(`test`, test);
         // logger.info(`test.toCryptoKey`, test.toCryptoKey);
 
-
-
         const verified = ed25519.verify(output.signature, output.signedMessage, output.account.publicKey as Uint8Array);
         logger.info('verified', verified);
-
 
         if (!verified) throw new Error('An error during signature validation');
 

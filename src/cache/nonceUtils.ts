@@ -4,11 +4,11 @@ import { nonceCache } from './cacheManager';
 
 type NonceData = {
     used: boolean;
-}
+};
 
 export const createNonce = async (): Promise<string> => {
     const nonce = generateRandomNonce();
-    logger.info('createNonce', { nonce })
+    logger.info('createNonce', { nonce });
     const nonceData: NonceData = { used: false };
 
     await nonceCache.set(nonce, nonceData);
