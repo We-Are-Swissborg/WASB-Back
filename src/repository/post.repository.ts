@@ -1,12 +1,14 @@
+import { Op, Transaction } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { Post } from '../models/post.model';
+import { IPost, Post } from '../models/post.model';
 import { PostCategory } from '../models/postcategory.model';
 import { User } from '../models/user.model';
+import { Translation } from '../models/translation.model';
 
-const create = async (post: Post): Promise<Post> => {
+const create = async (post: Partial<IPost>, transaction?: Transaction): Promise<Post> => {
     logger.info('post create', post);
 
-    const postCreated = await post.save();
+    const postCreated = await Post.create(post, {transaction});
 
     logger.debug(`post create OK : ${postCreated.id}`, postCreated);
 
@@ -32,7 +34,7 @@ const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
  * @param limit
  * @returns
  */
-const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
+const getPostsPagination = async (language: string, skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
     logger.info('get posts pagination');
 
     const posts = await Post.findAndCountAll({
@@ -50,8 +52,24 @@ const getPostsPagination = async (skip: number, limit: number): Promise<{ rows: 
             {
                 model: PostCategory,
                 attributes: ['id', 'title'],
+                where: {
+                    languageCode: language,
+                    entityType: "PostCategory",
+                    entityId: { [Op.col]: "PostCategory.id" },
+                },
+                required: true,
                 through: { attributes: [] },
             },
+            {
+                model: Translation,
+                attributes: ['title', 'content', 'slug'],
+                where: {
+                    languageCode: language,
+                    entityType: "Post",
+                    entityId: { [Op.col]: "Post.id" },
+                },
+                required: true,
+            }
         ],
         order: [['publishedAt', 'DESC']],
     });
@@ -143,10 +161,10 @@ const destroy = async (id: number) => {
  * @param {Post} post Update post
  * @returns {Promise<Post>} Update post
  */
-const update = async (post: Post): Promise<Post> => {
+const update = async (post: Post, transaction?: Transaction): Promise<Post> => {
     logger.info('post update', post);
 
-    post = await post.save();
+    await Post.update(post, {where: { id: post.id }, transaction});
 
     logger.debug('post updated');
 

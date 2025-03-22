@@ -1,22 +1,23 @@
 import { Expose } from 'class-transformer';
 import {
-    AllowNull,
     Column,
     CreatedAt,
     IsDate,
     Model,
     Table,
     UpdatedAt,
-    Unique,
     AutoIncrement,
     PrimaryKey,
     BelongsToMany,
+    HasMany,
 } from 'sequelize-typescript';
 import { Post } from './post.model';
 import { PostCategoryPost } from './postcategorypost.model';
+import { Translation } from './translation.model';
 
 interface IPostCategory {
-    title: string;
+    posts: Post[];
+    translations: Translation[];
 }
 
 @Table
@@ -26,12 +27,6 @@ class PostCategory extends Model implements IPostCategory {
     @PrimaryKey
     @Column
     declare id: number;
-
-    @Expose({ groups: ['admin', 'post', 'blog'] })
-    @AllowNull(false)
-    @Unique
-    @Column
-    declare title: string;
 
     @Expose({ groups: ['admin', 'post'], toClassOnly: false })
     @CreatedAt
@@ -47,6 +42,10 @@ class PostCategory extends Model implements IPostCategory {
 
     @BelongsToMany(() => Post, () => PostCategoryPost)
     declare posts: Post[];
+
+    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
+    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: 'PostCategory' } })
+    declare translations: Translation[];
 }
 
 export { PostCategory, IPostCategory };

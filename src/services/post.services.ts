@@ -1,25 +1,52 @@
+import { Transaction } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
+import sequelize from '../models';
 import { Post } from '../models/post.model';
 import * as postRepository from '../repository/post.repository';
+import * as translationRepository from '../repository/translation.repository';
 import domClean from './domPurify';
+import { TranslationService } from './translation.services';
+
+const translationService = new TranslationService(logger);
 
 const createPost = async (post: Post): Promise<Post> => {
     logger.info('createPost : services', post);
-    post.content = domClean(post.content);
 
-    if (!post.title?.trim()) {
-        throw new Error('A title for the post is required');
+    post.translations.forEach((t) => {
+        t.content = domClean(t.content!);
+        if (!t.title?.trim()) { throw new Error('A title for the post is required'); }
+        if (!t.content?.trim()) { throw new Error('A title for the post is required'); }
+    });
+
+    const transaction = await sequelize.transaction();
+    try {
+        const postCreated = await postRepository.create(post, transaction);
+
+        // const translationsData = post.translations.map((t) => ({
+        //     entityType: "Post",
+        //     entityId: post.id,
+        //     languageCode: t.languageCode,
+        //     title: t.title,
+        //     content: t.content,
+        //     slug: t.slug,
+        // }));
+
+        // await translationService.
+
+        // await translationRepository.bulkCreate(translationsData, transaction);
+
+        await transaction.commit();
+        logger.debug('Post created', { postCreated });
+        return postCreated;
+    } catch (error) {
+        await transaction.rollback();
+        console.error("Erreur lors de la création du post avec traductions :", error);
+        throw error;
     }
-
-    if (!post.content?.trim()) {
-        throw new Error('A content for the post is required');
+    finally
+    {
+        logger.info('createPost : end');
     }
-
-    const postCreated = await postRepository.create(post);
-
-    logger.debug('Post created', { postCreated });
-
-    return postCreated;
 };
 
 const getPosts = async (): Promise<Post[]> => {
@@ -38,13 +65,13 @@ const getPosts = async (): Promise<Post[]> => {
  * @param limit
  * @returns
  */
-const getPostsPagination = async (page: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('getPostsPagination : services', { page: page, limit: limit });
+const getPostsPagination = async (language: string, page: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
+    logger.info('getPostsPagination : services', { language, page, limit });
 
     let posts = null;
     const skip = (page - 1) * limit;
 
-    posts = await postRepository.getPostsPagination(skip, limit);
+    posts = await postRepository.getPostsPagination(language, skip, limit);
 
     logger.debug(`getPostsPagination : ${posts.count} item(s)`);
 
@@ -80,16 +107,25 @@ const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
         throw new Error('The encoded data do not coincide with those supplied');
     }
 
-    if (!updatedPost.title) {
-        throw new Error('A title for the post is required');
-    }
+    updatedPost.translations.forEach((t) => {
+        t.content = domClean(t.content!);
+        if (!t.title?.trim()) { throw new Error('A title for the post is required'); }
+        if (!t.content?.trim()) { throw new Error('A title for the post is required'); }
+    });
 
-    if (updatedPost.title.length < 3) {
-        throw new Error('A title for the post must contain more than 3 characters');
+    const transaction: Transaction = await sequelize.transaction();
+    try 
+    {
+        updatedPost = await postRepository.update(updatedPost, transaction);
+        return updatedPost;
+    } catch (error) {
+        await transaction.rollback();
+        throw new Error(`Erreur lors de la mise à jour du post : ${error}`);
     }
-
-    updatedPost = await postRepository.update(updatedPost);
-    return updatedPost;
+    finally
+    {
+        logger.info('updatePost : end');
+    }
 };
 
 export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost };

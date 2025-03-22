@@ -23,10 +23,11 @@ const getPosts = async (req: Request, res: Response) => {
     logger.info(`PostController: getPosts ->`, req.query);
 
     try {
+        const language = String(req.query.page || 'fr');
         const page = parseInt(String(req.query.page || '1'), 10);
         const limit = parseInt(String(req.query.limit || '10'), 10);
 
-        const posts = await PostServices.getPostsPagination(page, limit);
+        const posts = await PostServices.getPostsPagination(language, page, limit);
 
         const postListDTO = instanceToPlain(posts.rows, { groups: ['blog'], excludeExtraneousValues: true });
 

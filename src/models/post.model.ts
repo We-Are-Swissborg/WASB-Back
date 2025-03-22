@@ -1,6 +1,5 @@
 import { Expose, Type } from 'class-transformer';
 import {
-    AllowNull,
     Column,
     CreatedAt,
     IsDate,
@@ -12,25 +11,23 @@ import {
     ForeignKey,
     BeforeCreate,
     BeforeUpdate,
-    Index,
     BelongsToMany,
     BelongsTo,
+    HasMany,
 } from 'sequelize-typescript';
 import { User } from './user.model';
-import slugify from 'slugify';
 import { PostCategory } from './postcategory.model';
 import { PostCategoryPost } from './postcategorypost.model';
 import { BelongsToManySetAssociationsMixin, NonAttribute } from 'sequelize';
 import { getFileToBase64 } from '../services/file.servies';
+import { Translation } from './translation.model';
 
 interface IPost {
     author: number;
-    title: string;
     image: string;
-    content: string;
     isPublish: boolean;
     publishedAt?: Date;
-    slug: string;
+    translations: Translation[];
 }
 
 @Table
@@ -47,23 +44,8 @@ class Post extends Model implements IPost {
     declare author: number;
 
     @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
-    @AllowNull(false)
-    @Column({
-        validate: {
-            len: [3, 100],
-            notEmpty: true,
-        },
-    })
-    declare title: string;
-
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @Column
     declare image: string;
-
-    @Expose({ groups: ['admin', 'user', 'post'] })
-    @AllowNull(false)
-    @Column
-    declare content: string;
 
     @Expose({ groups: ['admin', 'user', 'post'] })
     @CreatedAt
@@ -91,15 +73,13 @@ class Post extends Model implements IPost {
     @Column
     declare publishedAt?: Date;
 
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
-    @Index
-    @Column
-    declare slug: string;
-
     // Relation many-to-many avec Post
     @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
     declare categories: PostCategory[];
+
+    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: 'Post' } })
+    declare translations: Translation[];
 
     declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>;
 
@@ -109,23 +89,6 @@ class Post extends Model implements IPost {
             return getFileToBase64(this.image);
         }
         return null;
-    }
-
-    @BeforeCreate
-    static async generateSlug(post: Post) {
-        const baseSlug = slugify(post.title, { lower: true, strict: true });
-        let slug = baseSlug;
-
-        let postWithSlug = await Post.findOne({ where: { slug } });
-        let counter = 1;
-
-        while (postWithSlug) {
-            slug = `${baseSlug}-${counter}`;
-            postWithSlug = await Post.findOne({ where: { slug } });
-            counter++;
-        }
-
-        post.slug = slug;
     }
 
     @BeforeCreate

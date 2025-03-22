@@ -1,6 +1,6 @@
 import { logger } from '../middlewares/logger.middleware';
 import { Contribution } from '../models/contribution.model';
-import * as ContributionRepository from '../repository/contribution.repositoty';
+import * as ContributionRepository from '../repository/contribution.repository';
 
 /**
  * Create new formule to contribution
