@@ -23,6 +23,7 @@ import { getFileToBase64 } from '../services/file.servies';
 import { Translation } from './translation.model';
 
 interface IPost {
+    id: number;
     author: number;
     image: string;
     isPublish: boolean;
@@ -78,6 +79,7 @@ class Post extends Model implements IPost {
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
     declare categories: PostCategory[];
 
+    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
     @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: 'Post' } })
     declare translations: Translation[];
 

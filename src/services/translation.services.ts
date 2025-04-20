@@ -3,9 +3,10 @@ import { ITranslation, Translation } from "../models/translation.model";
 import { EntityType } from "../enums/entityType.enum";
 import { Transaction } from "sequelize";
 import TranslationRepository from "../repository/translation.repository";
+import domClean from "./domPurify";
 
 
-export class TranslationService {
+export default class TranslationService {
     private translationRepository: TranslationRepository;
 
     constructor(private logger: Logger) 
@@ -20,8 +21,15 @@ export class TranslationService {
             t.title = t.title.trim();
             
             if (!t.title?.trim()) { 
-                throw new Error('A title for the category is required'); 
+                throw new Error(`A title for the ${entityType} is required`); 
             }
+
+            if (entityType == EntityType.POST)
+            {
+                t.content = domClean(t.content!);
+                if (!t.content?.trim()) { throw new Error(`A content for the ${entityType} is required`); }
+            }
+
             if (!t.languageCode?.trim()) { 
                 throw new Error('A languageCode for the translation is required'); 
             }
@@ -69,14 +77,7 @@ export class TranslationService {
 
         try
         {
-            const trans = await Translation.findByPk(translation.id);
-            
-            if(trans == null)
-                throw("not possible");
-
-            trans.title = translation.title.trim();
-            trans.save();
-            this.logger.info(`translation saved`, trans);
+            await this.translationRepository.update(translation);            
         }
         catch(e)
         {

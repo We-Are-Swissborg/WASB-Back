@@ -3,7 +3,7 @@ import { ITranslation, Translation } from "../models/translation.model";
 import { logger as defaultLogger } from "../middlewares/logger.middleware";
 import { Logger } from "winston";
 
-class TranslationRepository {
+export default class TranslationRepository {
     private logger;
 
     constructor(loggerInstance: Logger = defaultLogger) {
@@ -49,24 +49,20 @@ class TranslationRepository {
 
     /**
      * Met à jour une traduction
-     * @param {ITranslation} translations
-     * @param {Transaction} [transaction]
-     * @returns {Promise<Translation>}
+     * @param {Translation} translation
+     * @returns {Promise<void>}
      */
-    // async update(translation: ITranslation, transaction?: Transaction): Promise<ITranslation> {
-    //     this.logger.info("translations update", translation);
+    async update(translation: Translation): Promise<void> 
+    {
+        this.logger.info("translations update", translation);
+        const trans = await Translation.findByPk(translation.id);
+            
+        if(trans == null)
+            throw new Error("not possible");
 
-    //     try {
-    //         await translation.save({ transaction });
-    //         return translation;
-    //         // return await Translation.update(translation, 
-    //         //     transaction,
-    //         // );
-    //     } catch (error) {
-    //         this.logger.error("Error in update", { error });
-    //         throw new Error("Failed to update translations");
-    //     }
-    // }
+        trans.title = translation.title.trim();
+        trans.content = translation.content?.trim();
+        await trans.save();
+        this.logger.info(`translation saved`, trans);
+    }
 }
-
-export default TranslationRepository;

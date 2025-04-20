@@ -1,174 +1,337 @@
 import { Op, Transaction } from 'sequelize';
-import { logger } from '../middlewares/logger.middleware';
-import { IPost, Post } from '../models/post.model';
+import { Logger } from 'winston';
+import { Post } from '../models/post.model';
 import { PostCategory } from '../models/postcategory.model';
 import { User } from '../models/user.model';
 import { Translation } from '../models/translation.model';
-
-const create = async (post: Partial<IPost>, transaction?: Transaction): Promise<Post> => {
-    logger.info('post create', post);
-
-    const postCreated = await Post.create(post, {transaction});
-
-    logger.debug(`post create OK : ${postCreated.id}`, postCreated);
-
-    return postCreated;
-};
-
-const getAll = async (): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('get all posts');
-
-    const allPosts = await Post.findAndCountAll({
-        distinct: true, // avoid over-counting due to include
-        include: [PostCategory, User],
-    });
-
-    logger.debug(`get ${allPosts.count} posts OK`);
-
-    return allPosts;
-};
+import { PostDto } from '../dto/post.dto';
+import { mapPostToDto } from '../mappers/post.mapper';
+import { plainToInstance } from 'class-transformer';
 
 /**
- *
- * @param skip
- * @param limit
- * @returns
+ * Repository gérant les opérations CRUD des posts.
  */
-const getPostsPagination = async (language: string, skip: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('get posts pagination');
+export default class PostRepository {
+    private logger: Logger;
 
-    const posts = await Post.findAndCountAll({
-        where: {
-            isPublish: true,
-        },
-        limit: limit,
-        offset: skip,
-        distinct: true, // avoid over-counting due to include
-        include: [
-            {
-                model: User,
-                attributes: ['username'],
-            },
-            {
-                model: PostCategory,
-                attributes: ['id', 'title'],
-                where: {
-                    languageCode: language,
-                    entityType: "PostCategory",
-                    entityId: { [Op.col]: "PostCategory.id" },
-                },
-                required: true,
-                through: { attributes: [] },
-            },
-            {
-                model: Translation,
-                attributes: ['title', 'content', 'slug'],
-                where: {
-                    languageCode: language,
-                    entityType: "Post",
-                    entityId: { [Op.col]: "Post.id" },
-                },
-                required: true,
+    constructor(logger: Logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * Crée un nouveau post.
+     * @param {Post} post - Données du post à créer.
+     * @param {Transaction} [transaction] - Transaction Sequelize optionnelle.
+     * @returns {Promise<Post>} - Le post créé.
+     */
+    async create(post: Post, transaction?: Transaction): Promise<Post> {
+        this.logger.info('Creating post', { post });
+
+        try {
+            const postCreated = await Post.create({
+                author: post.author,
+                image: post.image ?? undefined,
+                isPublish: post.isPublish ?? false,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+              }, { transaction });
+            this.logger.debug(`Post created successfully: ${postCreated.id}`, { postCreated });
+            return postCreated;
+        } catch (error) {
+            this.logger.error('Error creating post', { error });
+            throw new Error('Failed to create post');
+        }
+    }
+
+    /**
+     * Récupère tous les posts avec leurs catégories et utilisateurs associés.
+     * @returns {Promise<{ rows: Post[]; count: number }>} - Liste paginée des posts.
+     */
+    async getAll(): Promise<{ rows: Post[]; count: number }> {
+        this.logger.info('Fetching all posts');
+
+        try {
+            const allPosts = await Post.findAndCountAll({
+                distinct: true,
+                include: [
+                    { model: User, attributes: ['username'] },
+                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
+                        {
+                          model: Translation,
+                          attributes: ['id', 'title', 'languageCode'],
+                          where: {
+                            entityType: 'PostCategory',
+                            languageCode: 'fr'
+                          },
+                          required: false,
+                        },
+                      ], },
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: "Post",
+                            entityId: { [Op.col]: "Post.id" },
+                        },
+                        required: true,
+                    }
+                ],
+            });
+
+            this.logger.debug(`Fetched ${allPosts.count} posts`);
+            return allPosts;
+        } catch (error) {
+            this.logger.error('Error fetching all posts', { error });
+            throw new Error('Failed to fetch posts');
+        }
+    }
+
+    /**
+     * Récupère les posts paginés et publiés avec leur traduction et leur catégorie.
+     * @param {string} language - Langue demandée.
+     * @param {number} skip - Nombre d'éléments à sauter.
+     * @param {number} limit - Nombre d'éléments par page.
+     * @returns {Promise<{ rows: PostDto[]; count: number }>} - Liste paginée des posts.
+     */
+    async getPostsPagination(language: string, skip: number, limit: number): Promise<{ rows: PostDto[]; count: number }> {
+        this.logger.info('Fetching paginated posts');
+
+        try {
+            const total = await Post.count({
+                where: { isPublish: true },
+            });
+            const posts = await Post.findAll({
+                where: { isPublish: true },
+                limit,
+                offset: skip,
+                include: [
+                    { model: User, attributes: ['username'] },
+                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
+                        {
+                          model: Translation,
+                          attributes: ['id', 'title', 'languageCode'],
+                          where: {
+                            entityType: 'PostCategory',
+                            languageCode: language
+                          },
+                          required: false,
+                        },
+                    ]},
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: "Post",
+                            entityId: { [Op.col]: "Post.id" },
+                            languageCode: language
+                        },
+                        required: true,
+                    }
+                ],
+                order: [['publishedAt', 'DESC']],
+            });
+
+            this.logger.debug(`Fetched ${total} paginated posts`);
+
+            const postDto = plainToInstance(PostDto, posts.map(p => mapPostToDto(p, language)), {
+                excludeExtraneousValues: true,
+            });
+
+            return { rows: postDto, count: total };
+        } catch (error) {
+            this.logger.error('Error fetching paginated posts', { error });
+            throw new Error('Failed to fetch paginated posts');
+        }
+    }
+
+    /**
+     * Récupère uniquement les posts publiés.
+     * @returns {Promise<{ rows: Post[]; count: number }>} - Liste des posts publiés.
+     */
+    async getOnlyPublished(skip: number, limit: number): Promise<{ rows: Post[]; count: number }> {
+        this.logger.info('Fetching only published posts');
+
+        try {
+            const total = await Post.count({
+                where: { isPublish: true },
+            });
+            const posts = await Post.findAll({
+                where: { isPublish: true },
+                offset: skip,
+                limit,
+                include: [
+                    { model: User, attributes: ['username'] },
+                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
+                        {
+                          model: Translation,
+                          attributes: ['id', 'title', 'languageCode'],
+                          where: {
+                            entityType: 'PostCategory',
+                          },
+                          required: false,
+                        },
+                      ], 
+                    },
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: "Post",
+                        },
+                        required: true,
+                    }
+                ],
+            });
+
+            this.logger.debug(`Fetched ${total} published posts`);
+            return { rows: posts, count: total };
+        } catch (error) {
+            this.logger.error('Error fetching published posts', { error });
+            throw new Error('Failed to fetch published posts');
+        }
+    }
+
+    /**
+     * Récupère un post par son identifiant.
+     * @param {number} id - Identifiant du post.
+     * @returns {Promise<Post | null>} - Le post trouvé ou null.
+     */
+    async get(id: number): Promise<Post | null> {
+        this.logger.info('Fetching post by ID', { id });
+
+        try {
+            const post = await Post.findByPk(id, {
+                include: [
+                    { model: User, attributes: ['username'] },
+                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
+                        {
+                          model: Translation,
+                          attributes: ['id', 'title', 'languageCode'],
+                          where: {
+                            entityType: 'PostCategory',
+                          },
+                          required: false,
+                        },
+                      ], },
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: "Post",
+                            entityId: { [Op.col]: "Post.id" },
+                        },
+                        required: true,
+                    }
+                ],
+            });
+
+            this.logger.debug('Fetched post by ID', { post });
+            return post;
+        } catch (error) {
+            this.logger.error('Error fetching post by ID', { error });
+            throw new Error('Failed to fetch post');
+        }
+    }
+
+    /**
+     * Supprime un post par son identifiant.
+     * @param {number} id - Identifiant du post à supprimer.
+     * @param {Transaction} [transaction] - Transaction Sequelize optionnelle.
+     * @throws {Error} - Si le post n'existe pas.
+     */
+    async destroy(id: number, transaction?: Transaction): Promise<void> {
+        this.logger.info('Deleting post', { id });
+
+        try {
+            const deleted = await Post.destroy({ where: { id }, transaction });
+
+            if (!deleted) {
+                this.logger.warn('Post not found for deletion', { id });
+                throw new Error('Post not found');
             }
-        ],
-        order: [['publishedAt', 'DESC']],
-    });
 
-    logger.debug(`get ${posts.count} posts`);
+            this.logger.debug(`Post ${id} deleted`);
+        } catch (error) {
+            this.logger.error('Error deleting post', { error });
+            throw new Error('Failed to delete post');
+        }
+    }
 
-    return posts;
-};
+    /**
+     * Met à jour un post existant.
+     * @param {Post} post - Le post mis à jour.
+     * @param {Transaction} [transaction] - Transaction Sequelize optionnelle.
+     * @returns {Promise<Post>} - Le post mis à jour.
+     */
+    async update(post: Post, transaction?: Transaction): Promise<Post> {
+        this.logger.info('Updating post', { post });
 
-const getOnlyPublished = async (): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('get all posts');
+        try {
+            post.isNewRecord = false;
+            post = await post.save({transaction});
 
-    const allPosts = await Post.findAndCountAll({
-        where: {
-            isPublish: true,
-        },
-        include: [PostCategory, User],
-    });
+            this.logger.debug('Post updated', { post });
+            return post;
+        } catch (error) {
+            this.logger.error('Error updating post', { error });
+            throw new Error('Failed to update post');
+        }
+    }
 
-    logger.debug(`get ${allPosts.count} posts OK`);
+    /**
+     * Récupère un post publié par son slug.
+     * @param {string} language - La langue pour les traductions.
+     * @param {string} slug - Slug du post recherché.
+     * @returns {Promise<Post | null>} - Le post trouvé ou null.
+     */
+    async getBySlug(language:string, slug: string): Promise<PostDto | null> {
+        this.logger.info('Fetching post by slug', { slug: slug });
 
-    return allPosts;
-};
+        try {
+            const post = await Post.findOne({
+                where: {
+                    isPublish: true,
+                },
+                include: [
+                    { model: User, attributes: ['username'] },
+                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
+                        {
+                            model: Translation,
+                            attributes: ['id', 'title', 'languageCode'],
+                            where: {
+                                entityType: 'PostCategory',
+                                languageCode: language,
+                            },
+                            required: false,
+                        },
+                        ], 
+                    },
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: "Post",
+                            entityId: { [Op.col]: "Post.id" },
+                            languageCode: language,
+                            slug: slug
+                        },
+                        required: true,
+                    }
+                ],
+            });
 
-const get = async (id: number): Promise<Post | null> => {
-    logger.info('get post');
+            if (!post) {
+                this.logger.warn('Post not found by slug', { slug });
+                return null;
+            }
 
-    const post = await Post.findByPk(id, {
-        include: [
-            {
-                model: User,
-                attributes: ['username'],
-            },
-            {
-                model: PostCategory,
-                attributes: ['id', 'title'],
-                through: { attributes: [] },
-            },
-        ],
-    });
+            this.logger.debug('Fetched post by slug', { post });
+            const raw = mapPostToDto(post, language);
 
-    logger.debug('get post OK');
-
-    return post;
-};
-
-/**
- *
- * @param slug
- * @returns
- */
-const getBySlug = async (slug: string): Promise<Post | null> => {
-    logger.info('get post by slug');
-
-    const post = await Post.findOne({
-        where: {
-            isPublish: true,
-            slug: slug,
-        },
-        include: [
-            {
-                model: User,
-                attributes: ['username'],
-            },
-            {
-                model: PostCategory,
-                attributes: ['id', 'title'],
-                through: { attributes: [] },
-            },
-        ],
-    });
-
-    logger.debug('get post OK');
-
-    return post;
-};
-
-const destroy = async (id: number) => {
-    logger.info('delete post');
-
-    const isDelete = await Post.destroy({ where: { id: id } });
-    if (!isDelete) throw new Error('Error, post not exist for delete');
-
-    logger.debug(`delete post ${id}`);
-};
-
-/**
- * Update a Post
- * @param {Post} post Update post
- * @returns {Promise<Post>} Update post
- */
-const update = async (post: Post, transaction?: Transaction): Promise<Post> => {
-    logger.info('post update', post);
-
-    await Post.update(post, {where: { id: post.id }, transaction});
-
-    logger.debug('post updated');
-
-    return post;
-};
-
-export { create, getAll, getOnlyPublished, get, getBySlug, getPostsPagination, destroy, update };
+            return plainToInstance(PostDto, raw, { excludeExtraneousValues: true });
+        } catch (error) {
+            this.logger.error('Error fetching post by slug', { error });
+            throw new Error('Failed to fetch post by slug');
+        }
+    }
+}

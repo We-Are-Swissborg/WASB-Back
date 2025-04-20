@@ -2,10 +2,8 @@ import { EntityType } from '../enums/entityType.enum';
 import { logger } from '../middlewares/logger.middleware';
 import sequelize from '../models';
 import { PostCategory } from '../models/postcategory.model';
-import { ITranslation, Translation } from '../models/translation.model';
 import * as categoryRepository from '../repository/postCategory.repository';
-import * as translationRepository from '../repository/translation.repository';
-import { TranslationService } from './translation.services';
+import TranslationService from './translation.services';
 
 const translationService = new TranslationService(logger);
 
@@ -22,11 +20,10 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
 
     try {
         const categoryCreated = await categoryRepository.create(category, transaction);
-        logger.info('create PostCategory : categoryRepository.create', categoryCreated);
+        logger.debug('create PostCategory : categoryRepository.create', categoryCreated);
         
         await translationService.bulkCreate(EntityType.POSTCATEGORY, categoryCreated.id, category.translations, transaction);
-        // await translationRepository.bulkCreate(translationsData, transaction);
-        logger.info('create PostCategory : translationRepository.bulkCreate');
+        logger.debug('create PostCategory : translationRepository.bulkCreate');
 
         await transaction.commit();
         logger.debug('PostCategory created', { categoryCreated });
