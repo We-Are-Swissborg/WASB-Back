@@ -21,8 +21,13 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
     try {
         const categoryCreated = await categoryRepository.create(category, transaction);
         logger.debug('create PostCategory : categoryRepository.create', categoryCreated);
-        
-        await translationService.bulkCreate(EntityType.POSTCATEGORY, categoryCreated.id, category.translations, transaction);
+
+        await translationService.bulkCreate(
+            EntityType.POSTCATEGORY,
+            categoryCreated.id,
+            category.translations,
+            transaction,
+        );
         logger.debug('create PostCategory : translationRepository.bulkCreate');
 
         await transaction.commit();
@@ -30,11 +35,9 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
         return categoryCreated;
     } catch (error) {
         await transaction.rollback();
-        console.error("Erreur lors de la création de la catégorie avec traductions :", error);
+        console.error('Erreur lors de la création de la catégorie avec traductions :', error);
         throw error;
-    }
-    finally
-    {
+    } finally {
         logger.info('create PostCategory : end');
     }
 };
@@ -87,11 +90,9 @@ const update = async (id: number, updatedcategory: PostCategory): Promise<PostCa
         return categoryUpdated;
     } catch (error) {
         await transaction.rollback();
-        console.error("Erreur lors de la mise à jour de la catégorie avec traductions :", error);
+        console.error('Erreur lors de la mise à jour de la catégorie avec traductions :', error);
         throw error;
-    }
-    finally
-    {
+    } finally {
         logger.info('update PostCategory : end');
     }
 };

@@ -11,7 +11,7 @@ import { Translation } from '../models/translation.model';
 const create = async (category: Partial<IPostCategory>, transaction?: Transaction): Promise<PostCategory> => {
     logger.info('category create', category);
 
-    const newCategory = await PostCategory.create(category, {transaction});
+    const newCategory = await PostCategory.create(category, { transaction });
 
     logger.debug('category created');
 
@@ -27,7 +27,7 @@ const update = async (category: PostCategory, transaction?: Transaction): Promis
     logger.info('category update', category);
 
     category.isNewRecord = false;
-    category = await category.save({transaction});
+    category = await category.save({ transaction });
 
     logger.debug('category updated');
 
@@ -55,21 +55,19 @@ const destroy = async (id: number): Promise<void> => {
 const findById = async (id: number): Promise<PostCategory | null> => {
     logger.info(`findById category ${id}`);
 
-    const category = await PostCategory.findByPk(id, 
-        {
-            include: [
-                {
-                    model: Translation,
-                    attributes: ['id', 'title', 'languageCode'],
-                    where: {
-                        entityType: "PostCategory",
-                        entityId: { [Op.col]: "PostCategory.id" },
-                    },
-                    required: true,
-                }
-            ],
-        }
-    );
+    const category = await PostCategory.findByPk(id, {
+        include: [
+            {
+                model: Translation,
+                attributes: ['id', 'title', 'languageCode'],
+                where: {
+                    entityType: 'PostCategory',
+                    entityId: { [Op.col]: 'PostCategory.id' },
+                },
+                required: true,
+            },
+        ],
+    });
 
     logger.debug('findById', { category: category });
 
@@ -89,11 +87,11 @@ const findAll = async (): Promise<PostCategory[]> => {
                 model: Translation,
                 attributes: ['id', 'title', 'languageCode'],
                 where: {
-                    entityType: "PostCategory",
-                    entityId: { [Op.col]: "PostCategory.id" },
+                    entityType: 'PostCategory',
+                    entityId: { [Op.col]: 'PostCategory.id' },
                 },
                 required: true,
-            }
+            },
         ],
     });
 

@@ -28,13 +28,16 @@ export default class PostRepository {
         this.logger.info('Creating post', { post });
 
         try {
-            const postCreated = await Post.create({
-                author: post.author,
-                image: post.image ?? undefined,
-                isPublish: post.isPublish ?? false,
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt,
-              }, { transaction });
+            const postCreated = await Post.create(
+                {
+                    author: post.author,
+                    image: post.image ?? undefined,
+                    isPublish: post.isPublish ?? false,
+                    createdAt: post.createdAt,
+                    updatedAt: post.updatedAt,
+                },
+                { transaction },
+            );
             this.logger.debug(`Post created successfully: ${postCreated.id}`, { postCreated });
             return postCreated;
         } catch (error) {
@@ -55,26 +58,31 @@ export default class PostRepository {
                 distinct: true,
                 include: [
                     { model: User, attributes: ['username'] },
-                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
-                        {
-                          model: Translation,
-                          attributes: ['id', 'title', 'languageCode'],
-                          where: {
-                            entityType: 'PostCategory',
-                            languageCode: 'fr'
-                          },
-                          required: false,
-                        },
-                      ], },
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: 'PostCategory',
+                                    languageCode: 'fr',
+                                },
+                                required: false,
+                            },
+                        ],
+                    },
                     {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: "Post",
-                            entityId: { [Op.col]: "Post.id" },
+                            entityType: 'Post',
+                            entityId: { [Op.col]: 'Post.id' },
                         },
                         required: true,
-                    }
+                    },
                 ],
             });
 
@@ -93,7 +101,11 @@ export default class PostRepository {
      * @param {number} limit - Nombre d'éléments par page.
      * @returns {Promise<{ rows: PostDto[]; count: number }>} - Liste paginée des posts.
      */
-    async getPostsPagination(language: string, skip: number, limit: number): Promise<{ rows: PostDto[]; count: number }> {
+    async getPostsPagination(
+        language: string,
+        skip: number,
+        limit: number,
+    ): Promise<{ rows: PostDto[]; count: number }> {
         this.logger.info('Fetching paginated posts');
 
         try {
@@ -106,36 +118,45 @@ export default class PostRepository {
                 offset: skip,
                 include: [
                     { model: User, attributes: ['username'] },
-                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
-                        {
-                          model: Translation,
-                          attributes: ['id', 'title', 'languageCode'],
-                          where: {
-                            entityType: 'PostCategory',
-                            languageCode: language
-                          },
-                          required: false,
-                        },
-                    ]},
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: 'PostCategory',
+                                    languageCode: language,
+                                },
+                                required: false,
+                            },
+                        ],
+                    },
                     {
                         model: Translation,
                         attributes: ['id', 'title', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: "Post",
-                            entityId: { [Op.col]: "Post.id" },
-                            languageCode: language
+                            entityType: 'Post',
+                            entityId: { [Op.col]: 'Post.id' },
+                            languageCode: language,
                         },
                         required: true,
-                    }
+                    },
                 ],
                 order: [['publishedAt', 'DESC']],
             });
 
             this.logger.debug(`Fetched ${total} paginated posts`);
 
-            const postDto = plainToInstance(PostDto, posts.map(p => mapPostToDto(p, language)), {
-                excludeExtraneousValues: true,
-            });
+            const postDto = plainToInstance(
+                PostDto,
+                posts.map((p) => mapPostToDto(p, language)),
+                {
+                    excludeExtraneousValues: true,
+                },
+            );
 
             return { rows: postDto, count: total };
         } catch (error) {
@@ -161,25 +182,29 @@ export default class PostRepository {
                 limit,
                 include: [
                     { model: User, attributes: ['username'] },
-                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
-                        {
-                          model: Translation,
-                          attributes: ['id', 'title', 'languageCode'],
-                          where: {
-                            entityType: 'PostCategory',
-                          },
-                          required: false,
-                        },
-                      ], 
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: 'PostCategory',
+                                },
+                                required: false,
+                            },
+                        ],
                     },
                     {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: "Post",
+                            entityType: 'Post',
                         },
                         required: true,
-                    }
+                    },
                 ],
             });
 
@@ -203,25 +228,30 @@ export default class PostRepository {
             const post = await Post.findByPk(id, {
                 include: [
                     { model: User, attributes: ['username'] },
-                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
-                        {
-                          model: Translation,
-                          attributes: ['id', 'title', 'languageCode'],
-                          where: {
-                            entityType: 'PostCategory',
-                          },
-                          required: false,
-                        },
-                      ], },
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: 'PostCategory',
+                                },
+                                required: false,
+                            },
+                        ],
+                    },
                     {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: "Post",
-                            entityId: { [Op.col]: "Post.id" },
+                            entityType: 'Post',
+                            entityId: { [Op.col]: 'Post.id' },
                         },
                         required: true,
-                    }
+                    },
                 ],
             });
 
@@ -268,7 +298,7 @@ export default class PostRepository {
 
         try {
             post.isNewRecord = false;
-            post = await post.save({transaction});
+            post = await post.save({ transaction });
 
             this.logger.debug('Post updated', { post });
             return post;
@@ -284,7 +314,7 @@ export default class PostRepository {
      * @param {string} slug - Slug du post recherché.
      * @returns {Promise<Post | null>} - Le post trouvé ou null.
      */
-    async getBySlug(language:string, slug: string): Promise<PostDto | null> {
+    async getBySlug(language: string, slug: string): Promise<PostDto | null> {
         this.logger.info('Fetching post by slug', { slug: slug });
 
         try {
@@ -294,29 +324,33 @@ export default class PostRepository {
                 },
                 include: [
                     { model: User, attributes: ['username'] },
-                    { model: PostCategory, attributes: ['id'], through: { attributes: [] }, include: [
-                        {
-                            model: Translation,
-                            attributes: ['id', 'title', 'languageCode'],
-                            where: {
-                                entityType: 'PostCategory',
-                                languageCode: language,
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: 'PostCategory',
+                                    languageCode: language,
+                                },
+                                required: false,
                             },
-                            required: false,
-                        },
-                        ], 
+                        ],
                     },
                     {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: "Post",
-                            entityId: { [Op.col]: "Post.id" },
+                            entityType: 'Post',
+                            entityId: { [Op.col]: 'Post.id' },
                             languageCode: language,
-                            slug: slug
+                            slug: slug,
                         },
                         required: true,
-                    }
+                    },
                 ],
             });
 

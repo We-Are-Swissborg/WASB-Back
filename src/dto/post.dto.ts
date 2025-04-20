@@ -1,39 +1,38 @@
-import { Expose, Type } from "class-transformer";
-import { PostCategoryDto } from "./postCategory.dto";
+import { Expose, Type } from 'class-transformer';
+import { PostCategoryDto } from './postCategory.dto';
 
 export class PostDto {
-  @Expose()
-  id: number;
+    @Expose()
+    id: number;
 
-  @Expose()
-  image64: string | null;
+    @Expose()
+    image64: string | null;
 
-  @Expose()
-  isPublish: boolean;
+    @Expose()
+    isPublish: boolean;
 
-  @Expose()
-  createdAt: Date;
+    @Expose()
+    createdAt: Date;
 
-  @Expose()
-  updatedAt?: Date;
+    @Expose()
+    updatedAt?: Date;
 
-  @Expose()
-  publishedAt?: Date;
+    @Expose()
+    publishedAt?: Date;
 
-  @Expose()
-  title: string | null;
+    @Expose()
+    title: string | null;
 
-  @Expose()
-  slug: string | null;
+    @Expose()
+    slug: string | null;
 
-  @Expose()
-  content: string | null;
+    @Expose()
+    content: string | null;
 
-  @Expose()
-  author: string | null;
+    @Expose()
+    author: string | null;
 
-  @Expose()
-  @Type(() => PostCategoryDto)
-  categories: PostCategoryDto[];
+    @Expose()
+    @Type(() => PostCategoryDto)
+    categories: PostCategoryDto[];
 }
-  

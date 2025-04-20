@@ -1,8 +1,21 @@
-import { Expose } from "class-transformer";
-import { AllowNull, AutoIncrement, BeforeBulkCreate, Column, CreatedAt, DataType, IsDate, Model, PrimaryKey, Table, Unique, UpdatedAt } from "sequelize-typescript";
-import slugify from "slugify";
-import { EntityType } from "../enums/entityType.enum";
-import { Transaction } from "sequelize";
+import { Expose } from 'class-transformer';
+import {
+    AllowNull,
+    AutoIncrement,
+    BeforeBulkCreate,
+    Column,
+    CreatedAt,
+    DataType,
+    IsDate,
+    Model,
+    PrimaryKey,
+    Table,
+    Unique,
+    UpdatedAt,
+} from 'sequelize-typescript';
+import slugify from 'slugify';
+import { EntityType } from '../enums/entityType.enum';
+import { Transaction } from 'sequelize';
 
 interface ITranslation {
     entityType: EntityType;
@@ -83,4 +96,4 @@ class Translation extends Model<ITranslation> {
     }
 }
 
-export { Translation, ITranslation }; 
+export { Translation, ITranslation };

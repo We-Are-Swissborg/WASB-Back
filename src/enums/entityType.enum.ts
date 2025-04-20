@@ -1,4 +1,4 @@
 export enum EntityType {
-    POST = "Post",
-    POSTCATEGORY = "PostCategory",
+    POST = 'Post',
+    POSTCATEGORY = 'PostCategory',
 }

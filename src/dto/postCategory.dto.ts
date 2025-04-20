@@ -1,9 +1,9 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class PostCategoryDto {
     @Expose()
-    id: number ;
-  
+    id: number;
+
     @Expose()
-    title: string | null;;
-  }
+    title: string | null;
+}

@@ -9,7 +9,6 @@ import { PostDto } from '../dto/post.dto';
 const translationService = new TranslationService(logger);
 const postRepository = new PostRepository(logger);
 
-
 const createPost = async (post: Post): Promise<Post> => {
     logger.info('createPost : services', post);
 
@@ -26,11 +25,9 @@ const createPost = async (post: Post): Promise<Post> => {
         return postCreated;
     } catch (error) {
         await transaction.rollback();
-        console.error("Erreur lors de la création du post avec traductions :", error);
+        console.error('Erreur lors de la création du post avec traductions :', error);
         throw error;
-    }
-    finally
-    {
+    } finally {
         logger.info('createPost : end');
     }
 };
@@ -51,7 +48,11 @@ const getPosts = async (): Promise<Post[]> => {
  * @param limit
  * @returns
  */
-const getPostsPagination = async (language: string, page: number, limit: number): Promise<{ rows: PostDto[]; count: number }> => {
+const getPostsPagination = async (
+    language: string,
+    page: number,
+    limit: number,
+): Promise<{ rows: PostDto[]; count: number }> => {
     logger.info('getPostsPagination : services', { language, page, limit });
 
     let posts = null;
@@ -107,8 +108,7 @@ const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
     const transaction = await sequelize.transaction();
     logger.info('update Post : transaction create');
 
-    try 
-    {
+    try {
         const postUpdated = await postRepository.update(updatedPost, transaction);
         logger.info('update Post : postRepository.update', updatedPost);
         logger.warn('update Post : postRepository.updatedPost.translations', updatedPost.translations);
@@ -121,9 +121,7 @@ const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
     } catch (error) {
         await transaction.rollback();
         throw new Error(`Erreur lors de la mise à jour du post : ${error}`);
-    }
-    finally
-    {
+    } finally {
         logger.info('updatePost : end');
     }
 };
