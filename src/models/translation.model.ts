@@ -81,17 +81,20 @@ class Translation extends Model<ITranslation> {
 
     @BeforeBulkCreate
     static async generateSlug(translates: Translation[], options: { transaction?: Transaction }) {
+        const existingSlugs = new Set<string>();
+
         for (const t of translates) {
             const baseSlug = slugify(t.title, { lower: true, strict: true });
             let slug = baseSlug;
             let counter = 1;
 
-            while (await Translation.findOne({ where: { slug: slug }, transaction: options.transaction })) {
+            while (existingSlugs.has(slug) || await Translation.findOne({ where: { slug: slug }, transaction: options.transaction })) {
                 slug = `${baseSlug}-${counter}`;
                 counter++;
             }
-
+            
             t.slug = slug;
+            existingSlugs.add(slug);
         }
     }
 }

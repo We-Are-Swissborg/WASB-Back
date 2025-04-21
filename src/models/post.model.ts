@@ -14,6 +14,7 @@ import {
     BelongsToMany,
     BelongsTo,
     HasMany,
+    BeforeDestroy,
 } from 'sequelize-typescript';
 import { User } from './user.model';
 import { PostCategory } from './postcategory.model';
@@ -21,6 +22,7 @@ import { PostCategoryPost } from './postcategorypost.model';
 import { BelongsToManySetAssociationsMixin, NonAttribute } from 'sequelize';
 import { getFileToBase64 } from '../services/file.servies';
 import { Translation } from './translation.model';
+import { EntityType } from '../enums/entityType.enum';
 
 interface IPost {
     id: number;
@@ -80,7 +82,8 @@ class Post extends Model implements IPost {
     declare categories: PostCategory[];
 
     @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
-    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: 'Post' } })
+    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: EntityType.POST }, onDelete: 'CASCADE', hooks: true})
+
     declare translations: Translation[];
 
     declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>;
@@ -99,6 +102,16 @@ class Post extends Model implements IPost {
         if (post.isPublish && post.changed('isPublish')) {
             post.publishedAt = new Date();
         }
+    }
+    
+    @BeforeDestroy
+    static async deleteTranslations(instance: Post) {
+        await Translation.destroy({
+            where: {
+                entityType: EntityType.POST,
+                entityId: instance.id
+            }
+        });
     }
 }
 

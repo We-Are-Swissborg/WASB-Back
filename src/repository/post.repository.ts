@@ -1,12 +1,13 @@
 import { Op, Transaction } from 'sequelize';
 import { Logger } from 'winston';
 import { Post } from '../models/post.model';
-import { PostCategory } from '../models/postcategory.model';
 import { User } from '../models/user.model';
 import { Translation } from '../models/translation.model';
 import { PostDto } from '../dto/post.dto';
 import { mapPostToDto } from '../mappers/post.mapper';
 import { plainToInstance } from 'class-transformer';
+import { PostCategory } from '../models/postcategory.model';
+import { EntityType } from '../enums/entityType.enum';
 
 /**
  * Repository gérant les opérations CRUD des posts.
@@ -67,7 +68,7 @@ export default class PostRepository {
                                 model: Translation,
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
-                                    entityType: 'PostCategory',
+                                    entityType: EntityType.POSTCATEGORY,
                                     languageCode: 'fr',
                                 },
                                 required: false,
@@ -78,7 +79,7 @@ export default class PostRepository {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: 'Post',
+                            entityType: EntityType.POST,
                             entityId: { [Op.col]: 'Post.id' },
                         },
                         required: true,
@@ -127,7 +128,7 @@ export default class PostRepository {
                                 model: Translation,
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
-                                    entityType: 'PostCategory',
+                                    entityType: EntityType.POSTCATEGORY,
                                     languageCode: language,
                                 },
                                 required: false,
@@ -138,7 +139,7 @@ export default class PostRepository {
                         model: Translation,
                         attributes: ['id', 'title', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: 'Post',
+                            entityType: EntityType.POST,
                             entityId: { [Op.col]: 'Post.id' },
                             languageCode: language,
                         },
@@ -191,7 +192,7 @@ export default class PostRepository {
                                 model: Translation,
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
-                                    entityType: 'PostCategory',
+                                    entityType: EntityType.POSTCATEGORY,
                                 },
                                 required: false,
                             },
@@ -201,7 +202,7 @@ export default class PostRepository {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: 'Post',
+                            entityType: EntityType.POST,
                         },
                         required: true,
                     },
@@ -237,7 +238,7 @@ export default class PostRepository {
                                 model: Translation,
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
-                                    entityType: 'PostCategory',
+                                    entityType: EntityType.POSTCATEGORY,
                                 },
                                 required: false,
                             },
@@ -247,7 +248,7 @@ export default class PostRepository {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: 'Post',
+                            entityType: EntityType.POST,
                             entityId: { [Op.col]: 'Post.id' },
                         },
                         required: true,
@@ -273,12 +274,10 @@ export default class PostRepository {
         this.logger.info('Deleting post', { id });
 
         try {
-            const deleted = await Post.destroy({ where: { id }, transaction });
+            const post = await Post.findByPk(id);
+            if (!post) throw new Error('Error, post not exist for delete');
 
-            if (!deleted) {
-                this.logger.warn('Post not found for deletion', { id });
-                throw new Error('Post not found');
-            }
+            await post.destroy({transaction});
 
             this.logger.debug(`Post ${id} deleted`);
         } catch (error) {
@@ -333,7 +332,7 @@ export default class PostRepository {
                                 model: Translation,
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
-                                    entityType: 'PostCategory',
+                                    entityType: EntityType.POSTCATEGORY,
                                     languageCode: language,
                                 },
                                 required: false,
@@ -344,7 +343,7 @@ export default class PostRepository {
                         model: Translation,
                         attributes: ['id', 'title', 'content', 'slug', 'languageCode', 'entityId'],
                         where: {
-                            entityType: 'Post',
+                            entityType: EntityType.POST,
                             entityId: { [Op.col]: 'Post.id' },
                             languageCode: language,
                             slug: slug,

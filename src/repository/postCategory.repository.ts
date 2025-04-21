@@ -2,6 +2,7 @@ import { Op, Transaction } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
 import { IPostCategory, PostCategory } from '../models/postcategory.model';
 import { Translation } from '../models/translation.model';
+import { EntityType } from '../enums/entityType.enum';
 
 /**
  * Create a new category
@@ -41,8 +42,10 @@ const update = async (category: PostCategory, transaction?: Transaction): Promis
 const destroy = async (id: number): Promise<void> => {
     logger.info(`delete category ${id}`);
 
-    const isDelete = await PostCategory.destroy({ where: { id: id } });
-    if (!isDelete) throw new Error('Error, category not exist for delete');
+    const category = await PostCategory.findByPk(id);
+    if (!category) throw new Error('Error, category not exist for delete');
+
+    await category.destroy();
 
     logger.debug(`delete category ${id}`);
 };
@@ -61,7 +64,7 @@ const findById = async (id: number): Promise<PostCategory | null> => {
                 model: Translation,
                 attributes: ['id', 'title', 'languageCode'],
                 where: {
-                    entityType: 'PostCategory',
+                    entityType: EntityType.POSTCATEGORY,
                     entityId: { [Op.col]: 'PostCategory.id' },
                 },
                 required: true,
@@ -87,7 +90,7 @@ const findAll = async (): Promise<PostCategory[]> => {
                 model: Translation,
                 attributes: ['id', 'title', 'languageCode'],
                 where: {
-                    entityType: 'PostCategory',
+                    entityType: EntityType.POSTCATEGORY,
                     entityId: { [Op.col]: 'PostCategory.id' },
                 },
                 required: true,

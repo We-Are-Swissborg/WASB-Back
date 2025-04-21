@@ -10,10 +10,12 @@ import {
     PrimaryKey,
     BelongsToMany,
     HasMany,
+    BeforeDestroy,
 } from 'sequelize-typescript';
 import { Post } from './post.model';
 import { PostCategoryPost } from './postcategorypost.model';
 import { Translation } from './translation.model';
+import { EntityType } from '../enums/entityType.enum';
 
 interface IPostCategory {
     posts: Post[];
@@ -44,8 +46,18 @@ class PostCategory extends Model implements IPostCategory {
     declare posts: Post[];
 
     @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
-    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: 'PostCategory' } })
+    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: EntityType.POSTCATEGORY }, onDelete: 'CASCADE', hooks: true})
     declare translations: Translation[];
+
+    @BeforeDestroy
+    static async deleteTranslations(instance: PostCategory) {
+        await Translation.destroy({
+            where: {
+                entityType: EntityType.POSTCATEGORY,
+                entityId: instance.id
+            }
+        });
+    }
 }
 
 export { PostCategory, IPostCategory };
