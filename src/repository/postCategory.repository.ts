@@ -1,17 +1,18 @@
+import { Op, Transaction } from 'sequelize';
 import { logger } from '../middlewares/logger.middleware';
-import { PostCategory } from '../models/postcategory.model';
+import { IPostCategory, PostCategory } from '../models/postcategory.model';
+import { Translation } from '../models/translation.model';
+import { EntityType } from '../enums/entityType.enum';
 
 /**
  * Create a new category
  * @param {PostCategory} category new category
  * @returns {Promise<Category>} new category
  */
-const create = async (category: PostCategory): Promise<PostCategory> => {
+const create = async (category: Partial<IPostCategory>, transaction?: Transaction): Promise<PostCategory> => {
     logger.info('category create', category);
 
-    const newCategory = await PostCategory.create({
-        title: category.title,
-    });
+    const newCategory = await PostCategory.create(category, { transaction });
 
     logger.debug('category created');
 
@@ -23,11 +24,11 @@ const create = async (category: PostCategory): Promise<PostCategory> => {
  * @param {PostCategory} category Update category
  * @returns {Promise<PostCategory>} Update category
  */
-const update = async (category: PostCategory): Promise<PostCategory> => {
+const update = async (category: PostCategory, transaction?: Transaction): Promise<PostCategory> => {
     logger.info('category update', category);
 
     category.isNewRecord = false;
-    category = await category.save();
+    category = await category.save({ transaction });
 
     logger.debug('category updated');
 
@@ -41,8 +42,10 @@ const update = async (category: PostCategory): Promise<PostCategory> => {
 const destroy = async (id: number): Promise<void> => {
     logger.info(`delete category ${id}`);
 
-    const isDelete = await PostCategory.destroy({ where: { id: id } });
-    if (!isDelete) throw new Error('Error, category not exist for delete');
+    const category = await PostCategory.findByPk(id);
+    if (!category) throw new Error('Error, category not exist for delete');
+
+    await category.destroy();
 
     logger.debug(`delete category ${id}`);
 };
@@ -55,7 +58,19 @@ const destroy = async (id: number): Promise<void> => {
 const findById = async (id: number): Promise<PostCategory | null> => {
     logger.info(`findById category ${id}`);
 
-    const category = await PostCategory.findByPk(id);
+    const category = await PostCategory.findByPk(id, {
+        include: [
+            {
+                model: Translation,
+                attributes: ['id', 'title', 'languageCode'],
+                where: {
+                    entityType: EntityType.POSTCATEGORY,
+                    entityId: { [Op.col]: 'PostCategory.id' },
+                },
+                required: true,
+            },
+        ],
+    });
 
     logger.debug('findById', { category: category });
 
@@ -69,7 +84,19 @@ const findById = async (id: number): Promise<PostCategory | null> => {
 const findAll = async (): Promise<PostCategory[]> => {
     logger.info('findAll category');
 
-    const categories = await PostCategory.findAll();
+    const categories = await PostCategory.findAll({
+        include: [
+            {
+                model: Translation,
+                attributes: ['id', 'title', 'languageCode'],
+                where: {
+                    entityType: EntityType.POSTCATEGORY,
+                    entityId: { [Op.col]: 'PostCategory.id' },
+                },
+                required: true,
+            },
+        ],
+    });
 
     logger.debug('findAll', { categories: categories });
 

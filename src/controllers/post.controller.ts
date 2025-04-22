@@ -1,16 +1,13 @@
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
-import { instanceToPlain } from 'class-transformer';
 import * as PostServices from '../services/post.services';
 
 const getPost = async (req: Request, res: Response) => {
     logger.info(`PostController: getPost ->`, req.params);
 
     try {
-        const post = await PostServices.getPostBySlug(req.params.slug);
-        if (!post) throw new Error('No post find');
-
-        const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
+        const postDTO = await PostServices.getPostBySlug(req.params.lang, req.params.slug);
+        if (!postDTO) throw new Error('No post find');
 
         res.status(200).json(postDTO);
     } catch (e: unknown) {
@@ -23,19 +20,18 @@ const getPosts = async (req: Request, res: Response) => {
     logger.info(`PostController: getPosts ->`, req.query);
 
     try {
+        const language = String(req.params.lang || 'fr');
         const page = parseInt(String(req.query.page || '1'), 10);
         const limit = parseInt(String(req.query.limit || '10'), 10);
 
-        const posts = await PostServices.getPostsPagination(page, limit);
+        const postListDTO = await PostServices.getPostsPagination(language, page, limit);
 
-        const postListDTO = instanceToPlain(posts.rows, { groups: ['blog'], excludeExtraneousValues: true });
-
-        const totalPages = Math.ceil(posts.count / limit);
+        const totalPages = Math.ceil(postListDTO.count / limit);
 
         res.status(200).json({
-            posts: postListDTO,
+            posts: postListDTO.rows,
             totalPages: totalPages,
-            totalPosts: posts.count,
+            totalPosts: postListDTO.count,
             currentPage: page,
         });
     } catch (e: unknown) {
