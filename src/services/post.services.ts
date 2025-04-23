@@ -1,25 +1,35 @@
 import { logger } from '../middlewares/logger.middleware';
+import sequelize from '../models';
 import { Post } from '../models/post.model';
-import * as postRepository from '../repository/post.repository';
-import domClean from './domPurify';
+import PostRepository from '../repository/post.repository';
+import TranslationService from './translation.services';
+import { EntityType } from '../enums/entityType.enum';
+import { PostDto } from '../dto/post.dto';
+
+const translationService = new TranslationService(logger);
+const postRepository = new PostRepository(logger);
 
 const createPost = async (post: Post): Promise<Post> => {
     logger.info('createPost : services', post);
-    post.content = domClean(post.content);
 
-    if (!post.title?.trim()) {
-        throw new Error('A title for the post is required');
+    const transaction = await sequelize.transaction();
+    try {
+        const postCreated = await postRepository.create(post, transaction);
+        logger.debug('create Post : postRepository.create', postCreated);
+
+        await translationService.bulkCreate(EntityType.POST, postCreated.id, post.translations, transaction);
+        logger.debug('create Post : translationRepository.bulkCreate');
+
+        await transaction.commit();
+        logger.debug('Post created', { postCreated });
+        return postCreated;
+    } catch (error) {
+        await transaction.rollback();
+        console.error('Erreur lors de la création du post avec traductions :', error);
+        throw error;
+    } finally {
+        logger.info('createPost : end');
     }
-
-    if (!post.content?.trim()) {
-        throw new Error('A content for the post is required');
-    }
-
-    const postCreated = await postRepository.create(post);
-
-    logger.debug('Post created', { postCreated });
-
-    return postCreated;
 };
 
 const getPosts = async (): Promise<Post[]> => {
@@ -38,13 +48,17 @@ const getPosts = async (): Promise<Post[]> => {
  * @param limit
  * @returns
  */
-const getPostsPagination = async (page: number, limit: number): Promise<{ rows: Post[]; count: number }> => {
-    logger.info('getPostsPagination : services', { page: page, limit: limit });
+const getPostsPagination = async (
+    language: string,
+    page: number,
+    limit: number,
+): Promise<{ rows: PostDto[]; count: number }> => {
+    logger.info('getPostsPagination : services', { language, page, limit });
 
     let posts = null;
     const skip = (page - 1) * limit;
 
-    posts = await postRepository.getPostsPagination(skip, limit);
+    posts = await postRepository.getPostsPagination(language, skip, limit);
 
     logger.debug(`getPostsPagination : ${posts.count} item(s)`);
 
@@ -62,10 +76,21 @@ const getPost = async (id: number): Promise<Post | null> => {
  * @param slug
  * @returns
  */
-const getPostBySlug = async (slug: string): Promise<Post | null> => {
-    logger.info('getPostBySlug : services', { slug: slug });
+const getPostBySlug = async (language: string, slug: string): Promise<PostDto | null> => {
+    logger.info('getPostBySlug : services', { language, slug });
 
-    return await postRepository.getBySlug(slug);
+    return await postRepository.getBySlug(language, slug);
+};
+
+/**
+ *
+ * @param slug
+ * @returns
+ */
+const destroy = async (id: number): Promise<void> => {
+    logger.info('destroy post : services', { id: id });
+
+    return await postRepository.destroy(id);
 };
 
 /**
@@ -80,16 +105,25 @@ const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
         throw new Error('The encoded data do not coincide with those supplied');
     }
 
-    if (!updatedPost.title) {
-        throw new Error('A title for the post is required');
-    }
+    const transaction = await sequelize.transaction();
+    logger.info('update Post : transaction create');
 
-    if (updatedPost.title.length < 3) {
-        throw new Error('A title for the post must contain more than 3 characters');
-    }
+    try {
+        const postUpdated = await postRepository.update(updatedPost, transaction);
+        logger.info('update Post : postRepository.update', updatedPost);
+        logger.warn('update Post : postRepository.updatedPost.translations', updatedPost.translations);
 
-    updatedPost = await postRepository.update(updatedPost);
-    return updatedPost;
+        await translationService.bulkUpdate(EntityType.POST, updatedPost.translations);
+        logger.info('update PostCategory : translationRepository.bulkUpdate');
+
+        await transaction.commit();
+        return postUpdated;
+    } catch (error) {
+        await transaction.rollback();
+        throw new Error(`Erreur lors de la mise à jour du post : ${error}`);
+    } finally {
+        logger.info('updatePost : end');
+    }
 };
 
-export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost };
+export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost, destroy };

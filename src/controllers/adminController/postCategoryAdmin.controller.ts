@@ -15,7 +15,6 @@ const createCategory = async (req: Request, res: Response) => {
 
     try {
         const category = plainToClass(PostCategory, req.body as string, { groups: ['admin'] });
-        logger.debug(`category`, category);
 
         try {
             await categoryService.create(category);

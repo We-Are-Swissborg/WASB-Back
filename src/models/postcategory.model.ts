@@ -1,22 +1,25 @@
 import { Expose } from 'class-transformer';
 import {
-    AllowNull,
     Column,
     CreatedAt,
     IsDate,
     Model,
     Table,
     UpdatedAt,
-    Unique,
     AutoIncrement,
     PrimaryKey,
     BelongsToMany,
+    HasMany,
+    BeforeDestroy,
 } from 'sequelize-typescript';
 import { Post } from './post.model';
 import { PostCategoryPost } from './postcategorypost.model';
+import { Translation } from './translation.model';
+import { EntityType } from '../enums/entityType.enum';
 
 interface IPostCategory {
-    title: string;
+    posts: Post[];
+    translations: Translation[];
 }
 
 @Table
@@ -26,12 +29,6 @@ class PostCategory extends Model implements IPostCategory {
     @PrimaryKey
     @Column
     declare id: number;
-
-    @Expose({ groups: ['admin', 'post', 'blog'] })
-    @AllowNull(false)
-    @Unique
-    @Column
-    declare title: string;
 
     @Expose({ groups: ['admin', 'post'], toClassOnly: false })
     @CreatedAt
@@ -47,6 +44,20 @@ class PostCategory extends Model implements IPostCategory {
 
     @BelongsToMany(() => Post, () => PostCategoryPost)
     declare posts: Post[];
+
+    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
+    @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: EntityType.POSTCATEGORY }, onDelete: 'CASCADE', hooks: true})
+    declare translations: Translation[];
+
+    @BeforeDestroy
+    static async deleteTranslations(instance: PostCategory) {
+        await Translation.destroy({
+            where: {
+                entityType: EntityType.POSTCATEGORY,
+                entityId: instance.id
+            }
+        });
+    }
 }
 
 export { PostCategory, IPostCategory };

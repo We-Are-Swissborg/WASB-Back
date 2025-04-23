@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
-import * as PostRepository from '../../repository/post.repository';
 import * as PostServices from '../../services/post.services';
 import { adminLogger as logger } from '../../middlewares/logger.middleware';
 import { Post } from '../../models/post.model';
@@ -37,8 +36,7 @@ const getPost = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         const post = await PostServices.getPost(id);
-        const postDTO = instanceToPlain(post, { groups: ['post'], excludeExtraneousValues: true });
-
+        const postDTO = instanceToPlain(post, { groups: ['admin'], excludeExtraneousValues: true });
         res.status(200).json(postDTO);
     } catch (e: unknown) {
         logger.error(`Get post error`, e);
@@ -55,7 +53,7 @@ const createPost = async (req: Request, res: Response) => {
     logger.info(`PostAdminController : Create Post`);
 
     try {
-        const post = plainToClass(Post, req.body as string, { groups: ['post'] });
+        const post = plainToClass(Post, req.body as string, { groups: ['admin'] });
         const newPost = await PostServices.createPost(post);
         await newPost.setCategories(post.categories.map((category) => category.id));
 
@@ -76,13 +74,14 @@ const updatePost = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-        const updatePost = plainToClass(Post, req.body as string, { groups: ['post'] });
+        const updatePost = plainToClass(Post, req.body as string, { groups: ['admin'] });
         const postRetrieve = await Post.findByPk(id);
         if (!postRetrieve) {
             res.status(404).json({ error: 'Post not found' });
             return;
         }
-        postRetrieve.set(req.body);
+
+        Object.assign(postRetrieve, updatePost);
         await postRetrieve.setCategories(updatePost.categories.map((category) => category.id));
 
         const updatedPost = await PostServices.updatePost(id, postRetrieve);
@@ -123,7 +122,7 @@ const deletePost = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-        await PostRepository.destroy(id);
+        await PostServices.destroy(id);
 
         res.status(200).end();
     } catch (e: unknown) {
