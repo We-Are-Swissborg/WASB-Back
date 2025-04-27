@@ -2,7 +2,8 @@ import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
 import isFileImage from '../utils/isFileImage';
-import mime from 'mime';
+import { lookup } from 'mime-types';
+
 
 const imageConvert = async (data: Express.Multer.File | undefined, size: { x: number; y: number }) => {
     const isImage = isFileImage(data!);
@@ -16,11 +17,16 @@ const getFileToBase64 = (filePath: string, mimetype?: string) => {
     const fileData = fs.readFileSync(uploadSFolder);
     const base64Image = fileData.toString('base64');
 
-    if (mimetype) {
-        mimetype = mime.lookup(filePath);
+    let mimeType = mimetype;
+    
+    if (!mimeType) {
+        const detectedMime = lookup(filePath);
+        if (typeof detectedMime === 'string') {
+            mimeType = detectedMime;
+        } else {
+            mimeType = 'application/octet-stream'; 
+        }
     }
-
-    const mimeType = mimetype;
     return `data:${mimeType};base64,${base64Image}`;
 };
 
