@@ -30,7 +30,7 @@ const setSocialMedias = async (id: number, data: ISocialMedias): Promise<boolean
 
     if (data.twitter) flag = await SocialMediasValidator.twitterAlreadyExist(data.twitter);
     if (flag) {
-        throw new Error(`Twitter '${data.twitter}' already exist !`);
+        throw new Error(`X '${data.twitter}' already exist !`);
     }
 
     if (data.discord) flag = await SocialMediasValidator.discordAlreadyExist(data.discord);
