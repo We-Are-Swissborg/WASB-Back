@@ -73,7 +73,6 @@ class User extends Model implements IUser {
     @Unique(true)
     @AllowNull(false)
     @Is(USERNAME_REGEX)
-    @AllowNull(false)
     @Column
     declare username: string;
 
