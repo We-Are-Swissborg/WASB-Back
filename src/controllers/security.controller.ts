@@ -9,7 +9,7 @@ import { getUserById } from '../repository/user.repository';
 
 const cookieOptions: CookieOptions = {
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'strict',
     secure: true,
     maxAge: 7 * 24 * 60 * 60 * 1000
 }
