@@ -103,7 +103,7 @@ class Post extends Model implements IPost {
             post.publishedAt = new Date();
         }
     }
-    
+
     @BeforeDestroy
     static async deleteTranslations(instance: Post) {
         await Translation.destroy({

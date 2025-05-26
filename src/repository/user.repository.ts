@@ -138,6 +138,11 @@ const setUser = async (id: number, data: IUser): Promise<number | null> => {
     return user[0];
 };
 
+const getUserByEmail = async (email: string): Promise<User | null> => {
+    const user = await User.findOne({ where: { email: email } });
+    return user;
+};
+
 export {
     getUserById,
     getUsers,
@@ -150,4 +155,5 @@ export {
     update,
     getUserByIdWithAllInfo,
     deleteUser,
+    getUserByEmail
 };

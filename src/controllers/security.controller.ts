@@ -5,7 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import Register from '../types/Register';
 import { TokenPayload } from '../types/TokenPayload';
-import { getUserById } from '../repository/user.repository';
+import { getUserByEmail, getUserById } from '../repository/user.repository';
 
 const cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -99,4 +99,50 @@ const refreshToken = async (req: Request, res: Response) => {
     }
 }
 
-export { registration, authCredentials, refreshToken };
+/**
+ * Check email exist.
+ *
+ * @param req Request
+ * @param res Response
+ */
+const checkEmail = async (req: Request, res: Response) => {
+    try {
+        const email = req.body.email;
+        const user = await getUserByEmail(email);
+
+        if(!user) throw new Error('Email is not valid');
+        
+        res.status(200).end();
+    } catch (e: unknown) {
+        logger.error(`Check email error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+}
+
+/**
+ * Check email and username.
+ *
+ * @param req Request
+ * @param res Response
+ */
+const checkUsernameAndEmail = async (req: Request, res: Response) => {
+    try {
+        const body = req.body;
+        const user = await getUserByEmail(body.email);
+
+        if(user?.username !== body.username) throw new Error('Username is not valid');
+
+        res.status(200).end();
+    } catch (e: unknown) {
+        logger.error(`Check username and email error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+}
+
+export {
+    registration,
+    authCredentials,
+    refreshToken,
+    checkEmail,
+    checkUsernameAndEmail
+};
