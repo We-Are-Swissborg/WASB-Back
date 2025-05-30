@@ -35,60 +35,60 @@ interface IPost {
 
 @Table
 class Post extends Model implements IPost {
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     @AutoIncrement
     @PrimaryKey
     @Column
     declare id: number;
 
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     @ForeignKey(() => User)
     @Column
     declare author: number;
 
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     @Column
     declare image: string;
 
-    @Expose({ groups: ['admin', 'user', 'post'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'author', 'editor'] })
     @CreatedAt
     @IsDate
     @Column
     declare createdAt: Date;
 
-    @Expose({ groups: ['user', 'post'] })
+    @Expose({ groups: ['user', 'post', 'author', 'editor'] })
     @UpdatedAt
     @IsDate
     @Column
     declare updatedAt: Date;
 
     @Type(() => User)
-    @Expose({ groups: ['admin', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'post', 'blog', 'editor'] })
     @BelongsTo(() => User, { onDelete: 'SET NULL', hooks: true })
     declare infoAuthor: User;
 
-    @Expose({ groups: ['admin', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'] })
     @Column
     declare isPublish: boolean;
 
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     @IsDate
     @Column
     declare publishedAt?: Date;
 
     // Relation many-to-many avec Post
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     @BelongsToMany(() => PostCategory, () => PostCategoryPost)
     declare categories: PostCategory[];
 
-    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
+    @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'], toClassOnly: false })
     @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: EntityType.POST }, onDelete: 'CASCADE', hooks: true})
 
     declare translations: Translation[];
 
     declare setCategories: BelongsToManySetAssociationsMixin<PostCategory, number>;
 
-    @Expose({ groups: ['admin', 'user', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
     get image64(): NonAttribute<string | null> {
         if (this.image) {
             return getFileToBase64(this.image);
