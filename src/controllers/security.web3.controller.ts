@@ -5,25 +5,7 @@ import { confirmSignMessage } from '../services/security.web3.services';
 // import { instanceToPlain } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import { createNonce, verifyAndUseNonce } from '../cache/nonceUtils';
-
-// /**
-//  * Generate Nonce for user
-//  *
-//  * @param req Request
-//  * @param res Response
-//  */
-// const nonce = async (req: Request, res: Response) => {
-//     try {
-//         const { walletAddress } = req.body;
-
-//         const user = await generateNonce(walletAddress);
-//         const userDTO = instanceToPlain(user, { groups: ['auth'], excludeExtraneousValues: true });
-//         res.status(200).json(userDTO);
-//     } catch (e: unknown) {
-//         logger.error(`nonce error`, e);
-//         if (e instanceof Error) res.status(400).json({ message: e.message });
-//     }
-// };
+import nacl from 'tweetnacl';
 
 /**
  * Generate Nonce
@@ -47,24 +29,44 @@ const getNonce = async (req: Request, res: Response) => {
  * @param req Request
  * @param res Response
  */
-const authWallet = async (req: Request, res: Response) => {
+const authWallet = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { output, nonce } = req.body;
-        // const { walletAddress, signedMessage, signature, nonce } = req.body;
-        // const { walletAddress, nonce, message, signature } = req.body;
-        logger.info(`Attempt authWallet`, req.body);
+        // const { publicKey, signedMessage, signature, nonce } = req.body;
+        const { output, nonce, account } = req.body;
 
+        logger.warn(`account '${account}' `, account);
+        logger.warn(`signedMessage '${output.signedMessage}' `, output.signedMessage);
+        // logger.warn(`signature '${signature}' `, signature);
+        // logger.warn(`signature '${signature}' `, signature);
+
+        const keyArray = Object.keys(account)
+            .filter(k => !isNaN(Number(k)))
+            .sort((a, b) => Number(a) - Number(b))
+            .map(k => account[k]);
+
+        const publicKeyUint8 = Uint8Array.from(keyArray);
+        logger.warn(`publicKeyUint8 '${publicKeyUint8}' `, publicKeyUint8);
+        logger.warn(`keyArray '${keyArray}' `, keyArray);
+
+  
         if (!verifyAndUseNonce(nonce)) {
             logger.error(`Le nonce '${nonce}' n'est pas valide`);
             res.status(401).send({ error: 'Invalid or expired nonce' });
             return;
         }
 
-        await confirmSignMessage(output);
+        const isValid = verifySolanaSignature({
+            publicKey: Uint8Array.from(keyArray),
+            message: Uint8Array.from(output.signedMessage),
+            signature: Uint8Array.from(output.signature),
+          });
+        
+          if (!isValid) {
+            res.status(401).json({ error: 'Signature invalide' });
+            return;
+        }
 
-        const message = new TextEncoder().encode(nonce);
-
-        logger.info('message', message);
+        const message = 'Bien joué';
 
         // const user = await confirmSignMessage(walletAddress, signedMessageHash);
         // updateLastLogin(user);
@@ -77,26 +79,22 @@ const authWallet = async (req: Request, res: Response) => {
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 };
-// const authWallet = async (req: Request, res: Response) => {
-//     try {
-//         const { walletAddress, signedMessageHash } = req.body;
-//         // const { walletAddress, nonce, message, signature } = req.body;
-//         logger.info(`Attempt authWallet`, req.body);
 
-//         // const cachedNonce = cache.get(nonce);
-//         // if (!cachedNonce || cachedNonce.used) {
-//         //     return res.status(401).send({ error: 'Invalid or expired nonce' });
-//         // }
-
-//         const user = await confirmSignMessage(walletAddress, signedMessageHash);
-//         updateLastLogin(user);
-//         const token = generateToken(user);
-
-//         res.status(200).json({ token: token });
-//     } catch (e: unknown) {
-//         logger.error(`User auth error`, e);
-//         if (e instanceof Error) res.status(400).json({ message: e.message });
-//     }
-// };
+function verifySolanaSignature({
+    publicKey,
+    message,
+    signature,
+  }: {
+    publicKey: Uint8Array;
+    message: Uint8Array;
+    signature: Uint8Array;
+  }): boolean {
+    try {
+      return nacl.sign.detached.verify(message, signature, publicKey);
+    } catch (e) {
+      console.error("Erreur de vérification:", e);
+      return false;
+    }
+}
 
 export { authWallet, getNonce };
