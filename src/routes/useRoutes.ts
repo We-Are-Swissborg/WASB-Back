@@ -9,9 +9,11 @@ import { contributionRouter } from './contribution.routes';
 import { membershipRouter } from './membership.routes';
 import { metricsRouter } from './metrics.routes';
 import { sessionRouter } from './session.routes';
+import { categoryRouter } from './postCategory.routes';
 
 export const apiRouter: Router = express.Router();
-apiRouter.use('/admin/', apiAdminRouter);
+console.log('Loading route: /admin');
+apiRouter.use('/admin', apiAdminRouter);
 
 apiRouter.use('/', securityRouter);
 apiRouter.use('/test', testRouter);
@@ -22,3 +24,5 @@ apiRouter.use('/contributions', contributionRouter);
 apiRouter.use('/memberships', membershipRouter);
 apiRouter.use('/metrics', metricsRouter);
 apiRouter.use('/sessions', sessionRouter);
+apiRouter.use('/postCategories', categoryRouter);
+

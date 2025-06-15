@@ -6,6 +6,7 @@ import { logger } from './middlewares/logger.middleware';
 import sequelize from './models';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 
 /* eslint-disable */
 require('@dotenvx/dotenvx').config();
@@ -38,8 +39,8 @@ app.use(helmet());
 app.use(limiter);
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
+app.use(cookieParser());
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 //Routes
 app.use('/api', apiRouter);

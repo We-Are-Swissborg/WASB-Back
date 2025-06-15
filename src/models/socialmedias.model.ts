@@ -13,10 +13,10 @@ import {
     PrimaryKey,
 } from 'sequelize-typescript';
 
-const TWITTER_REGEX = /^twitter\.com\/[a-zA-Z0-9_]+$/;
+const TWITTER_REGEX = /^[a-zA-Z0-9_]+$/;
 const DISCORD_REGEX = /^[a-z0-9._]{2,32}$/;
-const TIKTOK_REGEX = /^tiktok\.com\/@[a-zA-Z0-9_.]+$/;
-const TELEGRAM_REGEX = /^t\.me\/[a-zA-Z0-9_]+$/;
+const TIKTOK_REGEX = /^[a-zA-Z0-9_.]+$/;
+const TELEGRAM_REGEX = /^[a-zA-Z0-9_]+$/;
 
 interface ISocialMedias {
     userId: number | null;
