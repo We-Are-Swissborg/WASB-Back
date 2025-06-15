@@ -76,10 +76,10 @@ const getPost = async (id: number): Promise<Post | null> => {
  * @param slug
  * @returns
  */
-const getPostBySlug = async (language: string, slug: string): Promise<PostDto | null> => {
-    logger.info('getPostBySlug : services', { language, slug });
+const getPostBySlug = async (slug: string): Promise<PostDto | null> => {
+    logger.info('getPostBySlug : services', { slug });
 
-    return await postRepository.getBySlug(language, slug);
+    return await postRepository.getBySlug(slug);
 };
 
 /**

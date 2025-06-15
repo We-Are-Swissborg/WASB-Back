@@ -24,3 +24,30 @@ export function mapPostToDto(post: Post, language: string): PostDto {
         categories,
     };
 }
+
+export function mapPostBySlugToDto(post: Post): PostDto {
+    const translation = post.translations?.[0]; // Prend la première traduction car on filtre déjà par slug
+
+    const categories =
+        post.categories?.map((cat) => {
+            const catTranslation = cat.translations?.[0];
+            return {
+                id: cat.id,
+                title: catTranslation?.title || null,
+            };
+        }) || [];
+
+    return {
+        id: post.id,
+        author: post.infoAuthor?.username || null,
+        image64: post.image64,
+        isPublish: post.isPublish,
+        publishedAt: post.publishedAt,
+        createdAt: post.createdAt,
+        updatedAt: post.updatedAt,
+        title: translation?.title || null,
+        content: translation?.content || null,
+        slug: translation?.slug || null,
+        categories,
+    };
+}
