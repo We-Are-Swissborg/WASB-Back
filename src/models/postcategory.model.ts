@@ -24,19 +24,19 @@ interface IPostCategory {
 
 @Table
 class PostCategory extends Model implements IPostCategory {
-    @Expose({ groups: ['admin', 'post', 'blog'] })
+    @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'] })
     @AutoIncrement
     @PrimaryKey
     @Column
     declare id: number;
 
-    @Expose({ groups: ['admin', 'post'], toClassOnly: false })
+    @Expose({ groups: ['admin', 'post', 'author', 'editor'], toClassOnly: false })
     @CreatedAt
     @IsDate
     @Column
     declare createdAt: Date;
 
-    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
+    @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'], toClassOnly: false })
     @UpdatedAt
     @IsDate
     @Column
@@ -45,7 +45,7 @@ class PostCategory extends Model implements IPostCategory {
     @BelongsToMany(() => Post, () => PostCategoryPost)
     declare posts: Post[];
 
-    @Expose({ groups: ['admin', 'post', 'blog'], toClassOnly: false })
+    @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'], toClassOnly: false })
     @HasMany(() => Translation, { foreignKey: 'entityId', scope: { entityType: EntityType.POSTCATEGORY }, onDelete: 'CASCADE', hooks: true})
     declare translations: Translation[];
 
