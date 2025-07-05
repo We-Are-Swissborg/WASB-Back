@@ -4,7 +4,7 @@ import { Post } from '../models/post.model';
 import { User } from '../models/user.model';
 import { Translation } from '../models/translation.model';
 import { PostDto } from '../dto/post.dto';
-import { mapPostToDto } from '../mappers/post.mapper';
+import { mapPostToDto, mapPostBySlugToDto } from '../mappers/post.mapper';
 import { plainToInstance } from 'class-transformer';
 import { PostCategory } from '../models/postcategory.model';
 import { EntityType } from '../enums/entityType.enum';
@@ -309,11 +309,10 @@ export default class PostRepository {
 
     /**
      * Récupère un post publié par son slug.
-     * @param {string} language - La langue pour les traductions.
      * @param {string} slug - Slug du post recherché.
      * @returns {Promise<Post | null>} - Le post trouvé ou null.
      */
-    async getBySlug(language: string, slug: string): Promise<PostDto | null> {
+    async getBySlug(slug: string): Promise<PostDto | null> {
         this.logger.info('Fetching post by slug', { slug: slug });
 
         try {
@@ -333,7 +332,6 @@ export default class PostRepository {
                                 attributes: ['id', 'title', 'languageCode'],
                                 where: {
                                     entityType: EntityType.POSTCATEGORY,
-                                    languageCode: language,
                                 },
                                 required: false,
                             },
@@ -345,7 +343,6 @@ export default class PostRepository {
                         where: {
                             entityType: EntityType.POST,
                             entityId: { [Op.col]: 'Post.id' },
-                            languageCode: language,
                             slug: slug,
                         },
                         required: true,
@@ -359,7 +356,7 @@ export default class PostRepository {
             }
 
             this.logger.debug('Fetched post by slug', { post });
-            const raw = mapPostToDto(post, language);
+            const raw = mapPostBySlugToDto(post);
 
             return plainToInstance(PostDto, raw, { excludeExtraneousValues: true });
         } catch (error) {
