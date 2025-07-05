@@ -9,8 +9,9 @@ userRouter.use('/:id/socialMedias', socialMediasRouter);
 
 userRouter.get('/codeRef/:codeRef', User.checkReferralExist);
 userRouter.get('/', Auth.authorize([Role.Admin]), User.getAllUsers);
-userRouter.get('/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUser);
+userRouter.get('/:id', Auth.authorize([Role.Admin, Role.Moderator, Role.Organizer], true), User.getUser);
 userRouter.get('/allInfo/:id', Auth.authorize([Role.Admin, Role.Moderator], true), User.getUserWithAllInfo);
+userRouter.get('/organizers/username', Auth.authorize([Role.Admin, Role.Organizer]), User.getUsernameOrganizers);
 
 userRouter.put('/:id', Auth.authorize([Role.Admin], true), User.updateUser);
 userRouter.patch('/:id', Auth.authorize([Role.Admin], true), User.patchUser);
