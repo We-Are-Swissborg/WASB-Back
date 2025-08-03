@@ -5,7 +5,9 @@ import { plainToInstance } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import Register from '../types/Register';
 import { TokenPayload } from '../types/TokenPayload';
-import { getUserByEmail, getUserById } from '../repository/user.repository';
+import { getUserByEmail, getUserById, setPasswordByMail } from '../repository/user.repository';
+import { fortgetMail, getToken, sendMail } from '../services/mail.services';
+import { cache } from '../cache/cacheManager';
 
 const cookieOptions: CookieOptions = {
     httpOnly: true,
@@ -126,15 +128,49 @@ const checkEmail = async (req: Request, res: Response) => {
  * @param res Response
  */
 const checkUsernameAndEmail = async (req: Request, res: Response) => {
-    try {
-        const body = req.body;
-        const user = await getUserByEmail(body.email);
+    logger.info('Check username and email');
 
-        if(user?.username !== body.username) throw new Error('Username is not valid');
+    try {
+        const email = req.body.email;
+        const username = req.body.username;
+        const lang = req.params.lang;
+        const user = await getUserByEmail(email);
+        const zohoToken = await cache.get('zohoToken');
+
+        if(user?.username !== username) throw new Error('Username is not valid');
+        if(!zohoToken) await getToken();
+
+        const data = await fortgetMail(lang, email, username);
+        await sendMail(data);
 
         res.status(200).end();
     } catch (e: unknown) {
         logger.error(`Check username and email error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+}
+
+/**
+ * Reset password with link sent by mail.
+ *
+ * @param req Request
+ * @param res Response
+ */
+const resetPassword = async (req: Request, res: Response) => {
+    logger.info('Reset password');
+
+    try {
+        const newPassword = req.body.newPassword;
+        const slug = req.params.slug;
+        const email: string | null = await cache.get(slug);
+
+        if(!email) throw new Error('Reset password expired');
+
+        await setPasswordByMail(email, newPassword);
+
+        res.status(200).end();
+    } catch (e: unknown) {
+        logger.error(`Error to reset password`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 }
@@ -144,5 +180,6 @@ export {
     authCredentials,
     refreshToken,
     checkEmail,
-    checkUsernameAndEmail
+    checkUsernameAndEmail,
+    resetPassword
 };

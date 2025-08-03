@@ -4,6 +4,7 @@ import { logger } from '../middlewares/logger.middleware';
 import * as RegistValidator from '../validators/user.validator';
 import { SocialMedias } from '../models/socialmedias.model';
 import { Membership } from '../models/membership.model';
+import bcrypt from 'bcrypt';
 
 const getUserByWallet = async (wallet: string): Promise<User | null> => {
     const user = await User.findOne({ where: { walletAddress: wallet } });
@@ -143,6 +144,18 @@ const getUserByEmail = async (email: string): Promise<User | null> => {
     return user;
 };
 
+const setPasswordByMail = async (email: string, newPassword: string) => {
+    const cryptPassword = await bcrypt.hash(newPassword, 12);
+
+    const user = await User.update({
+        password: cryptPassword
+    }, {
+        where: { email: email },
+    });
+
+    logger.debug('password user update OK', user);
+};
+
 export {
     getUserById,
     getUsers,
@@ -155,5 +168,6 @@ export {
     update,
     getUserByIdWithAllInfo,
     deleteUser,
-    getUserByEmail
+    getUserByEmail,
+    setPasswordByMail
 };

@@ -1,9 +1,8 @@
-import NodeCache from 'node-cache';
+import { cache } from '../cache/cacheManager';
+import { IMetrics } from '../types/Cache';
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 import { checkMetrics, getCryptoWithValue } from '../services/metrics.services';
-
-const metricsCache = new NodeCache();
 
 const setMetricsCache = async (req: Request, res: Response) => {
     try {
@@ -14,7 +13,7 @@ const setMetricsCache = async (req: Request, res: Response) => {
         // Verify metrics values are valid.
         checkMetrics(metrics.crypto);
 
-        metricsCache.set('metrics', metrics);
+        await cache.set('metrics', metrics);
         logger.debug('Metrics Cached');
 
         res.status(201).json({ message: 'Set metrics cache OK !' });
@@ -24,19 +23,19 @@ const setMetricsCache = async (req: Request, res: Response) => {
     }
 };
 
+// Get crypto with walue for main metrics page.
 const getCryptoAvailable = async (req: Request, res: Response) => {
     try {
-        const metrics: (Record<'crypto', Record<string, object>> & Record<'lastUpdate', Date>) | undefined =
-            metricsCache.get('metrics');
+        const metrics: IMetrics | null = await cache.get('metrics');
         if (!metrics) throw new Error();
 
-        const cryptoList: Record<string, object> = metrics.crypto;
-        const lastUpdate: Date = metrics.lastUpdate;
+        const cryptoList = metrics.crypto;
+        const lastUpdate = metrics.lastUpdate;
 
-        const cryptoAvailable: Record<'crypto', object> & Record<'lastUpdate', Date> = {
+        const cryptoAvailable = {
             crypto: getCryptoWithValue(cryptoList),
             lastUpdate: lastUpdate,
-        }; // Get crypto with walue for main metrics page.
+        }; 
 
         res.status(200).json({ cryptoAvailable });
     } catch {
@@ -48,8 +47,7 @@ const getCryptoAvailable = async (req: Request, res: Response) => {
 const getOneCrypto = async (req: Request, res: Response) => {
     const crypto = req.params.crypto;
     try {
-        const metrics: (Record<'crypto', Record<string, string>> & Record<'lastUpdate', Date>) | undefined =
-            metricsCache.get('metrics');
+        const metrics: IMetrics | null = await cache.get('metrics');
 
         if (!metrics || !metrics.crypto[crypto]) throw new Error();
 
