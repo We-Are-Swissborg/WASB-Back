@@ -87,4 +87,32 @@ const updateSession = async (session: Session): Promise<Session> => {
     return await SessionRepository.update(session);
 };
 
-export { createSession, getSessions, getSessionsPagination, getSessionBySlug, getSessionById, updateSession };
+/**
+ *
+ * @param page
+ * @param limit
+ * @param userId
+ * @returns
+ */
+const getMySessionsPagination = async (page: number, limit: number, userId: number): Promise<{ rows: Session[]; count: number }> => {
+    logger.info('getMySessionsPagination : services', { page, limit, userId });
+
+    let sessions = null;
+    const skip = (page - 1) * limit;
+
+    sessions = await SessionRepository.getMySessionsPagination(skip, limit, userId);
+
+    logger.debug(`getMySessionsPagination : ${sessions.count} item(s)`);
+
+    return sessions;
+};
+
+export {
+    createSession,
+    getSessions,
+    getSessionsPagination,
+    getSessionBySlug,
+    getSessionById,
+    updateSession,
+    getMySessionsPagination
+};

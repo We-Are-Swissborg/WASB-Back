@@ -154,6 +154,12 @@ const setPasswordByMail = async (email: string, newPassword: string) => {
     });
 
     logger.debug('password user update OK', user);
+}
+
+const getUsernameOrganizers = async (): Promise<User[] | null> => {
+    const organizers = await User.findAll({where: {roles: {[Op.substring]: 'organizer'}}});
+
+    return organizers;
 };
 
 export {
@@ -169,5 +175,6 @@ export {
     getUserByIdWithAllInfo,
     deleteUser,
     getUserByEmail,
-    setPasswordByMail
+    setPasswordByMail,
+    getUsernameOrganizers,
 };

@@ -35,14 +35,16 @@ const getAll = async (): Promise<{ rows: Session[]; count: number }> => {
  * @returns
  */
 const getSessionsPagination = async (skip: number, limit: number): Promise<{ rows: Session[]; count: number }> => {
-    logger.info('get posts pagination');
+    logger.info('get sessions pagination');
 
     const sessions = await Session.findAndCountAll({
         where: {
             status: {
                 [Op.ne]: SessionStatus.Draft,
-                [Op.gte]: new Date(),
             },
+            // endDateTime: {
+            //     [Op.gte]: new Date(),
+            // },
         },
         limit: limit,
         offset: skip,
@@ -132,4 +134,41 @@ const update = async (session: Session): Promise<Session> => {
     return session;
 };
 
-export { create, getAll, getSessionsPagination, getById, getBySlug, destroy, update };
+/**
+ *
+ * @param skip
+ * @param limit
+ * @param organizerId
+ * @return sessions
+ */
+const getMySessionsPagination = async (skip: number, limit: number, organizerId: number): Promise<{ rows: Session[]; count: number }> => {
+    logger.info('get my posts pagination');
+
+    const sessions = await Session.findAndCountAll({
+        where: {
+            organizerById: {
+                [Op.eq]: organizerId,
+            },
+        },
+        limit: limit,
+        offset: skip,
+        distinct: true, // avoid over-counting due to include
+        order: [['startDateTime', 'DESC']],
+    });
+
+    logger.debug(`get ${sessions.count} sessions`);
+    logger.debug(`get my sessions :`, sessions);
+
+    return sessions;
+};
+
+export {
+    create,
+    getAll,
+    getSessionsPagination,
+    getById,
+    getBySlug,
+    destroy,
+    update,
+    getMySessionsPagination
+};
