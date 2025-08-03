@@ -125,14 +125,20 @@ class Session extends Model implements ISession {
     @Column
     declare updatedAt: Date;
 
-    @Expose({ groups: ['admin', 'organizer'] })
-    @Type(() => User)
-    @BelongsTo(() => User)
-    declare createdBy: User;
+    @ForeignKey(() => User)
+    declare createdById: number;
 
     @Expose({ groups: ['admin', 'organizer'] })
     @Type(() => User)
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, 'createdById')
+    declare createdBy: User;
+
+    @ForeignKey(() => User)
+    declare updatedById: number;
+
+    @Expose({ groups: ['admin', 'organizer'] })
+    @Type(() => User)
+    @BelongsTo(() => User, 'updatedById')
     declare updatedBy: User;
 
     @Expose({ groups: ['admin', 'all', 'organizer'] })

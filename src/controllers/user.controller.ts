@@ -5,6 +5,8 @@ import { logger } from '../middlewares/logger.middleware';
 import { referralExist } from '../validators/user.validator';
 import * as userRepository from '../repository/user.repository';
 import * as socialMediasRep from '../repository/socialMedias.repository';
+import { TokenPayload } from '../types/TokenPayload';
+import { getUserFromContext } from '../middlewares/auth.middleware';
 
 // const addUser = async (req: Request, res: Response) => {
 //   const user = plainToInstance(req.body, User, { groups: ['register']});
@@ -38,9 +40,11 @@ const getUser = async (req: Request, res: Response) => {
     try {
         const id: number = Number(req.params.id);
         const user: User | null = await userRepository.getUserById(id);
+        const userContext: TokenPayload = getUserFromContext()!;
+        const groups: string[] = userContext.roles.includes('organizer') ? ['organizer'] : ['user'];
 
         if (user instanceof User) {
-            const userDTO = instanceToPlain(user, { groups: ['user'], excludeExtraneousValues: true });
+            const userDTO = instanceToPlain(user, { groups: groups, excludeExtraneousValues: true });
             res.status(200).json(userDTO);
         } else {
             res.status(400).json(`This user doesn't exist`);
@@ -147,4 +151,34 @@ const patchUser = async (req: Request, res: Response) => {
     }
 };
 
-export { getUser, getAllUsers, checkReferralExist, updateUser, getUserWithAllInfo, patchUser };
+/**
+ * Retrive username all organizer
+ * @param req
+ * @param res
+ */
+const getUsernameOrganizers = async (req: Request, res: Response) => {
+    try {
+        const organizers: User[] | null = await userRepository.getUsernameOrganizers();
+
+        if (organizers?.length !== 0) {
+            const userDTO = instanceToPlain(organizers, { groups: ['organizer'], excludeExtraneousValues: true });
+            res.status(200).json(userDTO);
+        } else {
+            res.status(400).json({ message: `No organizers were found`});
+        }
+    } catch (e) {
+        logger.error(`getUsernameOrganizers error`, e);
+        res.status(500).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
+export {
+    getUser,
+    getAllUsers,
+    checkReferralExist,
+    updateUser,
+    getUserWithAllInfo,
+    patchUser,
+    getUsernameOrganizers,
+};
+    

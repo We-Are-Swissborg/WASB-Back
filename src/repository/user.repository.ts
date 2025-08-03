@@ -138,6 +138,12 @@ const setUser = async (id: number, data: IUser): Promise<number | null> => {
     return user[0];
 };
 
+const getUsernameOrganizers = async (): Promise<User[] | null> => {
+    const organizers = await User.findAll({where: {roles: {[Op.substring]: 'organizer'}}});
+
+    return organizers;
+};
+
 export {
     getUserById,
     getUsers,
@@ -150,4 +156,5 @@ export {
     update,
     getUserByIdWithAllInfo,
     deleteUser,
+    getUsernameOrganizers,
 };
