@@ -87,7 +87,7 @@ const getPostBySlug = async (slug: string): Promise<PostDto | null> => {
  * @param slug
  * @returns
  */
-const destroy = async (id: number): Promise<void> => {
+const destroyPost = async (id: number): Promise<void> => {
     logger.info('destroy post : services', { id: id });
 
     return await postRepository.destroy(id);
@@ -126,4 +126,24 @@ const updatePost = async (id: number, updatedPost: Post): Promise<Post> => {
     }
 };
 
-export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost, destroy };
+/**
+ *
+ * @param page
+ * @param limit
+ * @param userId
+ * @returns
+ */
+const getMyPostsPagination = async ( language: string, page: number, limit: number, userId: number): Promise<{ rows: PostDto[]; count: number }> => {
+   logger.info('getMyPostsPagination : services', { language, page, limit });
+
+    let posts = null;
+    const skip = (page - 1) * limit;
+
+    posts = await postRepository.getMyPostsPagination(language, skip, limit, userId);
+
+    logger.debug(`getMyPostsPagination : ${posts.count} item(s)`);
+
+    return posts;
+};
+
+export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost, destroyPost, getMyPostsPagination };

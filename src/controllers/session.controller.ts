@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { instanceToPlain, plainToClass } from 'class-transformer';
 import { logger } from '../middlewares/logger.middleware';
 import * as SessionServices from '../services/session.services';
-import * as SessionRepository from '../repository/session.repository';
 import { Session } from '../models/session.model';
 import { getUserFromContext } from '../middlewares/auth.middleware';
 import { TokenPayload } from '../types/TokenPayload';
@@ -105,7 +104,7 @@ const deleteSession = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-        SessionRepository.destroy(id);
+        await SessionServices.destroySession(id);
         res.status(200).end();
     } catch (e) {
         logger.error(`deleteSession error`, e);
@@ -142,11 +141,31 @@ const getMySessions = async (req: Request, res: Response) => {
     }
 };
 
+const deleteSessions = async (req: Request, res: Response) => {
+    logger.info(`${fileNameLogger}: deleteSessions`);
+
+    try {
+        const listId = req.body.listId;
+
+        if (!listId.length) throw new Error('The sessions list to be deleted is empty.');
+
+        listId.forEach(async (id: number) => {
+            await SessionServices.destroySession(id);
+        })
+
+        res.status(200).end();
+    } catch (e: unknown) {
+        logger.error('Delete sessions list error', e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
 export {
     getSession,
     getSessions,
     createSession,
     updateSession,
     deleteSession,
-    getMySessions
+    getMySessions,
+    deleteSessions
 };

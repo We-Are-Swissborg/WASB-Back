@@ -107,6 +107,17 @@ const getMySessionsPagination = async (page: number, limit: number, userId: numb
     return sessions;
 };
 
+/**
+ *
+ * @param id
+ * @returns
+ */
+const destroySession = async (id: number): Promise<void> => {
+    logger.info('destroy sessions : services', { id: id });
+
+    return await SessionRepository.destroy(id);
+};
+
 export {
     createSession,
     getSessions,
@@ -114,5 +125,6 @@ export {
     getSessionBySlug,
     getSessionById,
     updateSession,
-    getMySessionsPagination
+    getMySessionsPagination,
+    destroySession
 };
