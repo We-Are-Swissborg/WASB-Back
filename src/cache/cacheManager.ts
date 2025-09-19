@@ -1,6 +1,5 @@
 import { createCache } from 'cache-manager';
 
-export const nonceCache = createCache({
-    ttl: 300,
+export const cache = createCache({
     refreshThreshold: 100,
 });

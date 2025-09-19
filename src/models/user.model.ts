@@ -53,7 +53,7 @@ interface IUser {
 
 @Table
 class User extends Model implements IUser {
-    @Expose({ groups: ['admin', 'user', 'profil'] })
+    @Expose({ groups: ['admin', 'user', 'profil', 'organizer', 'event'] })
     @AutoIncrement
     @PrimaryKey
     @Column
@@ -69,7 +69,7 @@ class User extends Model implements IUser {
     @Column
     declare lastName?: string;
 
-    @Expose({ groups: ['user', 'profil', 'blog', 'post', 'admin'] })
+    @Expose({ groups: ['user', 'profil', 'blog', 'post', 'admin', 'organizer', 'event'] })
     @Unique(true)
     @AllowNull(false)
     @Is(USERNAME_REGEX)
@@ -84,7 +84,7 @@ class User extends Model implements IUser {
     @Column
     declare password: string;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'event'] })
     @AllowNull(false)
     @Unique(true)
     @IsEmail
@@ -146,11 +146,11 @@ class User extends Model implements IUser {
     declare updatedAt: Date;
 
     @Type(() => SocialMedias)
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'event'] })
     @HasOne(() => SocialMedias, { foreignKey: 'userId' })
     declare socialMedias: SocialMedias | null;
 
-    @Expose({ groups: ['user', 'profil'] })
+    @Expose({ groups: ['user', 'profil', 'event'] })
     @Unique(true)
     @Column
     declare referralCode: string;

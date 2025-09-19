@@ -4,6 +4,8 @@ import { logger } from '../middlewares/logger.middleware';
 import * as SessionServices from '../services/session.services';
 import * as SessionRepository from '../repository/session.repository';
 import { Session } from '../models/session.model';
+import { getUserFromContext } from '../middlewares/auth.middleware';
+import { TokenPayload } from '../types/TokenPayload';
 
 const fileNameLogger = 'sessionController';
 
@@ -50,6 +52,10 @@ const getSessions = async (req: Request, res: Response) => {
 
 const createSession = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger} : Create Session`);
+    const userContext: TokenPayload = getUserFromContext()!;
+
+    req.body.createdById = userContext.userId;
+    req.body.updatedById = userContext.userId;
 
     try {
         const session = plainToClass(Session, req.body as string, { groups: ['organizer'] });
@@ -63,7 +69,7 @@ const createSession = async (req: Request, res: Response) => {
             });
             res.status(201).json(sessionDTO);
         } catch (e: unknown) {
-            if (e instanceof Error) res.status(400).json(e.message);
+            if (e instanceof Error) res.status(400).json({ message: e.message });
         }
     } catch (e) {
         logger.error(`createSession error`, e);
@@ -107,4 +113,40 @@ const deleteSession = async (req: Request, res: Response) => {
     }
 };
 
-export { getSession, getSessions, createSession, updateSession, deleteSession };
+const getMySessions = async (req: Request, res: Response) => {
+    logger.info(`${fileNameLogger}: getMySessions ->`, req.query);
+
+    try {
+        const page = parseInt(String(req.query.page || '1'), 10);
+        const limit = parseInt(String(req.query.limit || '10'), 10);
+        const userId = Number(req.query.userId);
+        const userContext: TokenPayload = getUserFromContext()!;
+
+        if (userId && userId !== userContext.userId) throw new Error('Error user id is not valid');
+
+        const sessions = await SessionServices.getMySessionsPagination(page, limit, userId);
+
+        const sessionListDTO = instanceToPlain(sessions.rows, { groups: ['organizer'], excludeExtraneousValues: true });
+
+        const totalPages = Math.ceil(sessions.count / limit);
+
+        res.status(200).json({
+            sessions: sessionListDTO,
+            totalPages: totalPages,
+            totalSessions: sessions.count,
+            currentPage: page,
+        });
+    } catch (e: unknown) {
+        logger.error(`Get my sessions list error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
+export {
+    getSession,
+    getSessions,
+    createSession,
+    updateSession,
+    deleteSession,
+    getMySessions
+};

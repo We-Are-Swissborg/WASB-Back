@@ -4,7 +4,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { logger } from './logger.middleware';
 import { TokenPayload } from '../types/TokenPayload';
 import { AsyncLocalStorage } from 'async_hooks';
-import NodeCache from 'node-cache';
+import { cache } from '../cache/cacheManager';
 
 const asyncLocalStorage = new AsyncLocalStorage<TokenPayload>();
 
@@ -14,7 +14,7 @@ export const getUserFromContext = (): TokenPayload | undefined => {
     logger.info(`[getUserFromContext] : context`, { context: context });
     return context;
 };
-const cache = new NodeCache();
+
 /**
  * middleware to check whether user has access to a specific endpoint
  *
@@ -81,7 +81,7 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
     };
 };
 
-export const authorizeMetrics = (req: Request, res: Response, next: NextFunction): void => {
+export const authorizeMetrics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         let idMetrics = req.headers.authorization;
         const lastUpdate = new Date(req.body.metrics.lastUpdate);
@@ -105,8 +105,8 @@ export const authorizeMetrics = (req: Request, res: Response, next: NextFunction
         }
 
         verifyDataValid(idMetrics === process.env.METRICS_ID, 'Invalid ID metrics');
-        verifyDataValid(!cache.get('hasAlreadyReqMetrics'), 'Metrics request already done');
-        cache.set('hasAlreadyReqMetrics', true, ttl);
+        verifyDataValid(!await cache.get('hasAlreadyReqMetrics'), 'Metrics request already done');
+        await cache.set('hasAlreadyReqMetrics', true, ttl);
 
         logger.debug('Metrics request authorized');
 
