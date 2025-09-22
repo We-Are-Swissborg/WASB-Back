@@ -24,7 +24,7 @@ const getFileToBase64 = (filePath: string, mimetype?: string) => {
         if (typeof detectedMime === 'string') {
             mimeType = detectedMime;
         } else {
-            mimeType = 'application/octet-stream'; 
+            mimeType = 'application/octet-stream';
         }
     }
     return `data:${mimeType};base64,${base64Image}`;

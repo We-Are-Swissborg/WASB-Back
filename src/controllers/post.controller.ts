@@ -5,6 +5,8 @@ import { plainToClass } from 'class-transformer';
 import { Post } from '../models/post.model';
 import { TokenPayload } from '../types/TokenPayload';
 import { getUserFromContext } from '../middlewares/auth.middleware';
+import { getFileToBase64 } from '../services/file.servies';
+import { OUTPUT_DIR } from '../middlewares/upload.middleware';
 
 const getPost = async (req: Request, res: Response) => {
     logger.info(`PostController: getPost ->`, req.params);
@@ -110,6 +112,25 @@ const deletePosts = async (req: Request, res: Response) => {
     }
 };
 
+const uploadImage = async (req: Request, res: Response) => {
+    logger.info(`PostController : Upload Image Post`);
+
+    try {
+        if (!req.file) {
+            res.status(400).json({ message: 'No file uploaded' });
+            return;
+        }
+
+        const filePath = `/${OUTPUT_DIR}/${req.file.filename}`;
+        const base64String = getFileToBase64(filePath, req.file.mimetype);
+
+        res.status(201).json({ base64: base64String, filePath });
+    } catch (error) {
+        console.error('Error uploading post image:', error);
+        res.status(500).json({ message: 'Error uploading image' });
+    }
+};
+
 // /**
 //  * Update Post
 //  * @param req
@@ -139,25 +160,6 @@ const deletePosts = async (req: Request, res: Response) => {
 //     }
 // };
 
-// const uploadImage = async (req: Request, res: Response) => {
-//     logger.info(`PostAdminController : Upload Image Post`);
-
-//     try {
-//         if (!req.file) {
-//             res.status(400).json({ message: 'No file uploaded' });
-//             return;
-//         }
-
-//         const filePath = `/${OUTPUT_DIR}/${req.file.filename}`;
-//         const base64String = getFileToBase64(filePath, req.file.mimetype);
-
-//         res.status(201).json({ base64: base64String, filePath });
-//     } catch (error) {
-//         console.error('Error uploading post image:', error);
-//         res.status(500).json({ message: 'Error uploading image' });
-//     }
-// };
-
 // /**
 //  * Delete Post
 //  * @param req
@@ -177,4 +179,11 @@ const deletePosts = async (req: Request, res: Response) => {
 //     }
 // };
 
-export { getPost, getPosts, createPost, getMyPosts, deletePosts };
+export {
+    getPost,
+    getPosts,
+    createPost,
+    getMyPosts,
+    deletePosts,
+    uploadImage
+};
