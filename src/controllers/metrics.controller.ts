@@ -6,7 +6,7 @@ import { checkMetrics, getCryptoWithValue } from '../services/metrics.services';
 
 const setMetricsCache = async (req: Request, res: Response) => {
     try {
-        const metrics = req.body.metrics;
+        const metrics = JSON.parse(req.body.metrics);
 
         if (!metrics) throw new Error('Metrics is missing for cache.');
 

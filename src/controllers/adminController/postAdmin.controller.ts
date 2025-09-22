@@ -122,7 +122,7 @@ const deletePost = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-        await PostServices.destroy(id);
+        await PostServices.destroyPost(id);
 
         res.status(200).end();
     } catch (e: unknown) {

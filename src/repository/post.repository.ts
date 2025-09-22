@@ -364,4 +364,85 @@ export default class PostRepository {
             throw new Error('Failed to fetch post by slug');
         }
     }
+
+    /**
+     *  Get my paginated posts, published with their traduction and their category.
+     * @param {string} language - asked language.
+     * @param {number} skip - Number elements to skip.
+     * @param {number} limit - Number elements by page.
+     * @param {number} authorId - author id.
+     * @returns {Promise<{ rows: PostDto[]; count: number }>} - Paginated list posts.
+     */
+    async getMyPostsPagination(
+        language: string,
+        skip: number,
+        limit: number,
+        authorId: number,
+    ): Promise<{ rows: PostDto[]; count: number }> {
+        this.logger.info('Fetching my paginated posts');
+
+        try {
+            const total = await Post.count({
+                where: {
+                    author: {
+                        [Op.eq]: authorId,
+                    },
+                },
+            });
+            const posts = await Post.findAll({
+                where: {
+                    author: {
+                        [Op.eq]: authorId,
+                    },
+                },
+                limit,
+                offset: skip,
+                include: [
+                    { model: User, attributes: ['username'] },
+                    {
+                        model: PostCategory,
+                        attributes: ['id'],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Translation,
+                                attributes: ['id', 'title', 'languageCode'],
+                                where: {
+                                    entityType: EntityType.POSTCATEGORY,
+                                    languageCode: language,
+                                },
+                                required: false,
+                            },
+                        ],
+                    },
+                    {
+                        model: Translation,
+                        attributes: ['id', 'title', 'slug', 'languageCode', 'entityId'],
+                        where: {
+                            entityType: EntityType.POST,
+                            entityId: { [Op.col]: 'Post.id' },
+                            languageCode: language,
+                        },
+                        required: true,
+                    },
+                ],
+                order: [['updatedAt', 'DESC']],
+            });
+
+            this.logger.debug(`Fetched ${total} my paginated posts`);
+
+            const postDto = plainToInstance(
+                PostDto,
+                posts.map((p) => mapPostToDto(p, language)),
+                {
+                    excludeExtraneousValues: true,
+                },
+            );
+
+            return { rows: postDto, count: total };
+        } catch (error) {
+            this.logger.error('Error fetching my paginated posts', { error });
+            throw new Error('Failed to fetch my paginated posts');
+        }
+    }
 }

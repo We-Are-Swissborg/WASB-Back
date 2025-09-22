@@ -3,6 +3,10 @@ import { logger } from '../middlewares/logger.middleware';
 import * as PostServices from '../services/post.services';
 import { plainToClass } from 'class-transformer';
 import { Post } from '../models/post.model';
+import { TokenPayload } from '../types/TokenPayload';
+import { getUserFromContext } from '../middlewares/auth.middleware';
+import { getFileToBase64 } from '../services/file.servies';
+import { OUTPUT_DIR } from '../middlewares/upload.middleware';
 
 const getPost = async (req: Request, res: Response) => {
     logger.info(`PostController: getPost ->`, req.params);
@@ -62,6 +66,71 @@ const createPost = async (req: Request, res: Response) => {
     }
 };
 
+const getMyPosts = async (req: Request, res: Response) => {
+    logger.info('PostController: getMyPosts ->', req.query);
+try {
+        const language = String(req.params.lang || 'fr');
+        const page = parseInt(String(req.query.page || '1'), 10);
+        const limit = parseInt(String(req.query.limit || '10'), 10);
+        const userId = Number(req.query.userId);
+        const userContext: TokenPayload = getUserFromContext()!;
+
+        if (userId && userId !== userContext.userId) throw new Error('Error user id is not valid');
+
+        const postListDTO = await PostServices.getMyPostsPagination(language, page, limit, userId);
+
+        const totalPages = Math.ceil(postListDTO.count / limit);
+
+        res.status(200).json({
+            posts: postListDTO.rows,
+            totalPages: totalPages,
+            totalPosts: postListDTO.count,
+            currentPage: page,
+        });
+    } catch (e: unknown) {
+        logger.error('Get my posts list error', e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
+const deletePosts = async (req: Request, res: Response) => {
+    logger.info('PostController: deletePosts');
+
+    try {
+        const listId = req.body.listId;
+
+        if (!listId.length) throw new Error('The posts list to be deleted is empty.');
+
+        listId.forEach(async (id: number) => {
+            await PostServices.destroyPost(id);
+        })
+
+        res.status(200).end();
+    } catch (e: unknown) {
+        logger.error('Delete posts list error', e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
+const uploadImage = async (req: Request, res: Response) => {
+    logger.info(`PostController : Upload Image Post`);
+
+    try {
+        if (!req.file) {
+            res.status(400).json({ message: 'No file uploaded' });
+            return;
+        }
+
+        const filePath = `/${OUTPUT_DIR}/${req.file.filename}`;
+        const base64String = getFileToBase64(filePath, req.file.mimetype);
+
+        res.status(201).json({ base64: base64String, filePath });
+    } catch (error) {
+        console.error('Error uploading post image:', error);
+        res.status(500).json({ message: 'Error uploading image' });
+    }
+};
+
 // /**
 //  * Update Post
 //  * @param req
@@ -91,25 +160,6 @@ const createPost = async (req: Request, res: Response) => {
 //     }
 // };
 
-// const uploadImage = async (req: Request, res: Response) => {
-//     logger.info(`PostAdminController : Upload Image Post`);
-
-//     try {
-//         if (!req.file) {
-//             res.status(400).json({ message: 'No file uploaded' });
-//             return;
-//         }
-
-//         const filePath = `/${OUTPUT_DIR}/${req.file.filename}`;
-//         const base64String = getFileToBase64(filePath, req.file.mimetype);
-
-//         res.status(201).json({ base64: base64String, filePath });
-//     } catch (error) {
-//         console.error('Error uploading post image:', error);
-//         res.status(500).json({ message: 'Error uploading image' });
-//     }
-// };
-
 // /**
 //  * Delete Post
 //  * @param req
@@ -129,4 +179,11 @@ const createPost = async (req: Request, res: Response) => {
 //     }
 // };
 
-export { getPost, getPosts, createPost };
+export {
+    getPost,
+    getPosts,
+    createPost,
+    getMyPosts,
+    deletePosts,
+    uploadImage
+};
