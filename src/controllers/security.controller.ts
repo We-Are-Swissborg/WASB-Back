@@ -6,7 +6,7 @@ import { logger } from '../middlewares/logger.middleware';
 import Register from '../types/Register';
 import { TokenPayload } from '../types/TokenPayload';
 import { getUserByEmail, getUserById, setPasswordByMail } from '../repository/user.repository';
-import { fortgetMail, getToken, sendMail } from '../services/mail.services';
+import { fortgetMail, getMailToken, sendMail } from '../services/mail.services';
 import { cache } from '../cache/cacheManager';
 
 const cookieOptions: CookieOptions = {
@@ -135,10 +135,10 @@ const checkUsernameAndEmail = async (req: Request, res: Response) => {
         const username = req.body.username;
         const lang = req.params.lang;
         const user = await getUserByEmail(email);
-        const zohoToken = await cache.get('zohoToken');
+        const mailZohoToken = await cache.get('mailZohoToken');
 
         if(user?.username !== username) throw new Error('Username is not valid');
-        if(!zohoToken) await getToken();
+        if(!mailZohoToken) await getMailToken();
 
         const data = await fortgetMail(lang, email, username);
         await sendMail(data);
