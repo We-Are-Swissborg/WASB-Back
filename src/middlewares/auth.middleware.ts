@@ -84,7 +84,8 @@ export const authorize = (allowedAccessTypes?: string[], allowSelfModification: 
 export const authorizeMetrics = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         let idMetrics = req.headers.authorization;
-        const lastUpdate = new Date(req.body.metrics.lastUpdate);
+        const metrics = JSON.parse(req.body.metrics)
+        const lastUpdate = new Date(metrics.lastUpdate);
         const minutesLU = lastUpdate.getMinutes();
         const totalSecond = minutesLU * 60 + lastUpdate.getSeconds();
         const ttl = Number(process.env.TTL_METRICS_REQUEST as string) - totalSecond;
@@ -112,7 +113,7 @@ export const authorizeMetrics = async (req: Request, res: Response, next: NextFu
 
         return next();
     } catch (error) {
-        logger.error('Failed to authorize metrics serve :', error);
+        logger.error('Failed to authorize metrics server :', error);
         res.status(500).json('Failed to authorize metrics server : ' + error);
         return;
     }
