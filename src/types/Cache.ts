@@ -11,7 +11,7 @@ type ICache = {
     nonceData: INonceData,
     metrics: IMetrics,
     hasAlreadyReqMetrics: boolean,
-    zohoToken: string,
+    mailZohoToken: string,
 };
 
 export { INonceData, ICache, IMetrics }

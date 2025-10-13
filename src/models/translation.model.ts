@@ -46,22 +46,22 @@ class Translation extends Model<ITranslation> {
     @Column
     declare entityId: number;
 
-    @Expose({ groups: ['all', 'admin', 'post', 'blog'] })
+    @Expose({ groups: ['all', 'admin', 'post', 'blog', 'author', 'editor'] })
     @AllowNull(false)
     @Column
     declare languageCode: string;
 
-    @Expose({ groups: ['all', 'admin', 'post', 'blog'] })
+    @Expose({ groups: ['all', 'admin', 'post', 'blog', 'author', 'editor'] })
     @AllowNull(false)
     @Column
     declare title: string;
 
-    @Expose({ groups: ['all', 'admin', 'post', 'blog'] })
+    @Expose({ groups: ['all', 'admin', 'post', 'blog', 'author', 'editor'] })
     @AllowNull(true)
     @Column
     declare content?: string;
 
-    @Expose({ groups: ['all', 'admin', 'post', 'blog'] })
+    @Expose({ groups: ['all', 'admin', 'post', 'blog', 'author', 'editor'] })
     @AllowNull(true)
     @Unique
     @Column
