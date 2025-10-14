@@ -35,7 +35,7 @@ const getPost = async (req: Request, res: Response) => {
 
     try {
         const id: number = Number(req.params.id);
-        const post = await PostServices.getPost(id);
+        const post = await PostServices.getPostById(id);
         const postDTO = instanceToPlain(post, { groups: ['admin'], excludeExtraneousValues: true });
         res.status(200).json(postDTO);
     } catch (e: unknown) {

@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import { logger } from '../middlewares/logger.middleware';
 import * as PostServices from '../services/post.services';
-import { plainToClass } from 'class-transformer';
+import { instanceToPlain, plainToClass } from 'class-transformer';
 import { Post } from '../models/post.model';
 import { TokenPayload } from '../types/TokenPayload';
 import { getUserFromContext } from '../middlewares/auth.middleware';
 import { getFileToBase64 } from '../services/file.servies';
 import { OUTPUT_DIR } from '../middlewares/upload.middleware';
 
-const getPost = async (req: Request, res: Response) => {
-    logger.info(`PostController: getPost ->`, req.params);
+const getPostBySlug = async (req: Request, res: Response) => {
+    logger.info(`PostController: getPostBySlug ->`, req.params);
 
     try {
         const postDTO = await PostServices.getPostBySlug(req.params.slug);
@@ -131,34 +131,54 @@ const uploadImage = async (req: Request, res: Response) => {
     }
 };
 
-// /**
-//  * Update Post
-//  * @param req
-//  * @param res
-//  */
-// const updatePost = async (req: Request, res: Response) => {
-//     logger.info(`PostAdminController : Update Post`);
+/**
+ * Retrieve post by id
+ * @param req
+ * @param res
+ */
+const getPostById = async (req: Request, res: Response) => {
+    logger.info(`PostController : Get Post by ID`);
 
-//     try {
-//         const id: number = Number(req.params.id);
-//         const updatePost = plainToClass(Post, req.body as string, { groups: ['admin'] });
-//         const postRetrieve = await Post.findByPk(id);
-//         if (!postRetrieve) {
-//             res.status(404).json({ error: 'Post not found' });
-//             return;
-//         }
+    try {
+        const id: number = Number(req.params.id);
+        const post = await PostServices.getPostById(id);
+        const postDTO = instanceToPlain(post, { groups: ['author'], excludeExtraneousValues: true });
+        
+        res.status(200).json(postDTO);
+    } catch (e: unknown) {
+        logger.error(`Get post by ID error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
 
-//         Object.assign(postRetrieve, updatePost);
-//         await postRetrieve.setCategories(updatePost.categories.map((category) => category.id));
+/**
+ * Update Post
+ * @param req
+ * @param res
+ */
+const updatePost = async (req: Request, res: Response) => {
+    logger.info(`PostController : Update Post`);
 
-//         const updatedPost = await PostServices.updatePost(id, postRetrieve);
+    try {
+        const id: number = Number(req.params.id);
+        const updatePost = plainToClass(Post, req.body as string, { groups: ['author'] });
+        const postRetrieve = await Post.findByPk(id);
+        if (!postRetrieve) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
 
-//         res.status(200).json(updatedPost);
-//     } catch (e: unknown) {
-//         logger.error(`Update post error`, e);
-//         if (e instanceof Error) res.status(400).json({ message: e.message });
-//     }
-// };
+        Object.assign(postRetrieve, updatePost);
+        await postRetrieve.setCategories(updatePost.categories.map((category) => category.id));
+
+        const updatedPost = await PostServices.updatePost(id, postRetrieve);
+
+        res.status(200).json(updatedPost);
+    } catch (e: unknown) {
+        logger.error(`Update post error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
 
 // /**
 //  * Delete Post
@@ -180,10 +200,12 @@ const uploadImage = async (req: Request, res: Response) => {
 // };
 
 export {
-    getPost,
+    getPostBySlug,
     getPosts,
     createPost,
     getMyPosts,
     deletePosts,
-    uploadImage
+    uploadImage,
+    updatePost,
+    getPostById
 };

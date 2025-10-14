@@ -8,8 +8,8 @@ import { TokenPayload } from '../types/TokenPayload';
 
 const fileNameLogger = 'sessionController';
 
-const getSession = async (req: Request, res: Response) => {
-    logger.info(`${fileNameLogger}: getSession ->`, req.params);
+const getSessionBySlug = async (req: Request, res: Response) => {
+    logger.info(`${fileNameLogger}: getSessionBySlug ->`, req.params);
 
     try {
         const session = await SessionServices.getSessionBySlug(req.params.slug);
@@ -160,12 +160,32 @@ const deleteSessions = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Retrieve an session by id
+ * @param req
+ * @param res
+ */
+const getSessionById = async (req: Request, res: Response) => {
+    logger.info(`${fileNameLogger} : Get Session by ID`);
+
+    try {
+        const id: number = Number(req.params.id);
+        const session = await SessionServices.getSessionById(id);
+        const sessionDTO = instanceToPlain(session, { groups: ['organizer'], excludeExtraneousValues: true });
+        res.status(200).json(sessionDTO);
+    } catch (e) {
+        logger.error(`getSessionById error`, e);
+        res.status(400).json({ message: 'Oops !, an error has occurred.' });
+    }
+};
+
 export {
-    getSession,
+    getSessionBySlug,
     getSessions,
     createSession,
     updateSession,
     deleteSession,
     getMySessions,
-    deleteSessions
+    deleteSessions,
+    getSessionById
 };

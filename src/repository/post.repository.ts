@@ -317,9 +317,10 @@ export default class PostRepository {
 
         try {
             const post = await Post.findOne({
-                where: {
-                    isPublish: true,
-                },
+                // Later add a specially secure path for get no published posts.
+                // where: {
+                //     isPublish: true,
+                // },
                 include: [
                     { model: User, attributes: ['username'] },
                     {

@@ -65,8 +65,8 @@ const getPostsPagination = async (
     return posts;
 };
 
-const getPost = async (id: number): Promise<Post | null> => {
-    logger.info('getPost : services', { id: id });
+const getPostById = async (id: number): Promise<Post | null> => {
+    logger.info('getPostById : services', { id: id });
 
     return await postRepository.get(id);
 };
@@ -146,4 +146,4 @@ const getMyPostsPagination = async ( language: string, page: number, limit: numb
     return posts;
 };
 
-export { createPost, getPosts, getPostsPagination, getPost, getPostBySlug, updatePost, destroyPost, getMyPostsPagination };
+export { createPost, getPosts, getPostsPagination, getPostById, getPostBySlug, updatePost, destroyPost, getMyPostsPagination };

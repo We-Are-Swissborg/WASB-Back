@@ -10,7 +10,7 @@ const getMailToken = async () => {
     try {
         const clientId = process.env.ZOHO_CLIENT_ID;
         const clientSecret = process.env.ZOHO_CLIENT_SECRET;
-        const res = await fetch(`https://accounts.zoho.eu/oauth/v2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials&scope=ZohoCRM.messages.ALL`, {
+        const res = await fetch(`https://accounts.zoho.eu/oauth/v2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials&scope=ZohoMail.messages.ALL`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
