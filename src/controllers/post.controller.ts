@@ -7,6 +7,10 @@ import { TokenPayload } from '../types/TokenPayload';
 import { getUserFromContext } from '../middlewares/auth.middleware';
 import { getFileToBase64 } from '../services/file.servies';
 import { OUTPUT_DIR } from '../middlewares/upload.middleware';
+import { createHash } from 'crypto';
+import { PostView } from '../models/postview.model';
+import { Translation } from '../models/translation.model';
+import { sendEventToGA } from '../services/analytics.services';
 
 const getPostBySlug = async (req: Request, res: Response) => {
     logger.info(`PostController: getPostBySlug ->`, req.params);
@@ -68,7 +72,8 @@ const createPost = async (req: Request, res: Response) => {
 
 const getMyPosts = async (req: Request, res: Response) => {
     logger.info('PostController: getMyPosts ->', req.query);
-try {
+
+    try {
         const language = String(req.params.lang || 'fr');
         const page = parseInt(String(req.query.page || '1'), 10);
         const limit = parseInt(String(req.query.limit || '10'), 10);
@@ -180,6 +185,65 @@ const updatePost = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Check is first Post
+ * @param req
+ * @param res
+ */
+const isFirstViewPost = async (req: Request, res: Response) => {
+    logger.info(`PostController : Check is first view Post`);
+
+    try {
+        const id: number = Number(req.params.id);
+        const clientId = req.body.clientId;
+        const lang = req.body.lang;
+        let isFirstView = false;
+
+        if(!clientId) throw new Error("Client ID requis");
+
+        const post = await Post.findOne({
+            where: {
+                id: id,
+                isPublish: true,
+            },
+        });
+        
+        if(!post) throw new Error("Post not found or published");
+
+        const hashedClientId = createHash("sha256").update(clientId).digest('hex');
+
+        const translation = await Translation.findOne({
+            where: {
+                entityId: id,
+                languageCode: lang,
+            },
+        });
+
+        if(!translation) throw new Error("Post not found");
+
+        const isViewExist = await PostView.findOne({
+            where: {
+                postId: id,
+                clientId: hashedClientId,
+            },
+        });
+
+        if(!isViewExist) {
+            await PostView.create({ postId: id, clientId: hashedClientId });
+            post.views = await PostView.count({where: {postId: id}});
+            await post.save();
+            isFirstView = true;
+            await sendEventToGA(clientId, 'first_post_view', id, translation.title);
+        }
+
+        await sendEventToGA(clientId, 'view_post', id, translation.title);
+        res.status(200).json({ message: 'Vue comptabilisée', views: post.views, isFirstView });
+    } catch (e: unknown) {
+        logger.error(`Update post error`, e);
+        if (e instanceof Error) res.status(400).json({ message: e.message });
+    }
+};
+
 // /**
 //  * Delete Post
 //  * @param req
@@ -207,5 +271,6 @@ export {
     deletePosts,
     uploadImage,
     updatePost,
-    getPostById
+    getPostById,
+    isFirstViewPost
 };

@@ -15,6 +15,8 @@ postRouter.get('/:lang/:slug', Post.getPostBySlug);
 postRouter.post('/', Auth.authorize([Role.Author]), Post.createPost);
 postRouter.post('/delete', Post.deletePosts);
 postRouter.post('/upload', Auth.authorize([Role.Author, Role.Organizer, Role.Editor]), uploadMiddleware().single(inputFileName), Post.uploadImage);
+postRouter.post('/:id/view', Post.isFirstViewPost);
+
 // postRouter.post('/preview', Auth.authorize([Role.Admin, Role.Moderator]), upload.single('imagePost'), Post.preview);
 // postRouter.delete('/:idPost', Auth.authorize([Role.Admin, Role.Moderator]), Post.deletePost);
 

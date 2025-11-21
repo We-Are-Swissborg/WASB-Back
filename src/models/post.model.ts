@@ -15,6 +15,7 @@ import {
     BelongsTo,
     HasMany,
     BeforeDestroy,
+    Default,
 } from 'sequelize-typescript';
 import { User } from './user.model';
 import { PostCategory } from './postcategory.model';
@@ -31,6 +32,7 @@ interface IPost {
     isPublish: boolean;
     publishedAt?: Date;
     translations: Translation[];
+    views: number;
 }
 
 @Table
@@ -66,6 +68,11 @@ class Post extends Model implements IPost {
     @Expose({ groups: ['admin', 'post', 'blog', 'editor'] })
     @BelongsTo(() => User, { onDelete: 'SET NULL', hooks: true })
     declare infoAuthor: User;
+
+    @Expose({ groups: ['admin', 'user', 'post', 'blog', 'author', 'editor'] })
+    @Default(0)
+    @Column
+    declare views: number;
 
     @Expose({ groups: ['admin', 'post', 'blog', 'author', 'editor'] })
     @Column
