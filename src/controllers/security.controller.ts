@@ -6,7 +6,7 @@ import { logger } from '../middlewares/logger.middleware';
 import Register from '../types/Register';
 import { TokenPayload } from '../types/TokenPayload';
 import { getUserByEmail, getUserById, setPasswordByMail } from '../repository/user.repository';
-import { fortgetMail, getMailToken, sendMail } from '../services/mail.services';
+import { forgetMail, sendMail } from '../services/mail.services';
 import { cache } from '../cache/cacheManager';
 
 const cookieOptions: CookieOptions = {
@@ -107,45 +107,20 @@ const refreshToken = async (req: Request, res: Response) => {
  * @param req Request
  * @param res Response
  */
-const checkEmail = async (req: Request, res: Response) => {
+const passwordForget = async (req: Request, res: Response) => {
     try {
         const email = req.body.email;
         const user = await getUserByEmail(email);
+        const lang = req.params.lang;
 
         if(!user) throw new Error('Email is not valid');
-        
-        res.status(200).end();
-    } catch (e: unknown) {
-        logger.error(`Check email error`, e);
-        if (e instanceof Error) res.status(400).json({ message: e.message });
-    }
-}
 
-/**
- * Check email and username.
- *
- * @param req Request
- * @param res Response
- */
-const checkUsernameAndEmail = async (req: Request, res: Response) => {
-    logger.info('Check username and email');
-
-    try {
-        const email = req.body.email;
-        const username = req.body.username;
-        const lang = req.params.lang;
-        const user = await getUserByEmail(email);
-        const mailZohoToken = await cache.get('mailZohoToken');
-
-        if(user?.username !== username) throw new Error('Username is not valid');
-        if(!mailZohoToken) await getMailToken();
-
-        const data = await fortgetMail(lang, email, username);
+        const data = await forgetMail(lang, email, user.username);
         await sendMail(data);
 
         res.status(200).end();
     } catch (e: unknown) {
-        logger.error(`Check username and email error`, e);
+        logger.error(`Password forget error`, e);
         if (e instanceof Error) res.status(400).json({ message: e.message });
     }
 }
@@ -175,11 +150,33 @@ const resetPassword = async (req: Request, res: Response) => {
     }
 }
 
+// /**
+//  * Check email and username.
+//  *
+//  * @param req Request
+//  * @param res Response
+//  */
+// const checkUsernameAndEmail = async (req: Request, res: Response) => {
+//     logger.info('Check username and email');
+
+//     try {
+//         const email = req.body.email;
+//         const username = req.body.username;
+//         const user = await getUserByEmail(email);
+
+//         if(user?.username !== username) throw new Error('Username or email are not valid');
+
+//         res.status(200).end();
+//     } catch (e: unknown) {
+//         logger.error(`Check username and email error`, e);
+//         if (e instanceof Error) res.status(400).json({ message: e.message });
+//     }
+// }
+
 export {
     registration,
     authCredentials,
     refreshToken,
-    checkEmail,
-    checkUsernameAndEmail,
+    passwordForget,
     resetPassword
 };

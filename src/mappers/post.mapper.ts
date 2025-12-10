@@ -22,6 +22,7 @@ export function mapPostToDto(post: Post, language: string): PostDto {
         content: translation?.content || null,
         slug: translation?.slug || null,
         categories,
+        views: post.views,
     };
 }
 
@@ -49,5 +50,6 @@ export function mapPostBySlugToDto(post: Post): PostDto {
         content: translation?.content || null,
         slug: translation?.slug || null,
         categories,
+        views: post.views,
     };
 }

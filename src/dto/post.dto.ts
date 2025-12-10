@@ -35,4 +35,7 @@ export class PostDto {
     @Expose()
     @Type(() => PostCategoryDto)
     categories: PostCategoryDto[];
+   
+    @Expose()
+    views: number;
 }
