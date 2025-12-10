@@ -3,14 +3,14 @@ import { cache } from '../cache/cacheManager';
 import { ISendMail } from '../types/Mail';
 import { generateRandomCode } from '../utils/generator';
 
-// Get access for Zoho app.
+// Get access for mail message Zoho app.
 const getMailToken = async () => {
     logger.info('getMailToken : services');
 
     try {
         const clientId = process.env.ZOHO_CLIENT_ID;
         const clientSecret = process.env.ZOHO_CLIENT_SECRET;
-        const res = await fetch(`https://accounts.zoho.eu/oauth/v2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials&scope=ZohoCRM.messages.ALL`, {
+        const res = await fetch(`https://accounts.zoho.eu/oauth/v2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials&scope=ZohoMail.messages.ALL`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -37,7 +37,14 @@ const sendMail = async (data: ISendMail) => {
     try {
         const accountId = process.env.ZOHO_ACCOUNT_ID;
         const fromAddress = process.env.ZOHO_MAIL;
-        const token = await cache.get('mailZohoToken');
+        let token = await cache.get('mailZohoToken');
+
+        if(!token) {
+            await getMailToken();
+            token = await cache.get('mailZohoToken');
+            if(!token) throw new Error('Error to get Zoho mail token.')
+        }
+
         const res = await fetch(`https://mail.zoho.eu/api/accounts/${accountId}/messages`, {
             method: "POST",
             headers: {
@@ -53,7 +60,8 @@ const sendMail = async (data: ISendMail) => {
                 "askReceipt" : data.userReadOrNot
             }),
         });
-        if(!res.ok) throw new Error(`Error email not sent : ${await res.json()}`);
+
+        if(!res.ok) throw new Error(`Error email not sent : ${JSON.stringify(await res.json())}`);
 
         logger.info('Email sent');
     } catch (e: unknown) {
@@ -63,8 +71,8 @@ const sendMail = async (data: ISendMail) => {
 };
 
 // Function to set a forgot-password message for an email.
-const fortgetMail = async (lang: string, email: string, username: string) => {
-    logger.info('fortgetMail : services');
+const forgetMail = async (lang: string, email: string, username: string) => {
+    logger.info('forgetMail : services');
 
     let isUnique: boolean = false;
     let slug: string | undefined = undefined;
@@ -127,4 +135,4 @@ const fortgetMail = async (lang: string, email: string, username: string) => {
     return data;
 };
 
-export { sendMail, getMailToken, fortgetMail }
+export { sendMail, forgetMail }
