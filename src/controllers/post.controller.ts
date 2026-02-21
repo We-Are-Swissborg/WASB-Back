@@ -16,7 +16,7 @@ const getPostBySlug = async (req: Request, res: Response) => {
     logger.info(`PostController: getPostBySlug ->`, req.params);
 
     try {
-        const postDTO = await PostServices.getPostBySlug(req.params.slug);
+        const postDTO = await PostServices.getPostBySlug(req.params.slug as string);
         if (!postDTO) throw new Error('No post find');
 
         res.status(200).json(postDTO);

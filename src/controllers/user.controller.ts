@@ -62,7 +62,7 @@ const getUser = async (req: Request, res: Response) => {
  */
 const checkReferralExist = async (req: Request, res: Response) => {
     try {
-        const codeRef: string = req.params.codeRef;
+        const codeRef: string = req.params.codeRef as string;
         const referral: number | null = await referralExist(codeRef);
 
         if (referral) {

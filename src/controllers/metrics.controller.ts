@@ -45,7 +45,7 @@ const getCryptoAvailable = async (req: Request, res: Response) => {
 };
 
 const getOneCrypto = async (req: Request, res: Response) => {
-    const crypto = req.params.crypto;
+    const crypto = req.params.crypto as string;
     try {
         const metrics: IMetrics | null = await cache.get('metrics');
 

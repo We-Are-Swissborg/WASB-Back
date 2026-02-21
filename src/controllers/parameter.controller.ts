@@ -14,7 +14,7 @@ const getParameters = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: Get Parameters`);
 
     try {
-        const code = req.params.code;
+        const code = req.params.code as string;
         const parameters = await parameterServices.getParameters(code);
         const parametersDTO = instanceToPlain(parameters, { groups: ['all'], excludeExtraneousValues: true });
         logger.info(`${parametersDTO}: Get Parameters`, parametersDTO);
