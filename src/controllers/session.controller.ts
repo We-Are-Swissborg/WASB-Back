@@ -12,7 +12,7 @@ const getSessionBySlug = async (req: Request, res: Response) => {
     logger.info(`${fileNameLogger}: getSessionBySlug ->`, req.params);
 
     try {
-        const session = await SessionServices.getSessionBySlug(req.params.slug);
+        const session = await SessionServices.getSessionBySlug(req.params.slug as string);
         if (!session) throw new Error('No session find');
 
         const sessionDTO = instanceToPlain(session, { groups: ['all'], excludeExtraneousValues: true });

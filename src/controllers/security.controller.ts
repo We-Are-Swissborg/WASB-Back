@@ -111,7 +111,7 @@ const passwordForget = async (req: Request, res: Response) => {
     try {
         const email = req.body.email;
         const user = await getUserByEmail(email);
-        const lang = req.params.lang;
+        const lang = req.params.lang as string;
 
         if(!user) throw new Error('Email is not valid');
 
@@ -136,7 +136,7 @@ const resetPassword = async (req: Request, res: Response) => {
 
     try {
         const newPassword = req.body.newPassword;
-        const slug = req.params.slug;
+        const slug = req.params.slug as string;
         const email: string | null = await cache.get(slug);
 
         if(!email) throw new Error('Reset password expired');
